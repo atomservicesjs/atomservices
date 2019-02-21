@@ -21,10 +21,19 @@ export const composeServiceContext = (
       Identifier.AggregateID(type),
     newEventID: () =>
       Identifier.EventID(type),
-    newQueryID: () =>
-      Identifier.QueryID(type),
-    publish: (event) =>
-      EventStream.publish(event, { scope, level: Configure.level(event.name) }),
+    publish: async (event) => {
+      if (event.type !== type) {
+        // Cannot publish a event from different type
+      }
+
+      const { version: currentVersion } = await EventStores.queryCurrentVersion(event.aggregateID, { type, scope });
+
+      if ((currentVersion + 1) !== event._version) {
+        // Concurrency Conflict
+      }
+
+      return EventStream.publish(event, { scope, level: Configure.level(event.name) });
+    },
     queryByID: (eventID) =>
       EventStores.queryByID(eventID, { type, scope }),
     queryCurrentVersion: (aggregateID) =>
