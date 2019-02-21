@@ -1,0 +1,60 @@
+import { Core, IEvent, IEventStream } from "atomservicescore";
+
+interface IStream {
+  [scope: string]: {
+    [type: string]: {
+      [name: string]: Array<{ process: any; }>;
+    };
+  };
+}
+
+export const createLocalEventStream = (ackListener?: (event: IEvent) => void): IEventStream =>
+  ((): IEventStream => {
+    const PublicStreams: IStream = {};
+    const ScopeStreams: IStream = {};
+    const RefStreams: {
+      [ref: string]: (result: any) => Promise<void>;
+    } = {};
+
+    return {
+      fromRef: (ref, listener) => RefStreams[ref] = listener,
+      publish: async (event, { scope, level }) => {
+        const { name, type } = event;
+
+        const Streams = level === "public" ? PublicStreams : ScopeStreams;
+
+        if (Streams[scope] && Streams[scope][type] && Streams[scope][type][name]) {
+          const ack = Core.createLocalAck(event, ackListener);
+          const subscribers = Streams[scope][type][name];
+
+          subscribers.forEach(({ process }) => process(event, ack));
+        }
+
+        return { success: true };
+      },
+      subscribe: (on, process) => {
+        const { name, type, scope, level } = on;
+        const Streams = level === "public" ? PublicStreams : ScopeStreams;
+
+        if (Streams[scope] === undefined) {
+          Streams[scope] = {};
+        }
+
+        if (Streams[scope][type] === undefined) {
+          Streams[scope][type] = {};
+        }
+
+        if (Streams[scope][type][name] === undefined) {
+          Streams[scope][type][name] = [];
+        }
+
+        Streams[scope][type][name].push({ process });
+      },
+      toRef: async (ref, result) => {
+        if (RefStreams[ref] !== undefined) {
+          await RefStreams[ref](result);
+          delete RefStreams[ref];
+        }
+      },
+    };
+  })();

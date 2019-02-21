@@ -1,0 +1,50 @@
+{
+  "name": "atomservices",
+  "version": "0.3.0-alpha.1",
+  "description": "Providing Library for MicroServices Implementing EventSourcing",
+  "main": "./lib/index.js",
+  "typings": "./typings/index.d.ts",
+  "scripts": {
+    "build": "npm run cleanup && npm run build-ts",
+    "build-es5": "npm run cleanup && npm run build-ts-es5",
+    "build-es6": "npm run cleanup && npm run build-ts-es6",
+    "test": "npm run cleanup && npm run test-ts",
+    "test-cvr": "npm run cleanup && npm run test-cvr-ts",
+    "test-ts": "npm run build-ts && npm run test-all",
+    "test-cvr-ts": "npm run build-ts && npm run test-all-cvr",
+    "build-ts": "npm run tslint && tsc",
+    "build-ts-es5": "npm run tslint && tsc -p _tsconfigs/es5.tsconfig.json",
+    "build-ts-es6": "npm run tslint && tsc -p _tsconfigs/es6.tsconfig.json",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "tslint-fix": "tslint -c tslint.json -p tsconfig.json --fix",
+    "cleanup": "node _scripts/cleanup",
+    "aftertests": "node _scripts/aftertests",
+    "test-all": "npm run test-mocha",
+    "test-all-cvr": "npm run test-mocha-cvr",
+    "test-mocha": "mocha lib --recursive",
+    "test-mocha-cvr": "nyc mocha lib --recursive",
+    "prepublishOnly": "npm i && npm run build && npm run aftertests"
+  },
+  "author": "Architecode Corporation",
+  "license": "MIT",
+  "repository": "git+https://github.com/atomservicesjs/atomservices",
+  "dependencies": {
+    "atomservicescore": "^0.3.0-alpha.1",
+    "clone": "^2.1.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/clone": "^0.1.30",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.9.4",
+    "@types/sinon": "^7.0.6",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "mock-require": "^3.0.3",
+    "nyc": "^13.3.0",
+    "shelljs": "^0.8.3",
+    "sinon": "^7.2.3",
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.3"
+  }
+}
