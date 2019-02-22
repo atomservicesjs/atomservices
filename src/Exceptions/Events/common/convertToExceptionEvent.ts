@@ -1,6 +1,6 @@
 import { IEvent } from "atomservicescore";
 
-export const convertToExceptionEvent = (eventName: string, event: IEvent, error: Error): IEvent => {
+export const convertToExceptionEvent = (eventName: string, event: IEvent, error: any): IEvent => {
   const { _createdAt, _createdBy, _id, _version, aggregateID, name, payloads, type } = event;
 
   return {
@@ -11,7 +11,11 @@ export const convertToExceptionEvent = (eventName: string, event: IEvent, error:
     aggregateID,
     name: `_${eventName}`,
     payloads: {
-      error,
+      error: {
+        code: error.code,
+        message: error.message,
+        name: error.name,
+      },
       event: {
         _createdAt,
         _version,

@@ -1,5 +1,5 @@
-export { ConflictedConcurrentEvent } from "./ConflictedConcurrentEvent";
-export { EventStoringErrorEvent } from "./EventStoringErrorEvent";
-export { PublishUnmatchedEventTypeEvent } from "./PublishUnmatchedEventTypeEvent";
-export { QueryCurrentVersionErrorEvent } from "./QueryCurrentVersionErrorEvent";
-export { UnhandledErrorEvent } from "./UnhandledErrorEvent";
+export { EventStoringError } from "./EventStoringError";
+export { EventVersionConflictedConcurrent } from "./EventVersionConflictedConcurrent";
+export { PublishUnmatchedEventType } from "./PublishUnmatchedEventType";
+export { QueryCurrentVersionError } from "./QueryCurrentVersionError";
+export { UnhandledError } from "./UnhandledError";
