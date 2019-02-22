@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import { reducer } from "./reducer";
+import { reducize } from "./reducize";
 
-describe("reducer.ts tests", () => {
-  describe("#reducer()", () => {
+describe("reducize.ts tests", () => {
+  describe("#reducize()", () => {
     it("expect to reduce a new object as result", () => {
       // arranges
       const obj: any = {
@@ -12,7 +12,7 @@ describe("reducer.ts tests", () => {
       };
 
       // acts
-      const result = reducer(obj);
+      const result = reducize(obj);
 
       // asserts
       expect(result).not.to.equal(obj);
@@ -32,7 +32,7 @@ describe("reducer.ts tests", () => {
       });
 
       // acts
-      const result = reducer(obj);
+      const result = reducize(obj);
 
       // asserts
       expect(JSON.stringify(result)).to.equal(expected);
@@ -57,7 +57,7 @@ describe("reducer.ts tests", () => {
       });
 
       // acts
-      const result = reducer(obj);
+      const result = reducize(obj);
 
       // asserts
       expect(JSON.stringify(result)).to.equal(expected);
@@ -82,7 +82,7 @@ describe("reducer.ts tests", () => {
       });
 
       // acts
-      const result = reducer(obj);
+      const result = reducize(obj);
 
       // asserts
       expect(JSON.stringify(result)).to.equal(expected);

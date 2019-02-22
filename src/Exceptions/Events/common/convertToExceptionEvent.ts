@@ -1,7 +1,7 @@
 import { IEvent } from "atomservicescore";
 
-export const createQueryVersionErrorEvent = (originalEvent: IEvent, error: Error): IEvent => {
-  const { _createdAt, _createdBy, _id, _version, aggregateID, name, payloads, type } = originalEvent;
+export const convertToExceptionEvent = (eventName: string, event: IEvent, error: Error): IEvent => {
+  const { _createdAt, _createdBy, _id, _version, aggregateID, name, payloads, type } = event;
 
   return {
     _createdAt: new Date(),
@@ -9,10 +9,10 @@ export const createQueryVersionErrorEvent = (originalEvent: IEvent, error: Error
     _id,
     _version,
     aggregateID,
-    name: "_QueryVersionErrorEvent",
+    name: `_${eventName}`,
     payloads: {
       error,
-      originalEvent: {
+      event: {
         _createdAt,
         _version,
         name,
@@ -20,6 +20,6 @@ export const createQueryVersionErrorEvent = (originalEvent: IEvent, error: Error
         type,
       },
     },
-    type,
+    type: "exceptions",
   };
 };

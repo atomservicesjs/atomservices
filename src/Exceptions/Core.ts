@@ -11,23 +11,10 @@ export const CombineDuplicatedEventHandlersException = (type: string, name: stri
 export const CombineDuplicatedQueryHandlersException = (type: string, name: string) =>
   createException(Constants["000003_CombineDuplicatedQueryHandlers"], `{ type: ${type}, name: ${name} }`);
 
-export const ResolvedUndefinedEventHandlerException = (type: string, name: string) =>
-  createException(Constants["000004_ResolvedUndefinedEventHandler"], `{ type: ${type}, name: ${name} }]`);
-
-export const ConflictedConcurrentEventException = (currentVersion: number, event: IEvent) =>
+export const QueryCurrentVersionErrorException = (error: Error, type: string, aggregateID: any) =>
   createException(
-    Constants["000101_ConflictedConcurrentEvent"],
-    `try to apply [event: { version: ${event._version} } to { currentVersion: ${currentVersion} }]`,
-    {
-      currentVersion,
-      event,
-    },
-  );
-
-export const QueryVersionErrorException = (error: Error, type: string, aggregateID: any) =>
-  createException(
-    Constants["000102_QueryVersionError"],
-    `error occuring during querying an event version`,
+    Constants["000010_QueryCurrentVersionError"],
+    `error occured during querying a current version`,
     {
       innerError: error,
       query: {
@@ -37,12 +24,26 @@ export const QueryVersionErrorException = (error: Error, type: string, aggregate
     },
   );
 
-export const StoringEventProcessErrorException = (error: Error, event: IEvent) =>
+export const EventStoringErrorException = (error: Error, event: IEvent) =>
   createException(
-    Constants["000103_StoringEventProcessError"],
-    `error occuring during storing an event process`,
+    Constants["000011_EventStoringError"],
+    `error occured during event storing`,
     {
       event,
       innerError: error,
+    },
+  );
+
+export const PublishUnmatchedEventTypeException = (event: IEvent, service: string) =>
+  createException(Constants["000020_PublishUnmatchedEventType"],
+    `publish unmatched event: [{ type: ${event.type}, name: ${event.name} }] in [{ service: ${service} }]`);
+
+export const ConflictedConcurrentEventException = (currentVersion: number, event: IEvent) =>
+  createException(
+    Constants["000100_ConflictedConcurrentEvent"],
+    `apply a conflicted event: [{ version: ${event._version} }] to [{ currentVersion: ${currentVersion} }]`,
+    {
+      currentVersion,
+      event,
     },
   );

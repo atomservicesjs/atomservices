@@ -1,5 +1,6 @@
 import { IQuery, IQueryHandler, IServiceContext, Services, StateQueryStreamListener } from "atomservicescore";
 import { IQueryHandlers } from "../../Queries/IQueryHandlers";
+import { signQuery } from "../../Queries/signQuery";
 import { QueryResult } from "../QueryResult";
 import { StateQueryResult } from "./StateQueryResult";
 
@@ -38,11 +39,12 @@ export const createQuerier = (queryHandlers: IQueryHandlers, context: IServiceCo
 
         return QueryResult.invalid(invalidAttributes);
       } else {
-        const queryID = context.newQueryID();
-        context.fromRef(queryID, listener);
-        querying(handler, query, context, queryID);
+        const scope = context.scope();
+        const ref = signQuery.sign(query, type, scope);
+        context.fromRef(ref, listener);
+        querying(handler, query, context, ref);
 
-        return QueryResult.accept(queryID);
+        return QueryResult.accept(ref);
       }
     }
   };

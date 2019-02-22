@@ -1,11 +1,11 @@
-export const reducer = (json: object): any => {
-  const keys = Object.keys(json).sort();
+export const reducize = (obj: object): object => {
+  const keys = Object.keys(obj).sort();
 
   return keys.reduce((result, key) => {
-    const value = json[key];
+    const value = obj[key];
 
     if (typeof value === "object" && !Array.isArray(value)) {
-      result[key] = reducer(value);
+      result[key] = reducize(value);
     } else {
       result[key] = value;
     }
@@ -13,3 +13,5 @@ export const reducer = (json: object): any => {
     return result;
   }, {});
 };
+
+Object.freeze(reducize);

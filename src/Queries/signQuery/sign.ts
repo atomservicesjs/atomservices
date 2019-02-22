@@ -1,21 +1,9 @@
 import { IQuery } from "atomservicescore";
-import { hashify } from "./hashify";
-import { reducer } from "./reducer";
+import { tokenize } from "./tokenize";
 
-export interface IQuerySigned extends IQuery {
-  scope: string;
-  type: string;
-  _signature: string;
-}
+export const sign = (query: IQuery, type: string, scope: string) => ({
+  query,
+  token: tokenize(query, type, scope),
+});
 
-export const sign = (query: any, type: string, scope: string): IQuerySigned => {
-  const combined: any = query;
-  combined.scope = scope;
-  combined.type = type;
-
-  const reduced = reducer(combined);
-  const stringify = JSON.stringify(reduced);
-  reduced._signature = hashify(stringify);
-
-  return reduced;
-};
+Object.freeze(sign);

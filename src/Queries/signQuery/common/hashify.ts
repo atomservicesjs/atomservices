@@ -6,3 +6,5 @@ export const hashify = (val: string) => {
 
   return hash.digest("base64");
 };
+
+Object.freeze(hashify);

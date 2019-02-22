@@ -48,3 +48,5 @@ export const createQueryable = (handlers: IQueryHandlers): IQueryable => ({
     }
   },
 });
+
+Object.freeze(createQueryable);
