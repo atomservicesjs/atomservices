@@ -9,11 +9,10 @@ describe("composeServiceContext.ts tests", () => {
     queryEventsByAggregateID: sinon.spy(),
   };
   const EventStream = {
-    fromRef: sinon.spy(),
+    directTo: sinon.spy(),
+    listenTo: sinon.spy(),
     publish: sinon.spy(),
-    react: sinon.spy(),
     subscribe: sinon.spy(),
-    toRef: sinon.spy(),
   };
   const Identifier = {
     AggregateID: sinon.spy(),
@@ -26,10 +25,10 @@ describe("composeServiceContext.ts tests", () => {
     EventStores.queryCurrentVersion.resetHistory();
     EventStores.queryEventsByAggregateID.resetHistory();
 
-    EventStream.fromRef.resetHistory();
+    EventStream.directTo.resetHistory();
+    EventStream.listenTo.resetHistory();
     EventStream.publish.resetHistory();
     EventStream.subscribe.resetHistory();
-    EventStream.toRef.resetHistory();
 
     Identifier.AggregateID.resetHistory();
     Identifier.EventID.resetHistory();
@@ -188,56 +187,14 @@ describe("composeServiceContext.ts tests", () => {
       // acts
 
       // asserts
-      expect(EventStream.fromRef.callCount).to.equal(0);
+      expect(EventStream.directTo.callCount).to.equal(0);
+      expect(EventStream.listenTo.callCount).to.equal(0);
       expect(EventStream.publish.callCount).to.equal(0);
       expect(EventStream.subscribe.callCount).to.equal(0);
-      expect(EventStream.toRef.callCount).to.equal(0);
     });
 
-    describe("#ServiceContext.fromRef()", () => {
-      it("expect to call EventStream.fromRef()", () => {
-        // arranges
-        const composer = composeServiceContext(EventStores, EventStream, Identifier);
-        const context = composer("type", "scope");
-        const ref = "ref";
-        const listener: any = {};
-
-        // acts
-        context.fromRef(ref, listener);
-
-        // asserts
-        expect(EventStream.fromRef.callCount).to.equal(1);
-        expect(EventStream.publish.callCount).to.equal(0);
-        expect(EventStream.subscribe.callCount).to.equal(0);
-        expect(EventStream.toRef.callCount).to.equal(0);
-        expect(EventStream.fromRef.calledWith(ref, listener)).to.equal(true);
-      });
-    });
-
-    describe("#ServiceContext.subscribe()", () => {
-      it("expect to call EventStream.subscribe()", () => {
-        // arranges
-        const composer = composeServiceContext(EventStores, EventStream, Identifier);
-        const context = composer("type", "scope");
-        const name = "name";
-        const on = { name: "name", type: "type", scope: "scope", level: "public" };
-        const to = { type: "type", scope: "scope" };
-        const process: any = {};
-
-        // acts
-        context.subscribe(name, process);
-
-        // asserts
-        expect(EventStream.fromRef.callCount).to.equal(0);
-        expect(EventStream.publish.callCount).to.equal(0);
-        expect(EventStream.subscribe.callCount).to.equal(1);
-        expect(EventStream.toRef.callCount).to.equal(0);
-        expect(EventStream.subscribe.calledWith(on, to, process)).to.equal(true);
-      });
-    });
-
-    describe("#ServiceContext.toRef()", () => {
-      it("expect to call EventStream.toRef()", () => {
+    describe("#ServiceContext.directTo()", () => {
+      it("expect to call EventStream.directTo()", () => {
         // arranges
         const composer = composeServiceContext(EventStores, EventStream, Identifier);
         const context = composer("type", "scope");
@@ -245,14 +202,98 @@ describe("composeServiceContext.ts tests", () => {
         const result: any = {};
 
         // acts
-        context.toRef(ref, result);
+        context.directTo(ref, result);
 
         // asserts
-        expect(EventStream.fromRef.callCount).to.equal(0);
+        expect(EventStream.directTo.callCount).to.equal(1);
+        expect(EventStream.listenTo.callCount).to.equal(0);
         expect(EventStream.publish.callCount).to.equal(0);
         expect(EventStream.subscribe.callCount).to.equal(0);
-        expect(EventStream.toRef.callCount).to.equal(1);
-        expect(EventStream.toRef.calledWith(ref, result)).to.equal(true);
+        expect(EventStream.directTo.calledWith(ref, result)).to.equal(true);
+      });
+    });
+
+    describe("#ServiceContext.listenTo()", () => {
+      it("expect to call EventStream.listenTo()", () => {
+        // arranges
+        const composer = composeServiceContext(EventStores, EventStream, Identifier);
+        const context = composer("type", "scope");
+        const ref = "ref";
+        const listener: any = {};
+
+        // acts
+        context.listenTo(ref, listener);
+
+        // asserts
+        expect(EventStream.directTo.callCount).to.equal(0);
+        expect(EventStream.listenTo.callCount).to.equal(1);
+        expect(EventStream.publish.callCount).to.equal(0);
+        expect(EventStream.subscribe.callCount).to.equal(0);
+        expect(EventStream.listenTo.calledWith(ref, listener)).to.equal(true);
+      });
+    });
+
+    describe("#ServiceContext.registerHandler()", () => {
+      it("expect to call EventStream.subscribe()", () => {
+        // arranges
+        const composer = composeServiceContext(EventStores, EventStream, Identifier);
+        const context = composer("type", "scope");
+        const handler: any = { name: "name" };
+        const on = { name: "name", type: "type", scope: "scope", level: "public" };
+        const to = { type: "type", scope: "scope" };
+        const process: any = {};
+
+        // acts
+        context.registerHandler(handler, process);
+
+        // asserts
+        expect(EventStream.directTo.callCount).to.equal(0);
+        expect(EventStream.listenTo.callCount).to.equal(0);
+        expect(EventStream.publish.callCount).to.equal(0);
+        expect(EventStream.subscribe.callCount).to.equal(1);
+        expect(EventStream.subscribe.calledWith(on, to, process)).to.equal(true);
+      });
+    });
+
+    describe("#ServiceContext.registerReaction()", () => {
+      it("expect to call EventStream.subscribe() with same type and scope reaction", () => {
+        // arranges
+        const composer = composeServiceContext(EventStores, EventStream, Identifier);
+        const context = composer("type", "scope");
+        const reaction: any = { name: "name", type: "type", scope: "scope" };
+        const on = { name: "name", type: "type", scope: "scope", level: "public" };
+        const to = { type: "type", scope: "scope" };
+        const process: any = {};
+
+        // acts
+        context.registerReaction(reaction, process);
+
+        // asserts
+        expect(EventStream.directTo.callCount).to.equal(0);
+        expect(EventStream.listenTo.callCount).to.equal(0);
+        expect(EventStream.publish.callCount).to.equal(0);
+        expect(EventStream.subscribe.callCount).to.equal(1);
+        expect(EventStream.subscribe.calledWith(on, to, process)).to.equal(true);
+      });
+
+      it("expect to call EventStream.subscribe() with different type and scope reaction", () => {
+        // arranges
+        const composer = composeServiceContext(EventStores, EventStream, Identifier);
+        const context = composer("type", "scope");
+        const reaction: any = { name: "name", type: "other.type", scope: "other.scope" };
+        const on = { name: "name", type: "other.type", scope: "other.scope", level: "public" };
+        const to = { type: "type", scope: "scope" };
+        const process: any = {};
+
+        // acts
+        context.registerReaction(reaction, process);
+
+        // asserts
+        expect(EventStream.directTo.callCount).to.equal(0);
+        expect(EventStream.listenTo.callCount).to.equal(0);
+        expect(EventStream.publish.callCount).to.equal(0);
+        expect(EventStream.subscribe.callCount).to.equal(1);
+        expect(EventStream.subscribe.calledWith(on, to, process)).to.equal(true);
       });
     });
   });
@@ -304,7 +345,7 @@ describe("composeServiceContext.ts tests", () => {
     });
   });
 
-  describe("#ServiceContext.publish()", () => {
+  describe("#ServiceContext.dispatch()", () => {
     it("expect to call storeEvent() and publish()", async () => {
       // arranges
       const stores: any = {
@@ -326,7 +367,7 @@ describe("composeServiceContext.ts tests", () => {
       };
 
       // acts
-      await context.publish(event);
+      await context.dispatch(event);
 
       // asserts
       expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);
@@ -357,7 +398,7 @@ describe("composeServiceContext.ts tests", () => {
       };
 
       // acts
-      await context.publish(event);
+      await context.dispatch(event);
 
       // asserts
       expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);
@@ -389,7 +430,7 @@ describe("composeServiceContext.ts tests", () => {
       };
 
       // acts
-      await context.publish(event);
+      await context.dispatch(event);
 
       // asserts
       expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);
@@ -419,7 +460,7 @@ describe("composeServiceContext.ts tests", () => {
       };
 
       // acts
-      await context.publish(event);
+      await context.dispatch(event);
 
       // asserts
       expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);

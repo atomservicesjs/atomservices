@@ -25,15 +25,9 @@ export const composeServiceContext = (
   const Configure = ServiceConfigure(configs = {});
 
   return {
-    fromRef: (ref, listener) =>
-      EventStream.fromRef(ref, listener),
-    level: (name) =>
-      Configure.level(name),
-    newAggregateID: () =>
-      Identifier.AggregateID(type),
-    newEventID: () =>
-      Identifier.EventID(type),
-    publish: async (event) => {
+    directTo: (ref, data) =>
+      EventStream.directTo(ref, data),
+    dispatch: async (event) => {
       let EventException: { Exception: ExtendException; Event: IEvent; } | undefined;
 
       try {
@@ -67,39 +61,45 @@ export const composeServiceContext = (
         throw EventPublishingErrorException(error, event, scope);
       }
     },
+    level: (name) =>
+      Configure.level(name),
+    listenTo: (ref, listener) =>
+      EventStream.listenTo(ref, listener),
+    newAggregateID: () =>
+      Identifier.AggregateID(type),
+    newEventID: () =>
+      Identifier.EventID(type),
     queryByID: (eventID) =>
       EventStores.queryByID(eventID, { type, scope }),
     queryCurrentVersion: (aggregateID) =>
       EventStores.queryCurrentVersion(aggregateID, { type, scope }),
     queryEventsByAggregateID: (aggregateID, options) =>
       EventStores.queryEventsByAggregateID(aggregateID, { type, scope }, options),
-    react: (on, reactor) => {
-      if (on.scope === scope && on.type === type) {
-        const name = on.name;
-
-        return EventStream.subscribe(
-          { name, type, scope, level: Configure.level(name) },
-          { type, scope },
-          reactor,
-        );
-      } else {
-        return EventStream.subscribe(
-          { name: on.name, type: on.type, scope: on.scope, level: "public" },
-          { type, scope },
-          reactor,
-        );
-      }
-    },
-    scope: () =>
-      scope,
-    subscribe: (name, process) =>
+    registerHandler: ({ name }, process) =>
       EventStream.subscribe(
         { name, type, scope, level: Configure.level(name) },
         { type, scope },
         process,
       ),
-    toRef: (ref, result) =>
-      EventStream.toRef(ref, result),
+    registerReaction: (reaction, process) => {
+      const { name } = reaction;
+
+      if (reaction.scope === scope && reaction.type === type) {
+        return EventStream.subscribe(
+          { name, type, scope, level: Configure.level(name) },
+          { type, scope },
+          process,
+        );
+      } else {
+        return EventStream.subscribe(
+          { name, type: reaction.type, scope: reaction.scope, level: "public" },
+          { type, scope },
+          process,
+        );
+      }
+    },
+    scope: () =>
+      scope,
     type: () =>
       type,
   };
