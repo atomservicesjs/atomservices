@@ -1,40 +1,17 @@
 import { IEvent, IEventStores, IEventStream, IIdentifier, IServiceConfigs, IServiceContext } from "atomservicescore";
 import {
-  ConflictedConcurrentEventException,
+  CurrentVersionQueryingErrorException,
+  EventPublishingErrorException,
   EventStoringErrorException,
-  PublishUnmatchedEventTypeException,
-  QueryCurrentVersionErrorException,
+  EventVersionConflictedConcurrentException,
 } from "../../Exceptions/Core";
 import {
-  ConflictedConcurrentEvent,
-  EventStoringErrorEvent,
-  PublishUnmatchedEventTypeEvent,
-  QueryCurrentVersionErrorEvent,
-  UnhandledErrorEvent,
+  CurrentVersionQueryingError,
+  EventStoringError,
+  EventVersionConflictedConcurrent,
 } from "../../Exceptions/Events";
+import { ExtendException } from "../../Exceptions/ExtendException";
 import { ServiceConfigure } from "../../Services/ServiceConfigure";
-
-export const storeConcurrentEvent = async (event: IEvent, scope: string, stores: IEventStores) => {
-  const { aggregateID, type, _version: version } = event;
-  let currentVersion;
-
-  try {
-    const qr = await stores.queryCurrentVersion(aggregateID, { type, scope });
-    currentVersion = qr.version;
-  } catch (error) {
-    throw QueryCurrentVersionErrorException(error, type, aggregateID);
-  }
-
-  if (version === (currentVersion + 1)) {
-    try {
-      return stores.storeEvent(event, scope);
-    } catch (error) {
-      throw EventStoringErrorException(error, event);
-    }
-  } else {
-    throw ConflictedConcurrentEventException(currentVersion, event);
-  }
-};
 
 export const composeServiceContext = (
   stores: IEventStores,
@@ -57,38 +34,37 @@ export const composeServiceContext = (
     newEventID: () =>
       Identifier.EventID(type),
     publish: async (event) => {
-      let ErrorEvent;
+      let EventException: { Exception: ExtendException; Event: IEvent; } | undefined;
 
       try {
-        if (event.type !== type) {
-          const exception = PublishUnmatchedEventTypeException(event, type);
-          event = PublishUnmatchedEventTypeEvent(event, exception);
-        }
+        const { version: currentVersion } = await EventStores.queryCurrentVersion(event.aggregateID, { type, scope });
 
-        await storeConcurrentEvent(event, scope, EventStores);
+        if (event._version !== (currentVersion + 1)) {
+          const Exception = EventVersionConflictedConcurrentException(event, currentVersion, scope);
+          EventException = { Exception, Event: EventVersionConflictedConcurrent(event, Exception, currentVersion) };
+        }
       } catch (error) {
-        let storableErrorEvent;
+        const Exception = CurrentVersionQueryingErrorException(error, event.aggregateID, type, scope);
+        EventException = { Exception, Event: CurrentVersionQueryingError(event, Exception) };
+      }
 
-        if (error.code === "000010") {
-          ErrorEvent = QueryCurrentVersionErrorEvent(event, error);
-        } else if (error.code === "000011") {
-          ErrorEvent = EventStoringErrorEvent(event, error);
-        } else if (error.code === "000100") {
-          ErrorEvent = ConflictedConcurrentEvent(event, error, error.currentVersion);
-          storableErrorEvent = ErrorEvent;
-        } else {
-          ErrorEvent = UnhandledErrorEvent(event, error);
-        }
-
-        if (storableErrorEvent !== undefined) {
-          await storeConcurrentEvent(storableErrorEvent, scope, EventStores);
+      if (EventException === undefined) {
+        try {
+          await EventStores.storeEvent(event, scope);
+        } catch (error) {
+          const Exception = EventStoringErrorException(error, event, scope);
+          EventException = { Exception, Event: EventStoringError(event, Exception) };
         }
       }
 
-      if (ErrorEvent === undefined) {
-        return EventStream.publish(event, { scope, level: Configure.level(name) });
-      } else {
-        return EventStream.publish(ErrorEvent, { scope, level: Configure.level(name) });
+      try {
+        if (EventException === undefined) {
+          return EventStream.publish(event, { scope, level: Configure.level(event.name) });
+        } else {
+          return EventStream.publish(EventException.Event, { scope, level: Configure.level(event.name) });
+        }
+      } catch (error) {
+        throw EventPublishingErrorException(error, event, scope);
       }
     },
     queryByID: (eventID) =>

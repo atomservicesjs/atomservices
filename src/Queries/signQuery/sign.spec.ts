@@ -7,26 +7,26 @@ describe("sign.ts tests", () => {
       // arranges
       const type = "type";
       const scope = "scope";
-      const obj1 = {
+      const obj1: any = {
         key: "value",
       };
-      const obj2 = {
+      const obj2: any = {
         key: "value",
       };
 
       // acts
-      const sign1 = sign(obj1, type, scope);
-      const sign2 = sign(obj2, type, scope);
+      const { token: token1 } = sign(obj1, type, scope);
+      const { token: token2 } = sign(obj2, type, scope);
 
       // asserts
-      expect(sign1).to.deep.equal(sign2);
+      expect(token1).to.deep.equal(token2);
     });
 
     it("expect to sign a simple JSON object, #2", () => {
       // arranges
       const type = "type";
       const scope = "scope";
-      const obj1 = {
+      const obj1: any = {
         key1: "value1",
         key2: "value2",
       };
@@ -35,11 +35,11 @@ describe("sign.ts tests", () => {
       obj2.key1 = "value1";
 
       // acts
-      const sign1 = sign(obj1, type, scope);
-      const sign2 = sign(obj2, type, scope);
+      const { token: token1 } = sign(obj1, type, scope);
+      const { token: token2 } = sign(obj2, type, scope);
 
       // asserts
-      expect(sign1).to.deep.equal(sign2);
+      expect(token1).to.deep.equal(token2);
     });
 
     it("expect to sign a nested JSON", () => {
@@ -60,13 +60,13 @@ describe("sign.ts tests", () => {
           c: "c",
           d: ["d1", "d2"],
         },
-      }, type, scope);
+      } as any, type, scope);
 
       // acts
       const result = sign(obj, type, scope);
 
       // asserts
-      expect(result).to.deep.equal(expected);
+      expect(result.token).to.deep.equal(expected.token);
     });
   });
 });

@@ -214,26 +214,6 @@ describe("composeServiceContext.ts tests", () => {
       });
     });
 
-    describe("#ServiceContext.publish()", () => {
-      it("expect to call EventStream.publish()", () => {
-        // arranges
-        const composer = composeServiceContext(EventStores, EventStream, Identifier);
-        const context = composer("type", "scope");
-        const options = { scope: "scope", level: "public" };
-        const event: any = {};
-
-        // acts
-        context.publish(event);
-
-        // asserts
-        expect(EventStream.fromRef.callCount).to.equal(0);
-        expect(EventStream.publish.callCount).to.equal(1);
-        expect(EventStream.subscribe.callCount).to.equal(0);
-        expect(EventStream.toRef.callCount).to.equal(0);
-        expect(EventStream.publish.calledWith(event, options)).to.equal(true);
-      });
-    });
-
     describe("#ServiceContext.subscribe()", () => {
       it("expect to call EventStream.subscribe()", () => {
         // arranges
@@ -322,22 +302,130 @@ describe("composeServiceContext.ts tests", () => {
         expect(Identifier.EventID.calledWith("type")).to.equal(true);
       });
     });
+  });
 
-    describe("#ServiceContext.newQueryID()", () => {
-      it("expect to call Identifier.QueryID()", () => {
-        // arranges
-        const composer = composeServiceContext(EventStores, EventStream, Identifier);
-        const context = composer("type", "scope");
+  describe("#ServiceContext.publish()", () => {
+    it("expect to call storeEvent() and publish()", async () => {
+      // arranges
+      const stores: any = {
+        queryCurrentVersion: sinon.stub().callsFake(() => Promise.resolve({ version: 0 })),
+        storeEvent: sinon.spy(),
+      };
+      const stream: any = {
+        publish: sinon.spy(),
+      };
+      const scope = "scope";
+      const type = "type";
+      const composer = composeServiceContext(stores, stream, Identifier);
+      const context = composer(type, scope);
+      const event: any = {
+        _version: 1,
+        aggregateID: "aggregateID",
+        name: "test",
+        type,
+      };
 
-        // acts
-        context.newQueryID();
+      // acts
+      await context.publish(event);
 
-        // asserts
-        expect(Identifier.AggregateID.callCount).to.equal(0);
-        expect(Identifier.EventID.callCount).to.equal(0);
-        expect(Identifier.QueryID.callCount).to.equal(1);
-        expect(Identifier.QueryID.calledWith("type")).to.equal(true);
-      });
+      // asserts
+      expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);
+      expect(stores.storeEvent.calledWith(event, scope)).to.equal(true);
+      expect(stream.publish.calledWith(event, { scope, level: "public" })).to.equal(true);
+    });
+
+    it("expect to handle QueryCurrentVersionErrorException as error occured in queryCurrentVersion()", async () => {
+      // arranges
+      const stores: any = {
+        queryCurrentVersion: sinon.stub().callsFake(() => {
+          throw new Error("Error inside queryCurrentVersion()");
+        }),
+        storeEvent: sinon.spy(),
+      };
+      const stream: any = {
+        publish: sinon.spy(),
+      };
+      const scope = "scope";
+      const type = "type";
+      const composer = composeServiceContext(stores, stream, Identifier);
+      const context = composer(type, scope);
+      const event: any = {
+        _version: 1,
+        aggregateID: "aggregateID",
+        name: "test",
+        type,
+      };
+
+      // acts
+      await context.publish(event);
+
+      // asserts
+      expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);
+      expect(stores.storeEvent.callCount).to.equal(0);
+      expect(stream.publish.callCount).to.equal(1);
+      expect(stream.publish.getCall(0).args[0].name).to.equal("_QueryCurrentVersionErrorEvent");
+    });
+
+    it("expect to handle EventStoringErrorException as error occured in storeEvent()", async () => {
+      // arranges
+      const stores: any = {
+        queryCurrentVersion: sinon.stub().callsFake(() => Promise.resolve({ version: 0 })),
+        storeEvent: sinon.stub().callsFake(() => {
+          throw new Error("Error inside storeEvent()");
+        }),
+      };
+      const stream: any = {
+        publish: sinon.spy(),
+      };
+      const scope = "scope";
+      const type = "type";
+      const composer = composeServiceContext(stores, stream, Identifier);
+      const context = composer(type, scope);
+      const event: any = {
+        _version: 1,
+        aggregateID: "aggregateID",
+        name: "test",
+        type,
+      };
+
+      // acts
+      await context.publish(event);
+
+      // asserts
+      expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);
+      expect(stores.storeEvent.callCount).to.equal(1);
+      expect(stream.publish.callCount).to.equal(1);
+      expect(stream.publish.getCall(0).args[0].name).to.equal("_EventStoringErrorEvent");
+    });
+
+    it("expect to handle ConflictedConcurrentEventException", async () => {
+      // arranges
+      const stores: any = {
+        queryCurrentVersion: sinon.stub().callsFake(() => Promise.resolve({ version: 1 })),
+        storeEvent: sinon.spy(),
+      };
+      const stream: any = {
+        publish: sinon.spy(),
+      };
+      const scope = "scope";
+      const type = "type";
+      const composer = composeServiceContext(stores, stream, Identifier);
+      const context = composer(type, scope);
+      const event: any = {
+        _version: 1,
+        aggregateID: "aggregateID",
+        name: "test",
+        type,
+      };
+
+      // acts
+      await context.publish(event);
+
+      // asserts
+      expect(stores.queryCurrentVersion.calledWith("aggregateID", { type, scope })).to.equal(true);
+      expect(stores.storeEvent.callCount).to.equal(1);
+      expect(stream.publish.callCount).to.equal(1);
+      expect(stream.publish.getCall(0).args[0].name).to.equal("_ConflictedConcurrentEvent");
     });
   });
 });

@@ -46,7 +46,6 @@ describe("createEvent.ts tests", () => {
         key: "value",
       };
       const version = 1;
-      const createdAt: Date = new Date();
       const createdBy: any = {
         id: 10101,
       };
@@ -67,7 +66,7 @@ describe("createEvent.ts tests", () => {
           return obj;
         },
       );
-      const expected = createEvent(id, type, name, aggregateID, payloads, version, createdAt, createdBy);
+      const expected = createEvent(id, type, name, aggregateID, payloads, version, event._createdAt, createdBy);
 
       // asserts
       expect(event).to.deep.equal(expected);
