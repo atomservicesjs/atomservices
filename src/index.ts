@@ -32,6 +32,7 @@ export {
   INotifiable,
   IQuery,
   IQueryable,
+  IQueryableResult,
   IQueryHandler,
   IReaction,
   IService,
@@ -42,7 +43,6 @@ export {
   IServiceIdentifier,
   IStateBase,
   IStateQueryResult,
-  IStateQueryStream,
 } from "atomservicescore";
 
 export { Exceptions } from "./Exceptions";

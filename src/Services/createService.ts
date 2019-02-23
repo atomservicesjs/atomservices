@@ -43,8 +43,8 @@ export const createService = <State extends IStateBase>(
       const querier = createQuerier(QueryHandlers, ServiceContext);
       const reactor = createReactor(Reactions, ServiceContext);
 
-      EventHandlers.forEach((handler) => ServiceContext.subscribe(handler.name, process));
-      Reactions.forEach((reaction) => ServiceContext.react(reaction, reactor));
+      EventHandlers.forEach((handler) => ServiceContext.registerHandler(handler, process));
+      Reactions.forEach((reaction) => ServiceContext.registerReaction(reaction, reactor));
 
       const service: IService = {
         configs: () => Configs,

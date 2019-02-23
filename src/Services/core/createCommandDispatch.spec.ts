@@ -21,8 +21,7 @@ describe("createDispatchCommand.ts tests", () => {
 
   describe("#dispatchCommand()", () => {
     const Context: any = {
-      fromRef: sinon.spy(),
-      publish: sinon.spy(),
+      dispatch: sinon.spy(),
     };
     const event: any = { _id: 1 };
     const transform: any = sinon.stub().callsFake(() => event);
@@ -51,7 +50,7 @@ describe("createDispatchCommand.ts tests", () => {
     const dispatch = createCommandDispatch(Handlers, Context);
 
     afterEach(() => {
-      Context.publish.resetHistory();
+      Context.dispatch.resetHistory();
     });
 
     it("expect to get the result as dispatching unhandled command", () => {
@@ -71,7 +70,7 @@ describe("createDispatchCommand.ts tests", () => {
 
       // asserts
       expect(result).to.deep.equal(expected);
-      expect(Context.publish.callCount).to.equal(0);
+      expect(Context.dispatch.callCount).to.equal(0);
     });
 
     it("expect to get the result as dispatching invalid command", () => {
@@ -95,7 +94,7 @@ describe("createDispatchCommand.ts tests", () => {
 
       // asserts
       expect(result).to.deep.equal(expected);
-      expect(Context.publish.callCount).to.equal(0);
+      expect(Context.dispatch.callCount).to.equal(0);
     });
 
     it("expect to get the result as dispatching valid command", () => {
@@ -117,7 +116,7 @@ describe("createDispatchCommand.ts tests", () => {
 
       // asserts
       expect(result).to.deep.equal(expected);
-      expect(Context.publish.callCount).to.equal(1);
+      expect(Context.dispatch.callCount).to.equal(1);
     });
   });
 });

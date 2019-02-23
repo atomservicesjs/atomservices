@@ -21,13 +21,15 @@ export const composeServiceContext = (
   EventStores,
   EventStream,
   Identifier,
+  Configs,
 ): IServiceContext => {
-  const Configure = ServiceConfigure(configs = {});
+  const Configure = ServiceConfigure(Configs || {});
 
   return {
     directTo: (ref, data) =>
       EventStream.directTo(ref, data),
     dispatch: async (event) => {
+      let criticalException = false;
       let EventException: { Exception: ExtendException; Event: IEvent; } | undefined;
 
       try {
@@ -40,22 +42,30 @@ export const composeServiceContext = (
       } catch (error) {
         const Exception = CurrentVersionQueryingErrorException(error, event.aggregateID, type, scope);
         EventException = { Exception, Event: CurrentVersionQueryingError(event, Exception) };
-      }
-
-      if (EventException === undefined) {
-        try {
-          await EventStores.storeEvent(event, scope);
-        } catch (error) {
-          const Exception = EventStoringErrorException(error, event, scope);
-          EventException = { Exception, Event: EventStoringError(event, Exception) };
-        }
+        criticalException = true;
       }
 
       try {
         if (EventException === undefined) {
-          return EventStream.publish(event, { scope, level: Configure.level(event.name) });
+          await EventStores.storeEvent(event, scope);
         } else {
-          return EventStream.publish(EventException.Event, { scope, level: Configure.level(event.name) });
+          await EventStores.storeEvent(EventException.Event, scope);
+        }
+      } catch (error) {
+        const Exception = EventStoringErrorException(error, event, scope);
+        EventException = { Exception, Event: EventStoringError(event, Exception) };
+        criticalException = true;
+      }
+
+      try {
+        if (EventException === undefined) {
+          await EventStream.publish(event, { scope, level: Configure.level(event.name) });
+        } else {
+          await EventStream.publish(EventException.Event, { scope, level: Configure.level(event.name) });
+
+          if (criticalException) {
+            throw EventException.Exception;
+          }
         }
       } catch (error) {
         throw EventPublishingErrorException(error, event, scope);
@@ -103,6 +113,6 @@ export const composeServiceContext = (
     type: () =>
       type,
   };
-})(stores, stream, identifier);
+})(stores, stream, identifier, configs);
 
 Object.freeze(composeServiceContext);

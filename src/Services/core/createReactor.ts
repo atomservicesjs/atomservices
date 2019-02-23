@@ -16,7 +16,7 @@ const filterReactions = (event: IEvent, Reactions: IReactions): IReaction[] => {
 export const createReactor = (
   Reactions: IReactions,
   ServiceContext: IServiceContext,
-) => (event: IEvent, ack: EventStreams.SubscribeAckFunc) => {
+): EventStreams.EventProcess => (event: IEvent, ack: EventStreams.EventProcessAck) => {
   const filtered = filterReactions(event, Reactions);
   const ps = filtered.map((reaction) => reaction.react(event, ServiceContext));
 

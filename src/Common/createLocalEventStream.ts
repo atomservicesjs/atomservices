@@ -13,11 +13,17 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
     const PublicStreams: IStream = {};
     const ScopeStreams: IStream = {};
     const RefStreams: {
-      [ref: string]: (result: any) => Promise<void>;
+      [ref: string]: (result: any) => void;
     } = {};
 
     return {
-      fromRef: (ref, listener) => RefStreams[ref] = listener,
+      directTo: async (ref, result) => {
+        if (RefStreams[ref] !== undefined) {
+          await RefStreams[ref](result);
+          delete RefStreams[ref];
+        }
+      },
+      listenTo: (ref, listener) => RefStreams[ref] = listener,
       publish: async (event, { scope, level }) => {
         const { name, type } = event;
 
@@ -29,8 +35,6 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
 
           subscribers.forEach(({ process }) => process(event, ack));
         }
-
-        return { success: true };
       },
       subscribe: (on, process) => {
         const { name, type, scope, level } = on;
@@ -49,12 +53,6 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
         }
 
         Streams[scope][type][name].push({ process });
-      },
-      toRef: async (ref, result) => {
-        if (RefStreams[ref] !== undefined) {
-          await RefStreams[ref](result);
-          delete RefStreams[ref];
-        }
       },
     };
   })();

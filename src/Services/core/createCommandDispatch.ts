@@ -1,9 +1,9 @@
-import { ICommand, IServiceContext, Services, StateQueryStreamListener } from "atomservicescore";
+import { ICommand, IServiceContext, Services, StateQueryResultListener } from "atomservicescore";
 import { ICommandHandlers } from "../../Commands/ICommandHandlers";
 import { DispatchResult } from "../DispatchResult";
 
 export const createCommandDispatch = (commandHandlers: ICommandHandlers, context: IServiceContext) =>
-  (command: ICommand, listener?: StateQueryStreamListener): Services.DispatchResultType => {
+  (command: ICommand, listener?: StateQueryResultListener): Services.DispatchResultType => {
     const type = commandHandlers.type();
     const handler = commandHandlers.resolve(command);
 
@@ -22,10 +22,10 @@ export const createCommandDispatch = (commandHandlers: ICommandHandlers, context
         const event = handler.transform(command, type);
 
         if (listener !== undefined) {
-          context.fromRef(event._id, listener);
+          context.listenTo(event._id, listener);
         }
 
-        context.publish(event);
+        context.dispatch(event);
 
         return DispatchResult.accept(event._id);
       }

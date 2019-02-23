@@ -1,4 +1,4 @@
-import { IQuery, IQueryHandler, IServiceContext, Services, StateQueryStreamListener } from "atomservicescore";
+import { IQuery, IQueryHandler, IServiceContext, Services, StateQueryResultListener } from "atomservicescore";
 import { IQueryHandlers } from "../../Queries/IQueryHandlers";
 import { signQuery } from "../../Queries/signQuery";
 import { QueryResult } from "../QueryResult";
@@ -16,14 +16,14 @@ const querying = async (handler: IQueryHandler, query: IQuery, context: IService
   try {
     const result = await handler.query(query);
 
-    context.toRef(ref, qr.success(result));
+    context.directTo(ref, qr.success(result));
   } catch (error) {
-    return context.toRef(ref, qr.error(error));
+    return context.directTo(ref, qr.error(error));
   }
 };
 
 export const createQuerier = (queryHandlers: IQueryHandlers, context: IServiceContext) =>
-  (query: IQuery, listener: StateQueryStreamListener): Services.QueryResultType => {
+  (query: IQuery, listener: StateQueryResultListener): Services.QueryResultType => {
     const type = queryHandlers.type();
     const handler = queryHandlers.resolve(query);
 
@@ -41,7 +41,7 @@ export const createQuerier = (queryHandlers: IQueryHandlers, context: IServiceCo
       } else {
         const scope = context.scope();
         const ref = signQuery.sign(query, type, scope);
-        context.fromRef(ref, listener);
+        context.listenTo(ref, listener);
         querying(handler, query, context, ref);
 
         return QueryResult.accept(ref);
