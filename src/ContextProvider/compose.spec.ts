@@ -17,6 +17,22 @@ describe("compose.ts tests", () => {
     });
   });
 
+  describe("#ContextProvider.identifier()", () => {
+    it("expect to get an identifier", () => {
+      // arranges
+      const stores: any = {};
+      const stream: any = {};
+      const identifier: any = {};
+      const provider = compose(stores, stream, identifier);
+
+      // acts
+      const result = provider.identifier();
+
+      // asserts
+      expect(result).to.equal(identifier);
+    });
+  });
+
   describe("#ContextProvider.provide()", () => {
     it("expect to provide a service context", () => {
       // arranges
