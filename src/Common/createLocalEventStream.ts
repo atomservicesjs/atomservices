@@ -3,7 +3,7 @@ import { Core, IEvent, IEventStream } from "atomservicescore";
 interface IStream {
   [scope: string]: {
     [type: string]: {
-      [name: string]: Array<{ process: any; }>;
+      [name: string]: any[];
     };
   };
 }
@@ -17,9 +17,9 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
     } = {};
 
     return {
-      directTo: async (ref, result) => {
+      directTo: (ref, data) => {
         if (DirectStreams[ref] !== undefined) {
-          DirectStreams[ref].forEach((stream) => stream(result));
+          DirectStreams[ref].forEach((stream) => stream(data));
           delete DirectStreams[ref];
         }
       },
@@ -39,10 +39,10 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
           const ack = Core.createLocalAck(event, ackListener);
           const subscribers = Streams[scope][type][name];
 
-          subscribers.forEach(({ process }) => process(event, ack));
+          subscribers.forEach((process) => process(event, ack));
         }
       },
-      subscribe: (on, process) => {
+      subscribe: (on, to, process) => {
         const { name, type, scope, level } = on;
         const Streams = level === "public" ? PublicStreams : ScopeStreams;
 
@@ -58,7 +58,7 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
           Streams[scope][type][name] = [];
         }
 
-        Streams[scope][type][name].push({ process });
+        Streams[scope][type][name].push(process);
       },
     };
   })();

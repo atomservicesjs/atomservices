@@ -3,14 +3,18 @@ import { composeServiceContext } from "./core/composeServiceContext";
 
 const DefaultScope = "GLOBAL";
 
-export const compose = (stores: IEventStores, stream: IEventStream, identifier: IIdentifier): IContextProvider =>
-  ((EventStores, EventStream, Identifier): IContextProvider => {
-    const ServiceContextComposer = composeServiceContext(EventStores, EventStream, Identifier);
+export const compose = (
+  EventStores: IEventStores,
+  EventStream: IEventStream,
+  Identifier: IIdentifier,
+): IContextProvider =>
+  ((stores, stream, identifier): IContextProvider => {
+    const ServiceContextComposer = composeServiceContext(stores, stream, identifier);
 
     return {
-      identifier: () => Identifier,
+      identifier: () => identifier,
       provide: (type, configs) => ServiceContextComposer(type, DefaultScope, configs),
     };
-  })(stores, stream, identifier);
+  })(EventStores, EventStream, Identifier);
 
 Object.freeze(compose);
