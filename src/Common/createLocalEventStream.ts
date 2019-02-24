@@ -12,18 +12,24 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
   ((): IEventStream => {
     const PublicStreams: IStream = {};
     const ScopeStreams: IStream = {};
-    const RefStreams: {
-      [ref: string]: (result: any) => void;
+    const DirectStreams: {
+      [ref: string]: Array<(result: any) => void>;
     } = {};
 
     return {
       directTo: async (ref, result) => {
-        if (RefStreams[ref] !== undefined) {
-          await RefStreams[ref](result);
-          delete RefStreams[ref];
+        if (DirectStreams[ref] !== undefined) {
+          DirectStreams[ref].forEach((stream) => stream(result));
+          delete DirectStreams[ref];
         }
       },
-      listenTo: (ref, listener) => RefStreams[ref] = listener,
+      listenTo: (ref, listener) => {
+        if (DirectStreams[ref] === undefined) {
+          DirectStreams[ref] = [];
+        }
+
+        DirectStreams[ref].push(listener);
+      },
       publish: async (event, { scope, level }) => {
         const { name, type } = event;
 

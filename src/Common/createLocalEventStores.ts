@@ -21,10 +21,55 @@ export const createLocalEventStores = (): IEventStores => {
       }
     },
     queryCurrentVersion: async (aggregateID, { type, scope }) => {
-      return { type, aggregateID, version: 0 };
+      if (stores[scope] && stores[scope][type]) {
+        const map = stores[scope][type];
+        const keys = Object.keys(map);
+        let version = 0;
+
+        for (const key of keys) {
+          const event = map[key];
+
+          if (event.aggregateID === aggregateID && event._version > version) {
+            version = event._version;
+          }
+        }
+
+        return { type, aggregateID, version };
+      } else {
+        return { type, aggregateID, version: 0 };
+      }
     },
-    queryEventsByAggregateID: async (aggregateID, on, options) => {
-      return [];
+    queryEventsByAggregateID: async (aggregateID, { type, scope }, options = {}) => {
+      if (stores[scope] && stores[scope][type]) {
+        const matches = [];
+        const map = stores[scope][type];
+        const keys = Object.keys(map);
+        const { initialVersion = 0, limit } = options;
+
+        for (const key of keys) {
+          const event = map[key];
+
+          if (event.aggregateID === aggregateID && initialVersion <= event._version) {
+            matches.push(event);
+          }
+
+          if (limit !== undefined && matches.length === limit) {
+            break;
+          }
+        }
+
+        return matches.sort((event, other) => {
+          if (event._version < other._version) {
+            return -1;
+          } else if (event._version > other._version) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        return [];
+      }
     },
     storeEvent: (event: IEvent, scope: string) => {
       const { _id, type } = event;
