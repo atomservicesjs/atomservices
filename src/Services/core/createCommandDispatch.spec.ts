@@ -22,6 +22,7 @@ describe("createDispatchCommand.ts tests", () => {
   describe("#dispatchCommand()", () => {
     const Context: any = {
       dispatch: sinon.spy(),
+      listenTo: sinon.spy(),
     };
     const event: any = { _id: 1 };
     const transform: any = sinon.stub().callsFake(() => event);
@@ -51,6 +52,7 @@ describe("createDispatchCommand.ts tests", () => {
 
     afterEach(() => {
       Context.dispatch.resetHistory();
+      Context.listenTo.resetHistory();
     });
 
     it("expect to get the result as dispatching unhandled command", () => {
@@ -117,6 +119,31 @@ describe("createDispatchCommand.ts tests", () => {
       // asserts
       expect(result).to.deep.equal(expected);
       expect(Context.dispatch.callCount).to.equal(1);
+      expect(Context.listenTo.callCount).to.equal(0);
+    });
+
+    it("expect to get the result as dispatching valid command with listener", () => {
+      // arranges
+      const command: any = {
+        name: "test",
+        payloads: {
+          validResult: true,
+        },
+      };
+      const listener: any = {};
+      const expected = {
+        accept: true,
+        ref: 1,
+        status: "accepted",
+      };
+
+      // acts
+      const result = dispatch(command, listener);
+
+      // asserts
+      expect(result).to.deep.equal(expected);
+      expect(Context.dispatch.callCount).to.equal(1);
+      expect(Context.listenTo.callCount).to.equal(1);
     });
   });
 });

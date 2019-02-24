@@ -2,10 +2,12 @@ import { ICommand, IServiceContext, Services, StateQueryResultListener } from "a
 import { ICommandHandlers } from "../../Commands/ICommandHandlers";
 import { DispatchResult } from "../DispatchResult";
 
-export const createCommandDispatch = (commandHandlers: ICommandHandlers, context: IServiceContext) =>
-  (command: ICommand, listener?: StateQueryResultListener): Services.DispatchResultType => {
-    const type = commandHandlers.type();
-    const handler = commandHandlers.resolve(command);
+export const createCommandDispatch = (
+  CommandHandlers: ICommandHandlers,
+  ServiceContext: IServiceContext,
+) => (command: ICommand, listener?: StateQueryResultListener): Services.DispatchResultType => {
+    const type = CommandHandlers.type();
+    const handler = CommandHandlers.resolve(command);
 
     if (handler === undefined) {
       const { name } = command;
@@ -22,10 +24,10 @@ export const createCommandDispatch = (commandHandlers: ICommandHandlers, context
         const event = handler.transform(command, type);
 
         if (listener !== undefined) {
-          context.listenTo(event._id, listener);
+          ServiceContext.listenTo(event._id, listener);
         }
 
-        context.dispatch(event);
+        ServiceContext.dispatch(event);
 
         return DispatchResult.accept(event._id);
       }

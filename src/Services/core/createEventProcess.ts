@@ -3,8 +3,8 @@ import { IEventHandlers } from "../../Events/IEventHandlers";
 import { IStateRepository } from "../../IStateRepository";
 import { StateQueryResult } from "./StateQueryResult";
 
-const composeProcessResult = (context: IServiceContext, qr: { success: (state: any) => IStateQueryResult; }) =>
-  (event: IEvent, result: any) => context.directTo(event._id, qr.success(result));
+const composeProcessResult = (context: IServiceContext, stateResult: { success: (state: any) => IStateQueryResult; }) =>
+  (event: IEvent, result: any) => context.directTo(event._id, stateResult.success(result));
 
 export const createEventProcess = (
   EventHandlers: IEventHandlers,
@@ -12,7 +12,7 @@ export const createEventProcess = (
   ServiceContext: IServiceContext,
 ) => async (event: IEvent, ack: EventStreams.EventProcessAck) => {
   const scope = ServiceContext.scope();
-  const qr = StateQueryResult({
+  const stateResult = StateQueryResult({
     action: "process",
     name: event.name,
     ref: event._id,
@@ -24,7 +24,7 @@ export const createEventProcess = (
     const handler = EventHandlers.resolve(event);
 
     if (handler === undefined) {
-      await ServiceContext.directTo(event._id, qr.unhandled());
+      await ServiceContext.directTo(event._id, stateResult.unhandled());
     } else {
       const initState = await Repository.queryByID(event.aggregateID);
       const state = await Repository.applyEvent(initState, event, handler.process);
@@ -32,7 +32,7 @@ export const createEventProcess = (
       if (handler.processEffect !== undefined) {
         await handler.processEffect(
           { event, initState, state },
-          composeProcessResult(ServiceContext, qr),
+          composeProcessResult(ServiceContext, stateResult),
           ServiceContext,
         );
       }
@@ -40,7 +40,7 @@ export const createEventProcess = (
 
     ack();
   } catch (error) {
-    await ServiceContext.directTo(event._id, qr.error(error));
+    await ServiceContext.directTo(event._id, stateResult.error(error));
   }
 };
 
