@@ -38,7 +38,7 @@ describe("reducize.ts tests", () => {
       expect(JSON.stringify(result)).to.equal(expected);
     });
 
-    it("expect to reduce a nested object, #1", () => {
+    it("expect to reduce a nested object", () => {
       // arranges
       const obj: any = {};
       obj.b = "b";
@@ -63,7 +63,7 @@ describe("reducize.ts tests", () => {
       expect(JSON.stringify(result)).to.equal(expected);
     });
 
-    it("expect to reduce a nested object, #2", () => {
+    it("expect to reduce a nested object and array", () => {
       // arranges
       const obj: any = {};
       obj.b = "b";
