@@ -1,15 +1,15 @@
-import { IStateQueryResult, StateQueryAction, StateQueryStatus } from "atomservicescore";
+import { IStateQueryResult, StateQuery } from "atomservicescore";
 
 const convert = (
   init: {
     ref: any;
-    action: StateQueryAction;
+    action: StateQuery.StateQueryAction;
     name: string;
     type: string;
     scope: string;
   },
   ext: {
-    status: StateQueryStatus;
+    status: StateQuery.StateQueryStatus;
     error?: Error;
     state?: any;
   },
@@ -30,7 +30,7 @@ const convert = (
 export const StateQueryResult = (
   init: {
     ref: any;
-    action: StateQueryAction;
+    action: StateQuery.StateQueryAction;
     name: string;
     type: string;
     scope: string;

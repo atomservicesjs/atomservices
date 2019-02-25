@@ -1,10 +1,10 @@
-import { Events, IEventHandler, IStateBase } from "atomservicescore";
+import { EventHandler, IEventHandler, IStateBase } from "atomservicescore";
 
 export const createEventHandler = <State extends IStateBase = any, Payloads = any>(
   type: string,
   name: string,
-  process: Events.EventProcess<State, Payloads>,
-  processEffect?: Events.EventProcessEffect<State, Payloads>,
+  process: EventHandler.EventProcess<State, Payloads>,
+  processEffect?: EventHandler.EventProcessEffect<State, Payloads>,
 ): IEventHandler<State, Payloads> => {
   const handler: IEventHandler<State, Payloads> = Object.defineProperties({}, {
     name: {
@@ -22,7 +22,7 @@ export const createEventHandler = <State extends IStateBase = any, Payloads = an
     processEffect: {
       configurable: false,
       enumerable: true,
-      value: processEffect,
+      value: processEffect || EventHandler.DefaultEventProcessEffect,
       writable: false,
     },
     type: {

@@ -1,10 +1,10 @@
-import { Events, IEventHandler, IStateBase } from "atomservicescore";
+import { EventHandler, IEventHandler, IStateBase } from "atomservicescore";
 import { Compose } from "../../Common/Compose";
 
 export const EventHandlerBuilder = <State extends IStateBase, Payloads>(
   initial: {
-    process: Events.EventProcess<State, Payloads>;
-    processEffect?: Events.EventProcessEffect<State, Payloads>;
+    process: EventHandler.EventProcess<State, Payloads>;
+    processEffect?: EventHandler.EventProcessEffect<State, Payloads>;
   },
   eventBase: Compose,
 ): IEventHandler<State, Payloads> =>
@@ -18,7 +18,7 @@ export const EventHandlerBuilder = <State extends IStateBase, Payloads>(
     processEffect: {
       configurable: false,
       enumerable: true,
-      value: initial.processEffect,
+      value: initial.processEffect || EventHandler.DefaultEventProcessEffect,
       writable: false,
     },
   });

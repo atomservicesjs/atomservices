@@ -1,10 +1,10 @@
-import { Commands, ICommandHandler } from "atomservicescore";
+import { CommandHandler, ICommandHandler } from "atomservicescore";
 
 export const CommandHandlerBuilder = <CommandPayloads = any, EventPayloads = any>(
   initial: {
     name: string;
-    validate: Commands.CommandValidate<CommandPayloads>;
-    transform: Commands.CommandTransform<CommandPayloads, EventPayloads>;
+    validate: CommandHandler.CommandValidate<CommandPayloads>;
+    transform: CommandHandler.CommandTransform<CommandPayloads, EventPayloads>;
   },
 ): ICommandHandler<CommandPayloads, EventPayloads> =>
   Object.defineProperties({}, {

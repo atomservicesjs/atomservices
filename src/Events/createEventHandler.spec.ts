@@ -12,15 +12,16 @@ describe("createEventHandler.ts tests", () => {
       const expected = {
         name,
         process,
-        processEffect: undefined,
         type,
       };
 
       // acts
-      const handler = createEventHandler(type, name, process);
+      const handler: any = createEventHandler(type, name, process);
 
       // asserts
-      expect(handler).to.deep.equal(expected);
+      expect(handler.name).to.deep.equal(expected.name);
+      expect(handler.process).to.deep.equal(expected.process);
+      expect(handler.type).to.deep.equal(expected.type);
     });
 
     it("expect to get a new instance of EventHandler with processEffect", () => {

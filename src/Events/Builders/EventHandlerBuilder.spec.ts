@@ -11,25 +11,26 @@ describe("EventHandlerBuilder.ts tests", () => {
     it("expect to create an event handler builder", () => {
       // arranges
       const process: any = {};
-      const expected: any = {
+      const expected = {
         name: "name",
         process: {},
-        processEffect: undefined,
         type: "type",
       };
 
       // acts
-      const result = EventHandlerBuilder({ process }, eventBase);
+      const result: any = EventHandlerBuilder({ process }, eventBase);
 
       // asserts
-      expect(result).to.deep.equal(expected);
+      expect(result.name).to.deep.equal(expected.name);
+      expect(result.process).to.deep.equal(expected.process);
+      expect(result.type).to.deep.equal(expected.type);
     });
 
     it("expect to create an event handler builder with processEffect", () => {
       // arranges
       const process: any = {};
       const processEffect: any = {};
-      const expected: any = {
+      const expected = {
         name: "name",
         process: {},
         processEffect: {},

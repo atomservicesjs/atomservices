@@ -1,11 +1,11 @@
-import { IReaction, Reactions } from "atomservicescore";
+import { IReaction, Reaction } from "atomservicescore";
 
 export const ReactionBuilder = <Payloads = any, EventID = any, AggregateID = any, CreatedBy = any>(
   initial: {
     scope: string;
     type: string;
     name: string;
-    react: Reactions.Reaction;
+    react: Reaction.ReactionReact;
   },
 ): IReaction<Payloads, EventID, AggregateID, CreatedBy> =>
   Object.defineProperties({}, {

@@ -1,10 +1,10 @@
-import { IQueryHandler, Queries } from "atomservicescore";
+import { IQueryHandler, QueryHandler } from "atomservicescore";
 
 export const QueryHandlerBuilder = <Payloads, QueryResult>(
   initial: {
     name: string;
-    validate: Queries.QueryValidate<Payloads>
-    query: Queries.Querying<Payloads, QueryResult>;
+    validate: QueryHandler.QueryValidate<Payloads>
+    query: QueryHandler.Querying<Payloads, QueryResult>;
   },
 ): IQueryHandler<Payloads> =>
   Object.defineProperties({}, {
