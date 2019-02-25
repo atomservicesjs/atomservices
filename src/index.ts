@@ -3,6 +3,7 @@ import * as Common from "./Common";
 import * as ContextProvider from "./ContextProvider";
 import * as Events from "./Events";
 import * as Queries from "./Queries";
+import * as Queryable from "./Queryable";
 import * as Reactions from "./Reactions";
 import * as Services from "./Services";
 import * as States from "./States";
@@ -13,6 +14,7 @@ export {
   ContextProvider,
   Events,
   Queries,
+  Queryable,
   Reactions,
   Services,
   States,

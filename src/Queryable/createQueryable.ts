@@ -1,5 +1,5 @@
 import { IQueryable, IQueryableResult } from "atomservicescore";
-import { IQueryHandlers } from "./IQueryHandlers";
+import { IQueryHandlers } from "../Queries/IQueryHandlers";
 
 const QueryableResult = {
   error: (error: Error): IQueryableResult => ({
