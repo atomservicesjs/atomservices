@@ -1,5 +1,6 @@
 import * as Commands from "./Commands";
 import * as Common from "./Common";
+import * as Containers from "./Containers";
 import * as ContextProvider from "./ContextProvider";
 import * as Events from "./Events";
 import * as Queries from "./Queries";
@@ -11,6 +12,7 @@ import * as States from "./States";
 export {
   Commands,
   Common,
+  Containers,
   ContextProvider,
   Events,
   Queries,
@@ -21,6 +23,7 @@ export {
 };
 
 export {
+  IAnyState,
   ICommand,
   ICommandHandler,
   IContainer,
