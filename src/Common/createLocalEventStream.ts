@@ -17,7 +17,7 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
     } = {};
 
     return {
-      directTo: (ref, data) => {
+      directTo: async (ref, data) => {
         if (DirectStreams[ref] !== undefined) {
           DirectStreams[ref].forEach((stream) => stream(data));
           delete DirectStreams[ref];
