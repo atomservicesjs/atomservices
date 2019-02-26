@@ -1,4 +1,4 @@
-import { Core, IEvent, IEventStream } from "atomservicescore";
+import { common, IEvent, IEventStream } from "atomservicescore";
 
 interface IStream {
   [scope: string]: {
@@ -36,7 +36,7 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
         const Streams = level === "public" ? PublicStreams : ScopeStreams;
 
         if (Streams[scope] && Streams[scope][type] && Streams[scope][type][name]) {
-          const ack = Core.createLocalAck(event, ackListener);
+          const ack = common.createLocalAck(event, ackListener);
           const subscribers = Streams[scope][type][name];
 
           subscribers.forEach((process) => process(event, ack));

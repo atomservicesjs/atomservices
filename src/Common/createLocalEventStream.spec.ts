@@ -4,7 +4,7 @@ import { createLocalEventStream } from "./createLocalEventStream";
 
 describe("createLocalEventStream.ts tests", () => {
   describe("#createLocalEventStream()", () => {
-    const to = { scope: "to.scope", type: "to.type" };
+    const to: any = { scope: "to.scope", type: "to.type" };
 
     describe("#LocalEventStream.subscribe() and publish()", () => {
       it("expect to create a local event stream", async () => {
