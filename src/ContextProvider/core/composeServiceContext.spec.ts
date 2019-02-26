@@ -261,7 +261,7 @@ describe("composeServiceContext.ts tests", () => {
         const context = composer("type", "scope");
         const handler: any = { name: "name" };
         const on = { name: "name", type: "type", scope: "scope", level: "public" };
-        const to = { type: "type", scope: "scope" };
+        const to = { channel: "eventhandler", type: "type", scope: "scope" };
         const process: any = {};
 
         // acts
@@ -283,7 +283,7 @@ describe("composeServiceContext.ts tests", () => {
         const context = composer("type", "scope");
         const reaction: any = { name: "name", type: "type", scope: "scope" };
         const on = { name: "name", type: "type", scope: "scope", level: "public" };
-        const to = { type: "type", scope: "scope" };
+        const to = { channel: "reaction", type: "type", scope: "scope" };
         const process: any = {};
 
         // acts
@@ -303,7 +303,7 @@ describe("composeServiceContext.ts tests", () => {
         const context = composer("type", "scope");
         const reaction: any = { name: "name", type: "other.type", scope: "other.scope" };
         const on = { name: "name", type: "other.type", scope: "other.scope", level: "public" };
-        const to = { type: "type", scope: "scope" };
+        const to = { channel: "reaction", type: "type", scope: "scope" };
         const process: any = {};
 
         // acts

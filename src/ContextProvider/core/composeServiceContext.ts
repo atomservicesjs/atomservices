@@ -88,7 +88,7 @@ export const composeServiceContext = (
     registerHandler: ({ name }, process) =>
       EventStream.subscribe(
         { name, type, scope, level: Configure.level(name) },
-        { type, scope },
+        { channel: "eventhandler", type, scope },
         process,
       ),
     registerReaction: (reaction, process) => {
@@ -97,13 +97,13 @@ export const composeServiceContext = (
       if (reaction.scope === scope && reaction.type === type) {
         return EventStream.subscribe(
           { name, type, scope, level: Configure.level(name) },
-          { type, scope },
+          { channel: "reaction", type, scope },
           process,
         );
       } else {
         return EventStream.subscribe(
           { name, type: reaction.type, scope: reaction.scope, level: "public" },
-          { type, scope },
+          { channel: "reaction", type, scope },
           process,
         );
       }
