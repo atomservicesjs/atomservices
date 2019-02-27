@@ -23,7 +23,7 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
           delete DirectStreams[ref];
         }
       },
-      listenTo: (ref, listener) => {
+      listenTo: async (ref, listener) => {
         if (DirectStreams[ref] === undefined) {
           DirectStreams[ref] = [];
         }
@@ -42,7 +42,7 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
           subscribers.forEach((process) => process(event, ack));
         }
       },
-      subscribe: (on, to, process) => {
+      subscribe: async (on, to, process) => {
         const { name, type, scope, level } = on;
         const Streams = level === "public" ? PublicStreams : ScopeStreams;
 

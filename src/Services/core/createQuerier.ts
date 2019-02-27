@@ -40,7 +40,7 @@ export const createQuerier = (queryHandlers: IQueryHandlers, context: IServiceCo
         return QueryResult.invalid(invalidAttributes);
       } else {
         const scope = context.scope();
-        const ref = signQuery.sign(query, type, scope);
+        const { token: ref } = signQuery.sign(query, type, scope);
         context.listenTo(ref, listener);
         querying(handler, query, context, ref);
 

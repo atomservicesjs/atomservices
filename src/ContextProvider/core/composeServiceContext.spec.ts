@@ -261,7 +261,7 @@ describe("composeServiceContext.ts tests", () => {
         const context = composer("type", "scope");
         const handler: any = { name: "name" };
         const on = { name: "name", type: "type", scope: "scope", level: "public" };
-        const to = { channel: "eventhandler", type: "type", scope: "scope" };
+        const to = { channel: "handler", type: "type", scope: "scope" };
         const process: any = {};
 
         // acts

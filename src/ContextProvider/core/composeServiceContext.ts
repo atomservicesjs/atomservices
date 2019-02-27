@@ -88,7 +88,7 @@ export const composeServiceContext = (
     registerHandler: ({ name }, process) =>
       EventStream.subscribe(
         { name, type, scope, level: Configure.level(name) },
-        { channel: "eventhandler", type, scope },
+        { channel: "handler", type, scope },
         process,
       ),
     registerReaction: (reaction, process) => {
