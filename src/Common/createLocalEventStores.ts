@@ -71,7 +71,7 @@ export const createLocalEventStores = (): IEventStores => {
         return [];
       }
     },
-    storeEvent: (event: IEvent, scope: string) => {
+    storeEvent: async (event: IEvent, scope: string) => {
       const { _id, type } = event;
 
       if (stores[scope] === undefined) {
@@ -84,7 +84,7 @@ export const createLocalEventStores = (): IEventStores => {
 
       stores[scope][type][_id] = event;
 
-      return Promise.resolve(true);
+      return true;
     },
   };
 };
