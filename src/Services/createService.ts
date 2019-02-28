@@ -1,4 +1,4 @@
-import { IContainer, IContextProvider, IService, IServiceConfigs, IServiceContext, IStateBase } from "atomservicescore";
+import { IContainer, IService, IServiceConfigs, IServiceContext, IStateBase, ServiceBootstrap } from "atomservicescore";
 import { ICommandHandlers } from "../Commands/ICommandHandlers";
 import { IEventHandlers } from "../Events/IEventHandlers";
 import { IStateRepository } from "../IStateRepository";
@@ -19,8 +19,8 @@ export const createService = <State extends IStateBase>(
     repository: IStateRepository<State>;
   },
   configs?: IServiceConfigs,
-) => (boostraper: IContextProvider | IContainer): IService =>
-    ((
+): ServiceBootstrap => (bootstraper) =>
+    (async (
       ServiceName,
       {
         composeCommandHandlers,
@@ -29,22 +29,33 @@ export const createService = <State extends IStateBase>(
         composeReactions,
         repository: Repository,
       },
-      Boostraper,
+      Bootstraper,
       Configs = {},
-    ): IService => {
+    ): Promise<IService> => {
       const CommandHandlers = composeCommandHandlers(ServiceName);
       const EventHandlers = composeEventHandlers(ServiceName);
       const QueryHandlers = composeQueryHandlers(ServiceName);
       const Reactions = composeReactions(ServiceName);
-      const ServiceContext: IServiceContext = Boostraper.provide(ServiceName, configs);
+      const ServiceContext: IServiceContext = Bootstraper.provide(ServiceName, configs);
 
       const dispatch = createCommandDispatch(CommandHandlers, ServiceContext);
       const process = createEventProcess(EventHandlers, Repository, ServiceContext);
       const querier = createQuerier(QueryHandlers, ServiceContext);
       const reactor = createReactor(Reactions, ServiceContext);
 
-      EventHandlers.forEach((handler) => ServiceContext.registerHandler(handler, process));
-      Reactions.forEach((reaction) => ServiceContext.registerReaction(reaction, reactor));
+      const psHandlers: Array<Promise<void>> = [];
+      const psReactions: Array<Promise<void>> = [];
+
+      EventHandlers.forEach((handler) => {
+        psHandlers.push(ServiceContext.registerHandler(handler, process));
+      });
+
+      Reactions.forEach((reaction) => {
+        psReactions.push(ServiceContext.registerReaction(reaction, reactor));
+      });
+
+      await Promise.all(psHandlers);
+      await Promise.all(psReactions);
 
       const service: IService = {
         configs: () => Configs,
@@ -53,9 +64,9 @@ export const createService = <State extends IStateBase>(
         query: (query, listener) => querier(query, listener),
       };
 
-      if ((Boostraper as IContainer).registerService !== undefined) {
-        (Boostraper as IContainer).registerService(service);
+      if ((Bootstraper as IContainer).registerService !== undefined) {
+        (Bootstraper as IContainer).registerService(service);
       }
 
       return service;
-    })(name, components, boostraper, configs);
+    })(name, components, bootstraper, configs);
