@@ -10,7 +10,7 @@ export const createEventProcess = (
   EventHandlers: IEventHandlers,
   Repository: IStateRepository,
   ServiceContext: IServiceContext,
-) => async (event: IEvent, ack: EventStreams.EventProcessAck) => {
+): EventStreams.EventProcess => async (event: IEvent, ack: EventStreams.EventProcessAck) => {
   const scope = ServiceContext.scope();
   const stateResult = StateQueryResult({
     action: "process",

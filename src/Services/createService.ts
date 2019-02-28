@@ -1,4 +1,4 @@
-import { IContainer, IService, IServiceConfigs, IServiceContext, IStateBase, ServiceBootstrap } from "atomservicescore";
+import { IContainer, IService, IServiceConfigs, IServiceContext, IStateBase, Services } from "atomservicescore";
 import { ICommandHandlers } from "../Commands/ICommandHandlers";
 import { IEventHandlers } from "../Events/IEventHandlers";
 import { IStateRepository } from "../IStateRepository";
@@ -8,6 +8,7 @@ import { createCommandDispatch } from "./core/createCommandDispatch";
 import { createEventProcess } from "./core/createEventProcess";
 import { createQuerier } from "./core/createQuerier";
 import { createReactor } from "./core/createReactor";
+import { initializeService } from "./initializeService";
 
 export const createService = <State extends IStateBase>(
   name: string,
@@ -19,7 +20,7 @@ export const createService = <State extends IStateBase>(
     repository: IStateRepository<State>;
   },
   configs?: IServiceConfigs,
-): ServiceBootstrap => (bootstraper) =>
+): Services.ServiceBootstrap => (bootstraper) =>
     (async (
       ServiceName,
       {
@@ -43,22 +44,25 @@ export const createService = <State extends IStateBase>(
       const querier = createQuerier(QueryHandlers, ServiceContext);
       const reactor = createReactor(Reactions, ServiceContext);
 
-      const psHandlers: Array<Promise<void>> = [];
-      const psReactions: Array<Promise<void>> = [];
-
-      EventHandlers.forEach((handler) => {
-        psHandlers.push(ServiceContext.registerHandler(handler, process));
-      });
-
-      Reactions.forEach((reaction) => {
-        psReactions.push(ServiceContext.registerReaction(reaction, reactor));
-      });
-
-      await Promise.all(psHandlers);
-      await Promise.all(psReactions);
+      const initializer = await initializeService(
+        ServiceContext.scope(),
+        ServiceName,
+        {
+          CommandHandlers,
+          EventHandlers,
+          Reactions,
+        },
+        {
+          EventProcess: process,
+          ReactionProcess: reactor,
+        },
+        ServiceContext,
+      );
 
       const service: IService = {
+        asSubscribers: () => initializer.asSubscribers(),
         configs: () => Configs,
+        description: () => initializer.description(),
         dispatch: (command, listener) => dispatch(command, listener),
         name: () => ServiceName,
         query: (query, listener) => querier(query, listener),

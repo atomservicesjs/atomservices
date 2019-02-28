@@ -1,4 +1,12 @@
-import { IEvent, IEventStores, IEventStream, IIdentifier, IServiceConfigs, IServiceContext } from "atomservicescore";
+import {
+  EventStreams,
+  IEvent,
+  IEventStores,
+  IEventStream,
+  IIdentifier,
+  IServiceConfigs,
+  IServiceContext,
+} from "atomservicescore";
 import {
   CurrentVersionQueryingErrorException,
   EventPublishingErrorException,
@@ -85,28 +93,39 @@ export const composeServiceContext = (
       EventStores.queryCurrentVersion(aggregateID, { type, scope }),
     queryEventsByAggregateID: (aggregateID, options) =>
       EventStores.queryEventsByAggregateID(aggregateID, { type, scope }, options),
-    registerHandler: ({ name }, process) =>
-      EventStream.subscribe(
-        { name, type, scope, level: Configure.level(name) },
+    registerHandler: async ({ name }, process) => {
+      const on = { name, type, scope, level: Configure.level(name) };
+      await EventStream.subscribe(
+        on,
         { channel: "handler", type, scope },
         process,
-      ),
-    registerReaction: (reaction, process) => {
+      );
+
+      return on;
+    },
+    registerReaction: async (reaction, process) => {
       const { name } = reaction;
+      let on: { name: string; type: string; scope: string; level: EventStreams.EventLevel; };
 
       if (reaction.scope === scope && reaction.type === type) {
-        return EventStream.subscribe(
-          { name, type, scope, level: Configure.level(name) },
+        on = { name, type, scope, level: Configure.level(name) };
+
+        await EventStream.subscribe(
+          on,
           { channel: "reaction", type, scope },
           process,
         );
       } else {
-        return EventStream.subscribe(
-          { name, type: reaction.type, scope: reaction.scope, level: "public" },
+        on = { name, type: reaction.type, scope: reaction.scope, level: "public" };
+
+        await EventStream.subscribe(
+          on,
           { channel: "reaction", type, scope },
           process,
         );
       }
+
+      return on;
     },
     scope: () =>
       scope,
