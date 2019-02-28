@@ -9,16 +9,14 @@ import { combineEventHandlers } from "../Events/combineEventHandlers";
 import { combineQueryHandlers } from "../Queries/combineQueryHandlers";
 import { combineReactions } from "../Reactions/combineReactions";
 
-const createEmptyRepository = (): IStateRepository => {
-  return {
-    applyEvent: async () => {
-      throw new Error("Calling Empty Repository");
-    },
-    queryByID: async () => {
-      throw new Error("Calling Empty Repository");
-    },
-  };
-};
+const createEmptyRepository = (): IStateRepository => ({
+  applyEvent: async () => {
+    throw new Error("Calling EmptyRepository.applyEvent()");
+  },
+  queryByID: async () => {
+    throw new Error("Calling EmptyRepository.queryByID()");
+  },
+});
 
 export const composeServiceComponents = (
   components: {

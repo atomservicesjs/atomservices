@@ -23,7 +23,7 @@ describe("randomCode.ts tests", () => {
       expect(result.length).to.equal(10);
     });
 
-    it("expect to generate different two codes [2-digits] for 1,000 times with 980 results (98.00%)", async () => {
+    it("expect to generate different two codes [2-digits] for 1,000 times with 975 results (97.50%)", async () => {
       // arranges
       let equal: number = 0;
       let inequal: number = 0;
@@ -41,8 +41,8 @@ describe("randomCode.ts tests", () => {
       }
 
       // asserts
-      expect(inequal).to.greaterThan(980);
-      expect(equal).to.lessThan(20);
+      expect(inequal).to.greaterThan(975);
+      expect(equal).to.lessThan(25);
     });
 
     it("expect to generate different two codes [6-digits] for 1,000 times with 1,000 results (100%)", async () => {
