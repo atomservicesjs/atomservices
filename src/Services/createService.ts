@@ -11,7 +11,7 @@ import { createReactor } from "./core/createReactor";
 import { initializeService } from "./initializeService";
 
 export const createService = <State extends IStateBase>(
-  name: string,
+  type: string,
   components: {
     composeCommandHandlers: (type: string) => ICommandHandlers;
     composeEventHandlers: (type: string) => IEventHandlers;
@@ -22,7 +22,7 @@ export const createService = <State extends IStateBase>(
   configs?: IServiceConfigs,
 ): Services.ServiceBootstrap => (bootstraper) =>
     (async (
-      ServiceName,
+      Type,
       {
         composeCommandHandlers,
         composeEventHandlers,
@@ -33,11 +33,11 @@ export const createService = <State extends IStateBase>(
       Bootstraper,
       Configs = {},
     ): Promise<IService> => {
-      const CommandHandlers = composeCommandHandlers(ServiceName);
-      const EventHandlers = composeEventHandlers(ServiceName);
-      const QueryHandlers = composeQueryHandlers(ServiceName);
-      const Reactions = composeReactions(ServiceName);
-      const ServiceContext: IServiceContext = Bootstraper.provide(ServiceName, configs);
+      const CommandHandlers = composeCommandHandlers(Type);
+      const EventHandlers = composeEventHandlers(Type);
+      const QueryHandlers = composeQueryHandlers(Type);
+      const Reactions = composeReactions(Type);
+      const ServiceContext: IServiceContext = Bootstraper.provide(Type, configs);
 
       const dispatch = createCommandDispatch(CommandHandlers, ServiceContext);
       const process = createEventProcess(EventHandlers, Repository, ServiceContext);
@@ -46,7 +46,7 @@ export const createService = <State extends IStateBase>(
 
       const initializer = await initializeService(
         ServiceContext.scope(),
-        ServiceName,
+        Type,
         {
           CommandHandlers,
           EventHandlers,
@@ -64,7 +64,7 @@ export const createService = <State extends IStateBase>(
         configs: () => Configs,
         description: () => initializer.description(),
         dispatch: (command, listener) => dispatch(command, listener),
-        name: () => ServiceName,
+        name: () => Type,
         query: (query, listener) => querier(query, listener),
       };
 
@@ -73,4 +73,4 @@ export const createService = <State extends IStateBase>(
       }
 
       return service;
-    })(name, components, bootstraper, configs);
+    })(type, components, bootstraper, configs);

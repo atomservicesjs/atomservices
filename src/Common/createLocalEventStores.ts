@@ -1,5 +1,15 @@
 import { IEvent, IEventStores } from "atomservicescore";
 
+export const compareEvents = (event: { _version: number }, another: { _version: number }) => {
+  if (event._version < another._version) {
+    return -1;
+  } else if (event._version > another._version) {
+    return 1;
+  } else {
+    return 0;
+  }
+};
+
 export const createLocalEventStores = (): IEventStores => {
   let stores: {
     [scope: string]: {
@@ -58,15 +68,7 @@ export const createLocalEventStores = (): IEventStores => {
           }
         }
 
-        return matches.sort((event, other) => {
-          if (event._version < other._version) {
-            return -1;
-          } else if (event._version > other._version) {
-            return 1;
-          } else {
-            return 0;
-          }
-        });
+        return matches.sort(compareEvents);
       } else {
         return [];
       }
@@ -84,7 +86,7 @@ export const createLocalEventStores = (): IEventStores => {
 
       stores[scope][type][_id] = event;
 
-      return true;
+      return event._id;
     },
   };
 };
