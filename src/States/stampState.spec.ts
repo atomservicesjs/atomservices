@@ -22,11 +22,11 @@ describe("stampState.ts tests", () => {
         _createdBy: "createdBy",
         _version: 2,
       };
-      const expected: any = {
+      const expected = {
         _createdAt: state._createdAt,
         _createdBy: "createdBy",
         _id: 1,
-        _updatedAt: new Date(),
+        _updatedAt: null,
         _updatedBy: "createdBy",
         _version: 2,
         payloads: {
@@ -36,6 +36,7 @@ describe("stampState.ts tests", () => {
 
       // acts
       const result = stampState(state, event);
+      expected._updatedAt = result._updatedAt;
 
       // asserts
       expect(result).to.deep.equal(expected);
