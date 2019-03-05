@@ -43,3 +43,5 @@ export const StateQueryResult = (
   unhandled: (): IStateQueryResult =>
     convert(init, { status: "unhandled" }),
 });
+
+Object.freeze(StateQueryResult);
