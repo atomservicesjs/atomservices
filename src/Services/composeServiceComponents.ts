@@ -9,12 +9,18 @@ import { combineEventHandlers } from "../Events/combineEventHandlers";
 import { combineQueryHandlers } from "../Queries/combineQueryHandlers";
 import { combineReactions } from "../Reactions/combineReactions";
 
+class CallingEmptyRepositoryFunctionError extends Error {
+  constructor(funcName: string) {
+    super(`Calling EmptyRepository on ${funcName}()`);
+  }
+}
+
 const createEmptyRepository = (): IStateRepository => ({
   applyEvent: async () => {
-    throw new Error("Calling EmptyRepository.applyEvent()");
+    throw new CallingEmptyRepositoryFunctionError("applyEvent");
   },
   queryByID: async () => {
-    throw new Error("Calling EmptyRepository.queryByID()");
+    throw new CallingEmptyRepositoryFunctionError("queryByID");
   },
 });
 
