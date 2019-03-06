@@ -30,6 +30,13 @@ export const createContainer = (
 
       const ContainerHash = Containers.ContainerHash.hash(ContainerName);
 
+      const ServiceSelector = (type: string) => {
+        const servicename = type.toLowerCase();
+        const servicehash = ServicesHashMap[servicename];
+
+        return ServicesMap[servicehash];
+      };
+
       return {
         bootstrap: async (bootstraper) => {
           const service = await bootstraper(ContextProvider);
@@ -37,14 +44,19 @@ export const createContainer = (
           ServicesMap[service.name()] = service;
         },
         configs: () => Configs,
+        dispatch: (type, command, listener) => {
+          const Service = ServiceSelector(type);
+
+          return Service.dispatch(command, listener);
+        },
         hash: () => ContainerHash,
         name: () => ContainerName,
-        service: (serviceName) => {
-          const servicename = serviceName.toLowerCase();
-          const servicehash = ServicesHashMap[servicename];
+        query: (type, query, listener) => {
+          const Service = ServiceSelector(type);
 
-          return ServicesMap[servicehash];
+          return Service.query(query, listener);
         },
+        service: (type) => ServiceSelector(type),
         serviceNames: () => {
           const ServiceInstances = Object.values(ServicesMap);
 
