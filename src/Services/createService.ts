@@ -64,6 +64,7 @@ export const createService = <State extends IStateBase>(
         configs: () => Configs,
         description: () => describe.description(),
         dispatch: (command, listener) => dispatch(command, listener),
+        hash: (container?: string) => Services.ServiceHash.hash(Type, container),
         name: () => Type,
         query: (query, listener) => querier(query, listener),
       };

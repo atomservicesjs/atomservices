@@ -23,6 +23,7 @@ export const createContainer = (
           ServicesMap[service.name()] = service;
         },
         configs: () => Configs,
+        hash: () => Containers.ContainerHash.hash(Name),
         name: () => Name,
         service: (serviceName) => ServicesMap[serviceName],
         serviceNames: () => Object.keys(ServicesMap),
