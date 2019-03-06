@@ -11,6 +11,16 @@ export const CombineDuplicatedEventHandlersException = (type: string, name: stri
 export const CombineDuplicatedQueryHandlersException = (type: string, name: string) =>
   createException(Constants["000003_CombineDuplicatedQueryHandlers"], `{ type: ${type}, name: ${name} }`);
 
+export const DuplicatedServiceHashException = (container: string, service: string) =>
+  createException(
+    Constants["000007_DuplicatedServiceHash"],
+    `{ container: ${container}, service: ${service} }`,
+    {
+      container,
+      service,
+    },
+  );
+
 export const CurrentVersionQueryingErrorException = (error: Error, aggregateID: any, type: string, scope: string) =>
   createException(
     Constants["000010_CurrentVersionQueryingError"],
