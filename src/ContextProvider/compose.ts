@@ -12,7 +12,6 @@ export const compose = (
     const ServiceContextComposer = composeServiceContext(stores, stream, identifier);
 
     return {
-      identifier: () => identifier,
       provide: (type, configs) => ServiceContextComposer(type, DefaultScope, configs),
     };
   })(EventStores, EventStream, Identifier);

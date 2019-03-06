@@ -1,24 +1,21 @@
 import { expect } from "chai";
-import * as sinon from "sinon";
 import { createContainer } from "./createContainer";
 
 describe("createContainer.ts tests", () => {
   describe("#createContainer()", () => {
-    it("expect to create a container", () => {
+    it("expect to create a container bootstrap", () => {
       // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const provider: any = {};
+      const name = "Name";
 
       // acts
-      const container = createContainer(containerName, containerConfigs, provider);
+      const container = createContainer({ name, services: [] });
 
       // asserts
-      expect(typeof container).to.equal("object");
+      expect(typeof container).to.equal("function");
     });
   });
 
-  describe("#Container.configs()", () => {
+  /* describe("#Container.configs()", () => {
     it("expect to get container configs", () => {
       // arranges
       const containerName = "ContainerName";
@@ -156,5 +153,5 @@ describe("createContainer.ts tests", () => {
       // asserts
       expect(result).to.deep.equal([service1, service2]);
     });
-  });
+  });*/
 });

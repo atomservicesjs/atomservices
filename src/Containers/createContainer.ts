@@ -1,19 +1,30 @@
-import { IContainer, IContainerConfigs, IContextProvider, IService } from "atomservicescore";
+import { Containers, IContainer, IContainerConfigs, IService, Services } from "atomservicescore";
 
 export const createContainer = (
-  containerName: string,
-  containerConfigs: IContainerConfigs,
-  contextProvider: IContextProvider,
-): IContainer => ((ContainerName, ContainerConfigs, ContextProvider): IContainer => {
-  const ServicesMap: { [name: string]: IService; } = {};
+  container: {
+    name: string;
+    services: Services.ServiceBootstrap[],
+    configs?: IContainerConfigs;
+  },
+): Containers.ContainerBootstrap => (provider) =>
+    (async (Name, ServiceBootstraps, ContextProvider, Configs): Promise<IContainer> => {
+      const ServicesMap: { [name: string]: IService; } = {};
+      const ps = ServiceBootstraps.map((bootstrap) => bootstrap(ContextProvider));
+      const services = await Promise.all(ps);
 
-  return {
-    configs: () => ContainerConfigs,
-    name: () => ContainerName,
-    provide: (type, configs) => ContextProvider.provide(type, configs),
-    registerService: (service) => ServicesMap[service.name()] = service,
-    service: (serviceName) => ServicesMap[serviceName],
-    serviceNames: () => Object.keys(ServicesMap),
-    services: () => Object.values(ServicesMap),
-  };
-})(containerName, containerConfigs, contextProvider);
+      for (const service of services) {
+        ServicesMap[service.name()] = service;
+      }
+
+      return {
+        bootstrap: async (bootstraper) => {
+          const service = await bootstraper(ContextProvider);
+
+          ServicesMap[service.name()] = service;
+        },
+        configs: () => Configs,
+        name: () => Name,
+        service: (serviceName) => ServicesMap[serviceName],
+        serviceNames: () => Object.keys(ServicesMap),
+      };
+    })(container.name, container.services, provider, container.configs = {});

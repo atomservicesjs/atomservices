@@ -1,4 +1,4 @@
-import { IContainer, IService, IServiceConfigs, IServiceContext, IStateBase, Services } from "atomservicescore";
+import { IService, IServiceConfigs, IServiceContext, IStateBase, Services } from "atomservicescore";
 import { ICommandHandlers } from "../Commands/ICommandHandlers";
 import { IEventHandlers } from "../Events/IEventHandlers";
 import { IStateRepository } from "../IStateRepository";
@@ -8,7 +8,7 @@ import { createCommandDispatch } from "./core/createCommandDispatch";
 import { createEventProcess } from "./core/createEventProcess";
 import { createQuerier } from "./core/createQuerier";
 import { createReactor } from "./core/createReactor";
-import { initializeService } from "./initializeService";
+import { describeService } from "./describeService";
 
 export const createService = <State extends IStateBase>(
   type: string,
@@ -20,7 +20,7 @@ export const createService = <State extends IStateBase>(
     repository: IStateRepository<State>;
   },
   configs?: IServiceConfigs,
-): Services.ServiceBootstrap => (bootstraper) =>
+): Services.ServiceBootstrap => (provider) =>
     (async (
       Type,
       {
@@ -30,21 +30,21 @@ export const createService = <State extends IStateBase>(
         composeReactions,
         repository: Repository,
       },
-      Bootstraper,
+      ContextProvider,
       Configs = {},
     ): Promise<IService> => {
       const CommandHandlers = composeCommandHandlers(Type);
       const EventHandlers = composeEventHandlers(Type);
       const QueryHandlers = composeQueryHandlers(Type);
       const Reactions = composeReactions(Type);
-      const ServiceContext: IServiceContext = Bootstraper.provide(Type, configs);
+      const ServiceContext: IServiceContext = ContextProvider.provide(Type, Configs);
 
       const dispatch = createCommandDispatch(CommandHandlers, ServiceContext);
       const process = createEventProcess(EventHandlers, Repository, ServiceContext);
       const querier = createQuerier(QueryHandlers, ServiceContext);
       const reactor = createReactor(Reactions, ServiceContext);
 
-      const initializer = await initializeService(
+      const describe = await describeService(
         ServiceContext.scope(),
         Type,
         {
@@ -60,17 +60,13 @@ export const createService = <State extends IStateBase>(
       );
 
       const service: IService = {
-        asSubscribers: () => initializer.asSubscribers(),
+        asSubscribers: () => describe.asSubscribers(),
         configs: () => Configs,
-        description: () => initializer.description(),
+        description: () => describe.description(),
         dispatch: (command, listener) => dispatch(command, listener),
         name: () => Type,
         query: (query, listener) => querier(query, listener),
       };
 
-      if ((Bootstraper as IContainer).registerService !== undefined) {
-        (Bootstraper as IContainer).registerService(service);
-      }
-
       return service;
-    })(type, components, bootstraper, configs);
+    })(type, components, provider, configs);

@@ -3,7 +3,7 @@ import { ICommandHandlers } from "../Commands/ICommandHandlers";
 import { IEventHandlers } from "../Events/IEventHandlers";
 import { IReactions } from "../Reactions/IReactions";
 
-export const initializeService = (
+export const describeService = (
   scope: string,
   type: string,
   components: {

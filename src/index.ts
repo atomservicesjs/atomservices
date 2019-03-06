@@ -48,6 +48,7 @@ export {
   IServiceIdentifier,
   IStateBase,
   IStateQueryResult,
+  StateQueryResultListener,
 } from "atomservicescore";
 
 export { Exceptions } from "./Exceptions";

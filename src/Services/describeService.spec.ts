@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import * as sinon from "sinon";
-import { initializeService } from "./initializeService";
+import { describeService } from "./describeService";
 
-describe("initializeService.ts tests", () => {
-  describe("#initializeService.description()", () => {
+describe("describeService.ts tests", () => {
+  describe("#describeService.description()", () => {
     it("expect to get a description", async () => {
       // arranges
       const scope = "scope";
@@ -67,7 +67,7 @@ describe("initializeService.ts tests", () => {
       };
 
       // acts
-      const register = await initializeService(
+      const register = await describeService(
         scope,
         type,
         {
@@ -88,7 +88,7 @@ describe("initializeService.ts tests", () => {
     });
   });
 
-  describe("#initializeService.asSubscribers()", () => {
+  describe("#describeService.asSubscribers()", () => {
     it("expect to get subscribers", async () => {
       // arranges
       const scope = "scope";
@@ -149,7 +149,7 @@ describe("initializeService.ts tests", () => {
       };
 
       // acts
-      const register = await initializeService(
+      const register = await describeService(
         scope,
         type,
         {

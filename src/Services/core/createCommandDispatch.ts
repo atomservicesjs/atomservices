@@ -21,7 +21,7 @@ export const createCommandDispatch = (
 
         return DispatchResult.invalid(invalidAttributes);
       } else {
-        const event = handler.transform(command, type);
+        const event = handler.transform(command, type, ServiceContext);
 
         if (listener !== undefined) {
           ServiceContext.listenTo(event._id, listener);
