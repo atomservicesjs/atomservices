@@ -24,6 +24,10 @@ export {
 
 export {
   IAnyState,
+  IAtomCommand,
+  IAtomEvent,
+  IAtomQuery,
+  IAtomState,
   ICommand,
   ICommandHandler,
   IContainer,

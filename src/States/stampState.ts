@@ -1,11 +1,14 @@
 import { IEvent, IStateBase } from "atomservicescore";
 import { cloneDeep } from "./cloneDeep";
 
-export const stampState = (state: IStateBase, event: IEvent) => {
+export const stampState = <State extends IStateBase = IStateBase>(state: State, event: IEvent): State => {
   const cloned = cloneDeep(state);
   cloned._updatedAt = event._createdAt;
-  cloned._updatedBy = event._createdBy;
   cloned._version = event._version;
+
+  if (event._createdBy) {
+    cloned._updatedBy = event._createdBy;
+  }
 
   return cloned;
 };

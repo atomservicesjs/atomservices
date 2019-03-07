@@ -7,13 +7,13 @@ export const createContainer = (
     services: Services.ServiceBootstrap[],
     configs?: IContainerConfigs;
   },
-): Containers.ContainerBootstrap => (provider) =>
-    (async (ContainerName, ServiceBootstraps, ContextProvider, Configs): Promise<IContainer> => {
+): Containers.ContainerBootstrap => (ContextProvider) =>
+    (async (ContainerName, ServiceBootstraps, Configs): Promise<IContainer> => {
       const ServicesMap: { [hash: string]: IService; } = {};
       const ServicesHashMap: { [name: string]: string; } = {};
 
-      const ps = ServiceBootstraps.map((bootstrap) => bootstrap(ContextProvider));
-      const services = await Promise.all(ps);
+      const bootstrapings = ServiceBootstraps.map((bootstrap) => bootstrap(ContextProvider));
+      const services = await Promise.all(bootstrapings);
 
       for (const service of services) {
         const ServiceName = service.name();
@@ -63,4 +63,4 @@ export const createContainer = (
           return ServiceInstances.map((each) => each.name());
         },
       };
-    })(container.name, container.services, provider, container.configs = {});
+    })(container.name, container.services, container.configs = {});

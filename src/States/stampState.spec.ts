@@ -26,9 +26,9 @@ describe("stampState.ts tests", () => {
         _createdAt: state._createdAt,
         _createdBy: "createdBy",
         _id: 1,
-        _updatedAt: null,
-        _updatedBy: "createdBy",
-        _version: 2,
+        _updatedAt: event._createdAt,
+        _updatedBy: event._createdBy,
+        _version: event._version,
         payloads: {
           name: "name",
         },

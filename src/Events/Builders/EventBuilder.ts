@@ -1,24 +1,21 @@
 import { IEvent } from "atomservicescore";
 import { Compose } from "../../Common/Compose";
 
-export const EventBuilder = <Payloads = any, EventID = any, AggregateID = any, CreatedBy = any>(
-  initial: { id: EventID; aggregateID: AggregateID; version: number; createdBy: CreatedBy; },
-  payloads: Payloads,
-  base: Compose,
-): IEvent<Payloads, EventID, AggregateID> =>
-  Object.defineProperties(base({}), {
-    _createdAt: {
-      configurable: false,
-      enumerable: true,
-      value: new Date(),
-      writable: false,
-    },
-    _createdBy: {
-      configurable: false,
-      enumerable: true,
-      value: initial.createdBy,
-      writable: false,
-    },
+export const EventBuilder = (compose: Compose) => <Payloads = any, EventID = any, AggregateID = any, CreatedBy = any>(
+  initial: {
+    id: EventID;
+    name: string;
+    aggregateID: AggregateID;
+    version: number;
+    createdBy?: CreatedBy;
+  },
+  payloads?: Payloads,
+): IEvent<EventID, AggregateID> => {
+  let event: any = {
+    _createdAt: new Date(),
+  };
+
+  event = Object.defineProperties(compose(event), {
     _id: {
       configurable: false,
       enumerable: true,
@@ -37,10 +34,31 @@ export const EventBuilder = <Payloads = any, EventID = any, AggregateID = any, C
       value: initial.aggregateID,
       writable: false,
     },
-    payloads: {
+    name: {
+      configurable: false,
+      enumerable: true,
+      value: initial.name,
+      writable: false,
+    },
+  });
+
+  if (initial.createdBy) {
+    event = Object.defineProperty(event, "_createdBy", {
+      configurable: false,
+      enumerable: true,
+      value: initial.createdBy,
+      writable: false,
+    });
+  }
+
+  if (payloads) {
+    event = Object.defineProperty(event, "payloads", {
       configurable: false,
       enumerable: true,
       value: payloads,
       writable: false,
-    },
-  });
+    });
+  }
+
+  return event;
+};

@@ -1,42 +1,50 @@
 import { ICommand } from "atomservicescore";
 
-export const CommandBuilder = <Payloads = any>(
-  initial: {
-    name: string;
-    version: number;
-    createdBy: any;
-  },
-  payloads: Payloads,
-): ICommand<Payloads> =>
-  Object.defineProperties({}, {
-    _createdAt: {
-      configurable: false,
-      enumerable: true,
-      value: new Date(),
-      writable: false,
+export const CommandBuilder = <
+  Command extends ICommand = ICommand,
+  Payloads = any,
+  CreatedBy = any,
+  >(
+    initial: {
+      name: string;
+      version?: number;
+      createdBy?: CreatedBy;
     },
-    _createdBy: {
+    payloads?: Payloads,
+): Command => {
+  let command = Object.defineProperty({}, "name", {
+    configurable: false,
+    enumerable: true,
+    value: initial.name,
+    writable: false,
+  });
+
+  if (initial.createdBy) {
+    command = Object.defineProperty(command, "_createdBy", {
       configurable: false,
       enumerable: true,
       value: initial.createdBy,
       writable: false,
-    },
-    _version: {
+    });
+  }
+
+  if (initial.version) {
+    command = Object.defineProperty(command, "_version", {
       configurable: false,
       enumerable: true,
       value: initial.version,
       writable: false,
-    },
-    name: {
-      configurable: false,
-      enumerable: true,
-      value: initial.name,
-      writable: false,
-    },
-    payloads: {
+    });
+  }
+
+  if (payloads) {
+    command = Object.defineProperty(command, "payloads", {
       configurable: false,
       enumerable: true,
       value: payloads,
       writable: false,
-    },
-  });
+    });
+  }
+
+  return command;
+};

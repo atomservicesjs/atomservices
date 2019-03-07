@@ -7,7 +7,7 @@ export interface IValidValidationResult {
   isValid: boolean;
 }
 
-export const CommandValidateResult = {
+export const ValidateResult = {
   invalid: (invalidAttributes: any): IInvalidValidationResult => ({ isValid: false, invalidAttributes }),
   valid: (): IValidValidationResult => ({ isValid: true }),
 };

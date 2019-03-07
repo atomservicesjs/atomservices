@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import { CommandValidateResult } from "./CommandValidateResult";
+import { ValidateResult } from "./ValidateResult";
 
-describe("CommandValidateResult.ts tests", () => {
-  describe("#CommandValidateResult.valid()", () => {
+describe("ValidateResult.ts tests", () => {
+  describe("#ValidateResult.valid()", () => {
     it("expect to get the valid result", () => {
       // arranges
       const expected = {
@@ -10,14 +10,14 @@ describe("CommandValidateResult.ts tests", () => {
       };
 
       // acts
-      const result = CommandValidateResult.valid();
+      const result = ValidateResult.valid();
 
       // asserts
       expect(result).to.deep.equal(expected);
     });
   });
 
-  describe("#CommandValidateResult.invalid()", () => {
+  describe("#ValidateResult.invalid()", () => {
     it("expect to get the invalid result", () => {
       // arranges
       const invalidAttributes = {};
@@ -27,7 +27,7 @@ describe("CommandValidateResult.ts tests", () => {
       };
 
       // acts
-      const result = CommandValidateResult.invalid(invalidAttributes);
+      const result = ValidateResult.invalid(invalidAttributes);
 
       // asserts
       expect(result).to.deep.equal(expected);

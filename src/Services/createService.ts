@@ -1,4 +1,4 @@
-import { IService, IServiceConfigs, IServiceContext, IStateBase, Services } from "atomservicescore";
+import { IContextProvider, IService, IServiceConfigs, IServiceContext, IStateBase, Services } from "atomservicescore";
 import { ICommandHandlers } from "../Commands/ICommandHandlers";
 import { IEventHandlers } from "../Events/IEventHandlers";
 import { IStateRepository } from "../IStateRepository";
@@ -20,7 +20,7 @@ export const createService = <State extends IStateBase>(
     repository: IStateRepository<State>;
   },
   configs?: IServiceConfigs,
-): Services.ServiceBootstrap => (provider) =>
+) => (ContextProvider: IContextProvider): Promise<IService> =>
     (async (
       Type,
       {
@@ -30,7 +30,6 @@ export const createService = <State extends IStateBase>(
         composeReactions,
         repository: Repository,
       },
-      ContextProvider,
       Configs = {},
     ): Promise<IService> => {
       const CommandHandlers = composeCommandHandlers(Type);
@@ -70,4 +69,4 @@ export const createService = <State extends IStateBase>(
       };
 
       return service;
-    })(type, components, provider, configs);
+    })(type, components, configs);

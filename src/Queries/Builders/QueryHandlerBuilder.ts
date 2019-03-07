@@ -1,12 +1,12 @@
-import { IQueryHandler, QueryHandler } from "atomservicescore";
+import { IQuery, IQueryHandler, QueryHandler } from "atomservicescore";
 
-export const QueryHandlerBuilder = <Payloads, QueryResult>(
+export const QueryHandlerBuilder = <Query extends IQuery = IQuery, QueryResult = any>(
   initial: {
     name: string;
-    validate: QueryHandler.QueryValidate<Payloads>
-    query: QueryHandler.Querying<Payloads, QueryResult>;
+    validate: QueryHandler.QueryValidate<Query>
+    query: QueryHandler.Querying<Query, QueryResult>;
   },
-): IQueryHandler<Payloads> =>
+): IQueryHandler<Query, QueryResult> =>
   Object.defineProperties({}, {
     name: {
       configurable: false,

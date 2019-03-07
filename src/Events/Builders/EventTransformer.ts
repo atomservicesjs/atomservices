@@ -1,24 +1,29 @@
-import { ICommand, IEvent } from "atomservicescore";
+import { IEvent } from "atomservicescore";
 import { Compose } from "../../Common/Compose";
 
-export const EventTransformer = <Payloads, EventID = any, AggregateID = any>(
-  initial: { id: EventID; aggregateID: AggregateID; payloads: Payloads; },
-  command: ICommand,
-  eventBase: Compose,
-): IEvent<Payloads> =>
-  Object.defineProperties(eventBase({}), {
-    _createdAt: {
-      configurable: false,
-      enumerable: true,
-      value: command._createdAt,
-      writable: false,
+export const EventTransformer = (compose: Compose) => <
+  Event extends IEvent = IEvent,
+  Payloads = any,
+  EventID = any,
+  AggregateID = any,
+  CreatedBy = any,
+  >(
+    initial: {
+      aggregateID: AggregateID;
+      id: EventID;
+      name: string;
+      version: number;
     },
-    _createdBy: {
-      configurable: false,
-      enumerable: true,
-      value: command._createdBy,
-      writable: false,
+    options: {
+      _createdBy?: CreatedBy;
     },
+    payloads?: Payloads,
+): Event => {
+  let event: any = {
+    _createdAt: new Date(),
+  };
+
+  event = Object.defineProperties(compose(event), {
     _id: {
       configurable: false,
       enumerable: true,
@@ -28,7 +33,7 @@ export const EventTransformer = <Payloads, EventID = any, AggregateID = any>(
     _version: {
       configurable: false,
       enumerable: true,
-      value: command._version,
+      value: initial.version,
       writable: false,
     },
     aggregateID: {
@@ -37,10 +42,31 @@ export const EventTransformer = <Payloads, EventID = any, AggregateID = any>(
       value: initial.aggregateID,
       writable: false,
     },
-    payloads: {
+    name: {
       configurable: false,
       enumerable: true,
-      value: initial.payloads,
+      value: initial.name,
       writable: false,
     },
   });
+
+  if (options._createdBy) {
+    event = Object.defineProperty(event, "_createdBy", {
+      configurable: false,
+      enumerable: true,
+      value: options._createdBy,
+      writable: false,
+    });
+  }
+
+  if (payloads) {
+    event = Object.defineProperty(event, "payloads", {
+      configurable: false,
+      enumerable: true,
+      value: payloads,
+      writable: false,
+    });
+  }
+
+  return event;
+};
