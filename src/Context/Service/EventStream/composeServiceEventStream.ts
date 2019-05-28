@@ -1,23 +1,23 @@
 import { IEventStream, IServiceConfigs, IServiceEventStream } from "atomservicescore";
-import { composeServiceLevels } from "../Levels/composeServiceLevels";
+import { composeServiceLevels } from "../Levels";
 
 export const composeServiceEventStream = (stream: IEventStream) =>
   (type: string, scope: string, configs: IServiceConfigs = {}): IServiceEventStream =>
-    ((Stream, Type, Scope, Configs): IServiceEventStream => {
+    ((EventStream, Type, Scope, Configs): IServiceEventStream => {
       const ServiceLevels = composeServiceLevels(Configs);
 
       return {
         directTo: (ref, data) =>
-          Stream.directTo(ref, data),
+          EventStream.directTo(ref, data),
         dispatch: (event) =>
-          Stream.publish(event, {
+          EventStream.publish(event, {
             level: ServiceLevels.level(event.name),
             scope: Scope,
           }),
         listenTo: (ref, listener) =>
-          Stream.listenTo(ref, listener),
+          EventStream.listenTo(ref, listener),
         registerHandler: (handler, process) =>
-          Stream.subscribe(
+          EventStream.subscribe(
             {
               level: ServiceLevels.level(handler.name),
               name: handler.name,
@@ -32,7 +32,7 @@ export const composeServiceEventStream = (stream: IEventStream) =>
             process,
           ),
         registerReaction: (reaction, process) =>
-          Stream.subscribe(
+          EventStream.subscribe(
             {
               level: (reaction.scope === Scope && reaction.type === Type) ? ServiceLevels.level(reaction.name) : "public",
               name: reaction.name,

@@ -2,6 +2,7 @@ import { ICommand, ICommandHandler, IEventStream, IIdentifier, IServiceConfigs, 
 import { ServiceEventStream, ServiceIdentifier } from "../Context";
 import { combineCommandHandlers } from "./combineCommandHandlers";
 import { DispatchResult } from "./DispatchResult";
+import { ICommandDispatcher } from "./ICommandDispatcher";
 
 export const createCommandDispatcher = (
   identifier: IIdentifier,
@@ -10,10 +11,10 @@ export const createCommandDispatcher = (
 ) => (
   type: string,
   scope: string,
-  configs?: IServiceConfigs,
-  ) => {
+  configs: IServiceConfigs = {},
+  ): ICommandDispatcher => {
     const CommandHandlers = combineCommandHandlers(...commandHandlers)(type);
-    const Stream = ServiceEventStream.composeServiceEventStream(stream)(type, scope, configs);
+    const ServiceStream = ServiceEventStream.composeServiceEventStream(stream)(type, scope, configs);
     const Identifier = ServiceIdentifier.composeServiceIdentifier(identifier)(type);
 
     return {
@@ -25,7 +26,7 @@ export const createCommandDispatcher = (
 
           return DispatchResult.unhandled(type, name);
         } else {
-          const validationResult = handler.validate(command.payloads);
+          const validationResult = handler.validate(command);
 
           if (!validationResult.isValid) {
             const { invalidAttributes } = validationResult;
@@ -35,10 +36,10 @@ export const createCommandDispatcher = (
             const event = handler.transform(command, type, Identifier);
 
             if (listener !== undefined) {
-              Stream.listenTo(event._id, listener);
+              ServiceStream.listenTo(event._id, listener);
             }
 
-            await Stream.dispatch(event);
+            await ServiceStream.dispatch(event);
 
             return DispatchResult.accept(event._id);
           }

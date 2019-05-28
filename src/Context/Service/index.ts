@@ -1,9 +1,3 @@
-import * as ServiceEventStream from "./EventStream";
-import * as ServiceIdentifier from "./Identifier";
-import * as ServiceLevels from "./Levels";
-
-export {
-  ServiceEventStream,
-  ServiceIdentifier,
-  ServiceLevels,
-};
+export { composeServiceEventStream } from "./EventStream";
+export { composeServiceIdentifier } from "./Identifier";
+export { composeServiceLevels } from "./Levels";
