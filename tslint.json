@@ -5,7 +5,8 @@
   ],
   "jsRules": {},
   "rules": {
-    "variable-name": [true, "check-format", "allow-pascal-case", "allow-leading-underscore"]
+    "variable-name": [true, "check-format", "allow-pascal-case", "allow-leading-underscore"],
+    "max-line-length": [true, 150]
   },
   "rulesDirectory": []
 }

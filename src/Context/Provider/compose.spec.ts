@@ -5,12 +5,12 @@ describe("compose.ts tests", () => {
   describe("#compose()", () => {
     it("expect to compose a context provider", () => {
       // arranges
-      const stores: any = {};
-      const stream: any = {};
-      const identifier: any = {};
+      const composeEventStores: any = () => ({});
+      const composeEventStream: any = () => ({});
+      const composeIdentifier: any = () => ({});
 
       // acts
-      const provider = compose(stores, stream, identifier);
+      const provider = compose({ composeEventStores, composeEventStream, composeIdentifier });
 
       // asserts
       expect(typeof provider).to.equal("object");
@@ -20,10 +20,10 @@ describe("compose.ts tests", () => {
   describe("#ContextProvider.provide()", () => {
     it("expect to provide a service context", () => {
       // arranges
-      const stores: any = {};
-      const stream: any = {};
-      const identifier: any = {};
-      const provider = compose(stores, stream, identifier);
+      const composeEventStores: any = () => ({});
+      const composeEventStream: any = () => ({});
+      const composeIdentifier: any = () => ({});
+      const provider = compose({ composeEventStores, composeEventStream, composeIdentifier });
 
       // acts
       const context = provider.provide("type", {});
@@ -34,10 +34,10 @@ describe("compose.ts tests", () => {
 
     it("expect to provide a service context with default scope", () => {
       // arranges
-      const stores: any = {};
-      const stream: any = {};
-      const identifier: any = {};
-      const provider = compose(stores, stream, identifier);
+      const composeEventStores: any = () => ({});
+      const composeEventStream: any = () => ({});
+      const composeIdentifier: any = () => ({});
+      const provider = compose({ composeEventStores, composeEventStream, composeIdentifier });
 
       // acts
       const context = provider.provide("type", {});

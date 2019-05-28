@@ -1,10 +1,9 @@
-import { IServiceConfigs } from "atomservicescore";
-import { IServiceConfigure } from "./IServiceConfigure";
+import { EventStreams, IServiceConfigs } from "atomservicescore";
 
 const DefaultLevel = "public";
 
-export const ServiceConfigure = (configs: IServiceConfigs): IServiceConfigure => ({
-  level: (name) => {
+export const composeServiceLevels = (configs: IServiceConfigs) => ({
+  level: (name: string): EventStreams.EventLevel => {
     if (name[0] === "_") {
       return DefaultLevel;
     } else if (configs.events !== undefined && configs.events.levels !== undefined) {

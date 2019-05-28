@@ -1,24 +1,24 @@
 import * as Commands from "./Commands";
 import * as Common from "./Common";
 import * as Containers from "./Containers";
-import * as ContextProvider from "./ContextProvider";
+import * as Context from "./Context/Provider";
 import * as Events from "./Events";
 import * as Queries from "./Queries";
 import * as Queryable from "./Queryable";
 import * as Reactions from "./Reactions";
-import * as Services from "./Services";
+// import * as Services from "./Services";
 import * as States from "./States";
 
 export {
   Commands,
   Common,
   Containers,
-  ContextProvider,
+  Context,
   Events,
   Queries,
   Queryable,
   Reactions,
-  Services,
+  // Services,
   States,
 };
 

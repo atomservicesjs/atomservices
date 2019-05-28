@@ -30,7 +30,7 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
 
         DirectStreams[ref].push(listener);
       },
-      publish: async (event, { scope, level }) => {
+      publish: async (event, { level, scope }) => {
         const { name, type } = event;
 
         const Streams = level === "public" ? PublicStreams : ScopeStreams;
@@ -41,6 +41,8 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
 
           subscribers.forEach((process) => process(event, ack));
         }
+
+        return { level, name, scope, type };
       },
       subscribe: async (on, to, process) => {
         const { name, type, scope, level } = on;
@@ -59,6 +61,8 @@ export const createLocalEventStream = (ackListener?: (event: IEvent) => void): I
         }
 
         Streams[scope][type][name].push(process);
+
+        return on;
       },
     };
   })();
