@@ -1,6 +1,6 @@
 {
   "name": "atomservices",
-  "version": "0.4.0-alpha.8",
+  "version": "0.4.0-alpha.9",
   "description": "Providing Library for MicroServices Implementing EventSourcing Architecture",
   "main": "./lib/index.js",
   "typings": "./typings/index.d.ts",
@@ -29,7 +29,7 @@
   "license": "MIT",
   "repository": "git+https://github.com/atomservicesjs/atomservices",
   "dependencies": {
-    "atomservicescore": "^0.4.0-alpha.8",
+    "atomservicescore": "^0.4.0-alpha.9",
     "clone": "^2.1.2"
   },
   "devDependencies": {
