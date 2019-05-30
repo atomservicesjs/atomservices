@@ -5,14 +5,14 @@ import { DispatchResult } from "./DispatchResult";
 import { ICommandDispatcher } from "./ICommandDispatcher";
 
 export const createCommandDispatcher = (
+  scope: string,
   identifier: IIdentifier,
   stream: IEventStream,
-  ...commandHandlers: ICommandHandler[]
 ) => (
   type: string,
-  scope: string,
-  configs: IServiceConfigs = {},
-  ): ICommandDispatcher => {
+  configs: IServiceConfigs,
+  ...commandHandlers: ICommandHandler[]
+): ICommandDispatcher => {
     const CommandHandlers = combineCommandHandlers(...commandHandlers)(type);
     const ServiceStream = ServiceEventStream.composeServiceEventStream(stream)(type, scope, configs);
     const Identifier = ServiceIdentifier.composeServiceIdentifier(identifier)(type);

@@ -8,6 +8,7 @@ describe("createCommandDispatcher.ts tests", () => {
     const AggregateID = "A-1234567890";
     const EventID = "E-1234567890";
 
+    const scope = "TestPackage";
     const identifier: IIdentifier = {
       AggregateID: (type: string) => AggregateID,
       EventID: (type: string) => EventID,
@@ -53,7 +54,7 @@ describe("createCommandDispatcher.ts tests", () => {
       validate: cmdHlr2Validate,
     };
 
-    const creatingDispatcher = createCommandDispatcher(identifier, stream, cmdHlr1, cmdHlr2);
+    const creatingDispatcher = createCommandDispatcher(scope, identifier, stream);
 
     afterEach(() => {
       cmdHlr1Transform.resetHistory();
@@ -75,10 +76,9 @@ describe("createCommandDispatcher.ts tests", () => {
     it("expect to get an object when calling createCommandDispatcher(identifier, stream, ...commandHandlers)(type, scope)", () => {
       // arranges
       const type = "TestService";
-      const scope = "TestPackage";
 
       // acts
-      const dispatcher = creatingDispatcher(type, scope);
+      const dispatcher = creatingDispatcher(type, {}, cmdHlr1, cmdHlr2);
 
       // asserts
       expect(dispatcher).to.be.a("object");
@@ -87,8 +87,7 @@ describe("createCommandDispatcher.ts tests", () => {
     it("expect to get an unhandled result", async () => {
       // arranges
       const type = "TestService";
-      const scope = "TestPackage";
-      const dispatcher = creatingDispatcher(type, scope);
+      const dispatcher = creatingDispatcher(type, {}, cmdHlr1, cmdHlr2);
       const command = {
         name: "others",
       };
@@ -110,8 +109,7 @@ describe("createCommandDispatcher.ts tests", () => {
     it("expect to get an invalid result", async () => {
       // arranges
       const type = "TestService";
-      const scope = "TestPackage";
-      const dispatcher = creatingDispatcher(type, scope);
+      const dispatcher = creatingDispatcher(type, {}, cmdHlr1, cmdHlr2);
       const command = {
         name: "Cmd2",
       };
@@ -136,8 +134,7 @@ describe("createCommandDispatcher.ts tests", () => {
     it("expect to get a valid result", async () => {
       // arranges
       const type = "TestService";
-      const scope = "TestPackage";
-      const dispatcher = creatingDispatcher(type, scope);
+      const dispatcher = creatingDispatcher(type, {}, cmdHlr1, cmdHlr2);
       const command = {
         name: "Cmd1",
       };
@@ -160,8 +157,7 @@ describe("createCommandDispatcher.ts tests", () => {
     it("expect to get a valid result with listener", async () => {
       // arranges
       const type = "TestService";
-      const scope = "TestPackage";
-      const dispatcher = creatingDispatcher(type, scope);
+      const dispatcher = creatingDispatcher(type, {}, cmdHlr1, cmdHlr2);
       const command = {
         name: "Cmd1",
       };
