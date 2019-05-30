@@ -1,7 +1,7 @@
 import * as Commands from "./Commands";
 import * as Common from "./Common";
 import * as Containers from "./Containers";
-import * as Context from "./Context/Provider";
+import * as Context from "./Context";
 import * as Events from "./Events";
 import * as Queries from "./Queries";
 import * as Queryable from "./Queryable";
@@ -47,7 +47,6 @@ export {
   IService,
   IServiceConfigs,
   IServiceContext,
-  IServiceEventQueryable,
   IServiceEventStream,
   IServiceIdentifier,
   IStateBase,

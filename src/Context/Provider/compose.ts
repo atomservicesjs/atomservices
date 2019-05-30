@@ -10,25 +10,22 @@ export type ComposeIdentifierType<ComposeIdentifierOptions = any> = (options?: C
 
 export const compose = (
   composers: {
-    composeEventStores: (options?: any) => IEventStores;
     composeEventStream: (options?: any) => IEventStream;
     composeIdentifier: (options?: any) => IIdentifier;
   },
   options: {
-    eventStores?: any;
     eventStream?: any;
     identifier?: any;
   } = {},
   persistInstance: boolean = true,
 ): IContextProvider => {
-  const { composeEventStores, composeEventStream, composeIdentifier } = composers;
+  const { composeEventStream, composeIdentifier } = composers;
 
-  const EventStores = composeEventStores(options.eventStores);
   const EventStream = composeEventStream(options.eventStream);
   const Identifier = composeIdentifier(options.identifier);
 
-  return ((stores, stream, identifier): IContextProvider => {
-    const ServiceContextComposer = composeServiceContext(stream);
+  return ((stream, identifier): IContextProvider => {
+    const ServiceContextComposer = composeServiceContext(stream, identifier);
 
     const ContextProvider: IContextProvider = {
       provide: (type, configs) => ServiceContextComposer(type, DefaultScope, configs),
@@ -39,7 +36,7 @@ export const compose = (
     }
 
     return ContextProvider;
-  })(EventStores, EventStream, Identifier);
+  })(EventStream, Identifier);
 };
 
 Object.freeze(compose);
