@@ -1,6 +1,6 @@
 import { ICommand, ICommandHandler, IEventStream, IIdentifier, IServiceConfigs, Services, StateQueryResultListener } from "atomservicescore";
-import { ServiceEventStream, ServiceIdentifier } from "../Context";
-import { combineCommandHandlers } from "./combineCommandHandlers";
+import { ServiceEventStream, ServiceIdentifier } from "../../Context";
+import { combineCommandHandlers } from "../combineCommandHandlers";
 import { DispatchResult } from "./DispatchResult";
 import { ICommandDispatcher } from "./ICommandDispatcher";
 
@@ -45,6 +45,8 @@ export const createCommandDispatcher = (
           }
         }
       },
+      scope: () => scope,
+      type: () => type,
     };
   };
 
