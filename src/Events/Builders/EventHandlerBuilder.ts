@@ -6,10 +6,10 @@ export const EventHandlerBuilder = <
   >(
     initial: {
       name: string;
-      process: EventHandler.EventProcess<State, Event>;
-      processEffect?: EventHandler.EventProcessEffect<State, Event>;
+      process: EventHandler.EventProcess<Event>;
+      processEffect?: EventHandler.EventProcessEffect<Event>;
     },
-): IEventHandler<State, Event> =>
+): IEventHandler<Event> =>
   Object.defineProperties({}, {
     name: {
       configurable: false,
