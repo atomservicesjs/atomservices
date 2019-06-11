@@ -1,17 +1,24 @@
-import { IEvent } from "atomservicescore";
+// import { IEvent } from "atomservicescore";
 import Constants from "./Constants";
 import { createException } from "./createException";
 
-export const CombineDuplicatedCommandHandlersException = (type: string, name: string) =>
-  createException(Constants["000001_CombineDuplicatedCommandHandlers"], `{ type: ${type}, name: ${name} }`);
+export const ComposeDuplicatedCommandHandlersException = (type: string, name: string) =>
+  createException(Constants["000001_ComposeDuplicatedCommandHandlers"], `compose duplicated command handlers - { type: '${type}', name: '${name}' }`);
 
-export const CombineDuplicatedEventHandlersException = (type: string, name: string) =>
+/* export const CombineDuplicatedEventHandlersException = (type: string, name: string) =>
   createException(Constants["000002_CombineDuplicatedEventHandlers"], `{ type: ${type}, name: ${name} }`);
 
 export const CombineDuplicatedQueryHandlersException = (type: string, name: string) =>
   createException(Constants["000003_CombineDuplicatedQueryHandlers"], `{ type: ${type}, name: ${name} }`);
+*/
 
-export const DuplicatedServiceHashException = (container: string, service: string) =>
+export const CombineDuplicatedCommandDispatcherException = (type: string) =>
+  createException(Constants["000004_CombineDuplicatedCommandDispatchers"], `combine duplicated command dispatchers - { type: '${type}' }`);
+
+export const CombineInvalidScopeCommandDispatcherException = (scope: string) =>
+  createException(Constants["000005_CombineInvalidScopeCommandDispatchers"], `combine invalid scope command dispatchers - { scope: '${scope}' }`);
+
+/* export const DuplicatedServiceHashException = (container: string, service: string) =>
   createException(
     Constants["000007_DuplicatedServiceHash"],
     `{ container: ${container}, service: ${service} }`,
@@ -68,3 +75,4 @@ export const EventVersionConflictedConcurrentException = (event: IEvent, current
       type: event.type,
     },
   );
+*/

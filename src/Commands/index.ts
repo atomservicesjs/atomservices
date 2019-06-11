@@ -1,12 +1,14 @@
-import * as Dispatcher from "./Dispatcher";
-
 export { Builders } from "./Builders";
-export { combineCommandHandlers } from "./combineCommandHandlers";
-export { DispatchResult } from "./Dispatcher/DispatchResult";
-export { ICommandDispatcher } from "./Dispatcher/ICommandDispatcher";
-export { ICommandHandlers } from "./ICommandHandlers";
-export { ValidateResult } from "./ValidateResult";
-
+export { combineCommandDispatchers } from "./combineCommandDispatchers";
+export { composeCommandDispatcher } from "./composeCommandDispatcher";
+export { composeCommandHandlers } from "./composeCommandHandlers";
+export { DispatchResult } from "./DispatchResult";
 export {
-  Dispatcher,
-};
+  DispatchResultType,
+  DispatchStatus,
+  IAcceptDispatchResult,
+  IInvalidDispatchResult,
+  IUnhandledDispatchResult,
+} from "./DispatchResultType";
+export { ICommandDispatcher } from "./ICommandDispatcher";
+export { ICommandHandlers } from "./ICommandHandlers";

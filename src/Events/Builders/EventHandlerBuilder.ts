@@ -1,32 +1,29 @@
-import { EventHandler, IAnyState, IEvent, IEventHandler, IStateBase } from "atomservicescore";
+import { EventHandler, IEvent, IEventHandler } from "atomservicescore";
 
-export const EventHandlerBuilder = <
-  State extends IStateBase = IAnyState,
-  Event extends IEvent = IEvent,
-  >(
-    initial: {
+export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult = any, State = any, Resulting = any>(
+    composed: {
       name: string;
-      process: EventHandler.EventProcess<Event>;
-      processEffect?: EventHandler.EventProcessEffect<Event>;
+      process: EventHandler.EventProcess<Event, ProcessResult, State>;
+      processEffect?: EventHandler.EventProcessEffect<Event, ProcessResult, Resulting>;
     },
-): IEventHandler<Event> =>
+): IEventHandler<Event, ProcessResult, State, Resulting> =>
   Object.defineProperties({}, {
     name: {
       configurable: false,
       enumerable: true,
-      value: initial.name,
+      value: composed.name,
       writable: false,
     },
     process: {
       configurable: false,
       enumerable: true,
-      value: initial.process,
+      value: composed.process,
       writable: false,
     },
     processEffect: {
       configurable: false,
       enumerable: true,
-      value: initial.processEffect || EventHandler.DefaultProcessEffect,
+      value: composed.processEffect || EventHandler.DefaultEventProcessEffect,
       writable: false,
     },
   });

@@ -1,1 +1,0 @@
-export { createQueryable } from "./createQueryable";

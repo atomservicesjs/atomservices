@@ -1,52 +1,63 @@
 import { IEvent } from "atomservicescore";
-import { Compose } from "../../Common/Compose";
 
-export const EventBuilder = (compose: Compose) => <Payloads = any, EventID = any, AggregateID = any, CreatedBy = any>(
-  initial: {
-    id: EventID;
-    name: string;
-    aggregateID: AggregateID;
-    version: number;
-    createdBy?: CreatedBy;
-  },
-  payloads?: Payloads,
+export const EventBuilder = <
+  Payloads = any,
+  EventID = any,
+  AggregateID = any,
+  CreatedBy = any,
+  >(
+    composed: {
+      id: EventID;
+      type: string;
+      name: string;
+      aggregateID: AggregateID;
+      version: number;
+      createdBy?: CreatedBy;
+    },
+    payloads?: Payloads,
 ): IEvent<EventID, AggregateID> => {
   let event: any = {
     _createdAt: new Date(),
   };
 
-  event = Object.defineProperties(compose(event), {
+  event = Object.defineProperties(event, {
     _id: {
       configurable: false,
       enumerable: true,
-      value: initial.id,
+      value: composed.id,
       writable: false,
     },
     _version: {
       configurable: false,
       enumerable: true,
-      value: initial.version,
+      value: composed.version,
       writable: false,
     },
     aggregateID: {
       configurable: false,
       enumerable: true,
-      value: initial.aggregateID,
+      value: composed.aggregateID,
       writable: false,
     },
     name: {
       configurable: false,
       enumerable: true,
-      value: initial.name,
+      value: composed.name,
+      writable: false,
+    },
+    type: {
+      configurable: false,
+      enumerable: true,
+      value: composed.type,
       writable: false,
     },
   });
 
-  if (initial.createdBy) {
+  if (composed.createdBy) {
     event = Object.defineProperty(event, "_createdBy", {
       configurable: false,
       enumerable: true,
-      value: initial.createdBy,
+      value: composed.createdBy,
       writable: false,
     });
   }
