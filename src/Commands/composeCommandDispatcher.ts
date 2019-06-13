@@ -1,4 +1,4 @@
-import { ICommandHandler, IEventStream, IIdentifier, IServiceConfigs } from "atomservicescore";
+import { ICommandHandler, IEventStream, IIdentifier, IServiceConfigs, IServiceContainer } from "atomservicescore";
 import { ServiceEventStreamFactory } from "../Context/Factories/ServiceEventStreamFactory";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
 import { composeCommandHandlers } from "./composeCommandHandlers";
@@ -6,16 +6,17 @@ import { DispatchResult } from "./DispatchResult";
 import { ICommandDispatcher } from "./ICommandDispatcher";
 
 export const composeCommandDispatcher = (
-  scope: string,
+  scope: string | IServiceContainer,
   identifier: IIdentifier,
   stream: IEventStream,
 ) => (
-  type: string,
   configs: IServiceConfigs,
   ...commandHandlers: ICommandHandler[]
 ): ICommandDispatcher => {
+    const { type } = configs;
+    const Scope: string = typeof scope === "string" ? scope : scope.scope();
     const CommandHandlers = composeCommandHandlers(...commandHandlers)(type);
-    const ServiceEventStream = ServiceEventStreamFactory.create(stream, scope, type, configs);
+    const ServiceEventStream = ServiceEventStreamFactory.create(stream, Scope, type, configs);
     const ServiceIdentifier = ServiceIdentifierFactory.create(identifier, type);
 
     const Dispatcher: ICommandDispatcher = {
@@ -42,7 +43,7 @@ export const composeCommandDispatcher = (
           }
         }
       },
-      scope: () => scope,
+      scope: () => Scope,
       type: () => type,
     };
 

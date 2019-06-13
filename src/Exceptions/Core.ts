@@ -5,12 +5,8 @@ import { createException } from "./createException";
 export const ComposeDuplicatedCommandHandlersException = (type: string, name: string) =>
   createException(Constants["000001_ComposeDuplicatedCommandHandlers"], `compose duplicated command handlers - { type: '${type}', name: '${name}' }`);
 
-/* export const CombineDuplicatedEventHandlersException = (type: string, name: string) =>
-  createException(Constants["000002_CombineDuplicatedEventHandlers"], `{ type: ${type}, name: ${name} }`);
-
-export const CombineDuplicatedQueryHandlersException = (type: string, name: string) =>
-  createException(Constants["000003_CombineDuplicatedQueryHandlers"], `{ type: ${type}, name: ${name} }`);
-*/
+export const ComposeDuplicatedEventHandlersException = (type: string, name: string) =>
+  createException(Constants["000002_ComposeDuplicatedEventHandlers"], `compose duplicated event handlers - { type: '${type}', name: '${name}' }`);
 
 export const CombineDuplicatedCommandDispatcherException = (type: string) =>
   createException(Constants["000004_CombineDuplicatedCommandDispatchers"], `combine duplicated command dispatchers - { type: '${type}' }`);
@@ -18,7 +14,8 @@ export const CombineDuplicatedCommandDispatcherException = (type: string) =>
 export const CombineInvalidScopeCommandDispatcherException = (scope: string) =>
   createException(Constants["000005_CombineInvalidScopeCommandDispatchers"], `combine invalid scope command dispatchers - { scope: '${scope}' }`);
 
-/* export const DuplicatedServiceHashException = (container: string, service: string) =>
+/*
+export const DuplicatedServiceHashException = (container: string, service: string) =>
   createException(
     Constants["000007_DuplicatedServiceHash"],
     `{ container: ${container}, service: ${service} }`,

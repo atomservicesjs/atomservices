@@ -1,8 +1,7 @@
-import { ICommand } from "atomservicescore";
-import { DispatchResultType } from "./DispatchResultType";
+import { DispatchResult, ICommand } from "atomservicescore";
 
 export interface ICommandDispatcher {
-  dispatch: (command: ICommand) => Promise<DispatchResultType>;
+  dispatch: (command: ICommand) => Promise<DispatchResult.DispatchResultType>;
   scope: () => string;
   type: () => string;
 }

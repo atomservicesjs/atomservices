@@ -1,8 +1,7 @@
-import { IEvent } from "atomservicescore";
-import { IAcceptDispatchResult, IInvalidDispatchResult, IUnhandledDispatchResult } from "./DispatchResultType";
+import { DispatchResult as DispatchResultType, IEvent } from "atomservicescore";
 
 export const DispatchResult = {
-  accept: (event: IEvent): IAcceptDispatchResult =>
+  accept: (event: IEvent, ext: { [key: string]: any; } = {}): DispatchResultType.IAcceptDispatchResult =>
     ({
       accept: true,
       ref: {
@@ -12,16 +11,17 @@ export const DispatchResult = {
         aggregateID: event.aggregateID,
         name: event.name,
         type: event.type,
+        ...ext,
       },
       status: "accepted",
     }),
-  invalid: (invalidAttributes: any): IInvalidDispatchResult =>
+  invalid: (invalidAttributes: any): DispatchResultType.IInvalidDispatchResult =>
     ({
       accept: false,
       invalidAttributes,
       status: "invalid",
     }),
-  unhandled: (type: string, name: string): IUnhandledDispatchResult =>
+  unhandled: (type: string, name: string): DispatchResultType.IUnhandledDispatchResult =>
     ({
       accept: false,
       name,

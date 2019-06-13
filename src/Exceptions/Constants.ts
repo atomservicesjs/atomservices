@@ -6,8 +6,7 @@
  */
 
 export const ComposeDuplicatedCommandHandlers = "ComposeDuplicatedCommandHandlers";
-// export const CombineDuplicatedEventHandlers = "CombineDuplicatedEventHandlers";
-// export const CombineDuplicatedQueryHandlers = "CombineDuplicatedQueryHandlers";
+export const ComposeDuplicatedEventHandlers = "ComposeDuplicatedEventHandlers";
 export const CombineDuplicatedCommandDispatchers = "CombineDuplicatedCommandDispatchers";
 export const CombineInvalidScopeCommandDispatchers = "CombineInvalidScopeCommandDispatchers";
 // export const DuplicatedServiceHash = "DuplicatedServiceHash";
@@ -18,8 +17,7 @@ export const CombineInvalidScopeCommandDispatchers = "CombineInvalidScopeCommand
 
 export default {
   "000001_ComposeDuplicatedCommandHandlers": { code: "000001", name: ComposeDuplicatedCommandHandlers },
-  // "000002_CombineDuplicatedEventHandlers": { code: "000002", name: CombineDuplicatedEventHandlers },
-  // "000003_CombineDuplicatedQueryHandlers": { code: "000003", name: CombineDuplicatedQueryHandlers },
+  "000002_ComposeDuplicatedEventHandlers": { code: "000002", name: ComposeDuplicatedEventHandlers },
   "000004_CombineDuplicatedCommandDispatchers": { code: "000004", name: CombineDuplicatedCommandDispatchers },
   "000005_CombineInvalidScopeCommandDispatchers": { code: "000005", name: CombineInvalidScopeCommandDispatchers },
   // "000007_DuplicatedServiceHash": { code: "000007", name: DuplicatedServiceHash },
