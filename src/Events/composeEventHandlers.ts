@@ -6,7 +6,7 @@ interface IEventHandlersMap {
   [name: string]: IEventHandler;
 }
 
-export const composeEventHandler = (...eventHandlers: IEventHandler[]) =>
+export const composeEventHandlers = (...eventHandlers: IEventHandler[]) =>
   (type: string): IEventHandlers =>
     ((EventHandlers: IEventHandler[]): IEventHandlers => {
       const HandlersMap = EventHandlers.reduce((result: IEventHandlersMap, handler) => {
@@ -33,4 +33,4 @@ export const composeEventHandler = (...eventHandlers: IEventHandler[]) =>
       };
     })(eventHandlers);
 
-Object.freeze(composeEventHandler);
+Object.freeze(composeEventHandlers);
