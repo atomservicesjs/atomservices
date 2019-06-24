@@ -9,6 +9,7 @@ export const ComposeDuplicatedCommandHandlers = "ComposeDuplicatedCommandHandler
 export const ComposeDuplicatedEventHandlers = "ComposeDuplicatedEventHandlers";
 export const CombineDuplicatedCommandDispatchers = "CombineDuplicatedCommandDispatchers";
 export const CombineInvalidScopeCommandDispatchers = "CombineInvalidScopeCommandDispatchers";
+export const NoBoundCommandHandlersService = "NoBoundCommandHandlersService";
 // export const DuplicatedServiceHash = "DuplicatedServiceHash";
 // export const CurrentVersionQueryingError = "CurrentVersionQueryingError";
 // export const EventStoringError = "EventStoringError";
@@ -20,6 +21,7 @@ export default {
   "000002_ComposeDuplicatedEventHandlers": { code: "000002", name: ComposeDuplicatedEventHandlers },
   "000004_CombineDuplicatedCommandDispatchers": { code: "000004", name: CombineDuplicatedCommandDispatchers },
   "000005_CombineInvalidScopeCommandDispatchers": { code: "000005", name: CombineInvalidScopeCommandDispatchers },
+  "000051_NoBoundCommandHandlersService": { code: "000051", name: NoBoundCommandHandlersService },
   // "000007_DuplicatedServiceHash": { code: "000007", name: DuplicatedServiceHash },
   // "000010_CurrentVersionQueryingError": { code: "000010", name: CurrentVersionQueryingError },
   // "000011_EventStoringError": { code: "000011", name: EventStoringError },

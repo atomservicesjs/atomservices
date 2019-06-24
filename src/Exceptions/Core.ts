@@ -14,6 +14,9 @@ export const CombineDuplicatedCommandDispatcherException = (type: string) =>
 export const CombineInvalidScopeCommandDispatcherException = (scope: string) =>
   createException(Constants["000005_CombineInvalidScopeCommandDispatchers"], `combine invalid scope command dispatchers - { scope: '${scope}' }`);
 
+export const NoBoundCommandHandlersServiceException = (scope: string, type: string) =>
+  createException(Constants["000051_NoBoundCommandHandlersService"], `no bound command handlers service - { scope: '${scope}', type: '${type} }`);
+
 /*
 export const DuplicatedServiceHashException = (container: string, service: string) =>
   createException(

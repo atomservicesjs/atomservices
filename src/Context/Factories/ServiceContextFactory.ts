@@ -16,7 +16,9 @@ export const ServiceContextFactory = {
     const Context: IServiceContext = {
       AggregateID: () => ServiceIdentifier.AggregateID(),
       EventID: () => ServiceIdentifier.EventID(),
-      dispatch: (event) => ServiceStream.dispatch(event),
+      dispatch: (event, isReplay = false) => ServiceStream.dispatch(event, isReplay),
+      registerHandler: (handler, process) => ServiceStream.registerHandler(handler, process),
+      registerReaction: (reaction, react) => ServiceStream.registerReaction(reaction, react),
       scope: () => Scope,
       type: () => Type,
     };
