@@ -2,6 +2,7 @@ import * as Commands from "./Commands";
 import * as Containers from "./Containers";
 import * as Context from "./Context";
 import * as Events from "./Events";
+import * as Reactions from "./Reactions";
 import * as Services from "./Services";
 
 export {
@@ -9,6 +10,7 @@ export {
   Containers,
   Context,
   Events,
+  Reactions,
   Services,
 };
 
