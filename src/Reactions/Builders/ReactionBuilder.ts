@@ -5,7 +5,7 @@ export const ReactionBuilder = <Event extends IEvent = IEvent>(
     scope: string;
     type: string;
     name: string;
-    react: Reaction.ReactionReact;
+    react: Reaction.ReactionReact<Event>;
   },
 ): IReaction<Event> =>
   Object.defineProperties({}, {
