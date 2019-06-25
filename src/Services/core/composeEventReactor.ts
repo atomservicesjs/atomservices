@@ -13,15 +13,19 @@ export const composeEventReactor = (
 ): IEventReactor => ((ScopeType, Identifier, EventStream, Configs, Reactions): IEventReactor => {
   const { type } = Configs;
   const Scope: string = typeof ScopeType === "string" ? ScopeType : ScopeType.scope();
-  const EventReactions = composeReactions(...Reactions)(type);
+  const EventReactions = composeReactions(...Reactions);
   const ServiceContext = ServiceContextFactory.create(EventStream, Identifier, Scope, type, Configs);
 
   const reactor: IEventReactor = {
     react: async (event, scope, processAck) => {
-      const ps: Array<Promise<any>> = [];
-      EventReactions.resolve(event, scope).forEach((each) => ps.push(each.react(event, ServiceContext)));
+      const reacts: Array<Promise<any>> = [];
+      const list = EventReactions.resolve(event, scope);
 
-      await Promise.all(ps);
+      for (const reaction of list) {
+        reacts.push(reaction.react(event, ServiceContext));
+      }
+
+      await Promise.all(reacts);
       await processAck();
     },
   };
