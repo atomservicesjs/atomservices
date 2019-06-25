@@ -15,7 +15,7 @@ export const createService = (
     CommandHandlers?: ICommandHandler[];
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
-  } = {}): Promise<IService> => (async (Container, Identifier, EventStream, Configs, Components): Promise<IService> => {
+  } = {}): IService => ((Container, Identifier, EventStream, Configs, Components): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
@@ -29,7 +29,20 @@ export const createService = (
     const Service: IService = {
       configs: () =>
         Configs,
-      dispatch: (command) => {
+      connect: async () => {
+        const proc: Array<Promise<any>> = [];
+
+        for (const handler of EventHandlers) {
+          proc.push(ServiceEventStream.registerHandler(handler, EventProcessor.process));
+        }
+
+        for (const reaction of Reactions) {
+          proc.push(ServiceEventStream.registerReaction(reaction, EventReactor.react));
+        }
+
+        await Promise.all(proc);
+      },
+      dispatch: async (command) => {
         if (CommandDispatcher) {
           return CommandDispatcher.dispatch(command);
         } else {
@@ -43,19 +56,6 @@ export const createService = (
     };
 
     Object.freeze(Service);
-
-    // ServiceEventStream Register
-    const ps: Array<Promise<any>> = [];
-
-    for (const handler of EventHandlers) {
-      ps.push(ServiceEventStream.registerHandler(handler, EventProcessor.process));
-    }
-
-    for (const reaction of Reactions) {
-      ps.push(ServiceEventStream.registerReaction(reaction, EventReactor.react));
-    }
-
-    await Promise.all(ps);
 
     return Service;
   })(container, identifier, stream, configs, components);
