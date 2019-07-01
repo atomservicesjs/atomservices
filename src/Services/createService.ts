@@ -30,17 +30,12 @@ export const createService = (
       configs: () =>
         Configs,
       connect: async () => {
-        const proc: Array<Promise<any>> = [];
+        const registes: Array<Promise<any>> = [];
 
-        for (const handler of EventHandlers) {
-          proc.push(ServiceEventStream.registerHandler(handler, EventProcessor.process));
-        }
+        EventHandlers.forEach((handler) => registes.push(ServiceEventStream.registerEventProcess(handler, EventProcessor.process)));
+        Reactions.forEach((reaction) => registes.push(ServiceEventStream.registerEventReact(reaction, EventReactor.react)));
 
-        for (const reaction of Reactions) {
-          proc.push(ServiceEventStream.registerReaction(reaction, EventReactor.react));
-        }
-
-        await Promise.all(proc);
+        await Promise.all(registes);
       },
       dispatch: async (command) => {
         if (CommandDispatcher) {

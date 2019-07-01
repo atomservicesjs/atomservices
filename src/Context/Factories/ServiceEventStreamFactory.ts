@@ -11,12 +11,17 @@ export const ServiceEventStreamFactory = {
     const ServiceStreamLevel = ServiceStreamLevelFactory.create(Type, Configs);
 
     const ServiceStream: IServiceEventStream = {
-      dispatch: async (event, isReplay = false) => EventStream.publish(event, { level: ServiceStreamLevel.level(event.name), scope: Scope }, isReplay),
-      registerHandler: async (handler, process) => {
+      directTo: (ref, data) =>
+        EventStream.directTo(ref, data),
+      dispatch: async (event, isReplay = false) =>
+        EventStream.publish(event, { level: ServiceStreamLevel.level(event.name), scope: Scope }, isReplay),
+      listenTo: (ref, listener) =>
+        EventStream.listenTo(ref, listener),
+      registerEventProcess: async ({ name }, process) => {
         const { on } = await EventStream.subscribe(
           {
-            level: ServiceStreamLevel.level(handler.name),
-            name: handler.name,
+            level: ServiceStreamLevel.level(name),
+            name,
             scope: Scope,
             type: Type,
           },
@@ -30,26 +35,28 @@ export const ServiceEventStreamFactory = {
 
         return on;
       },
-      registerReaction: async (reaction, react) => {
-        const { on } = await EventStream.subscribe(
+      registerEventReact: async (on, react) => {
+        const result = await EventStream.subscribe(
           {
-            level: (reaction.scope === Scope && reaction.type === Type) ? ServiceStreamLevel.level(reaction.name) : "Public",
-            name: reaction.name,
-            scope: reaction.scope,
-            type: reaction.type,
+            level: (on.scope === Scope && on.type === Type) ? ServiceStreamLevel.level(on.name) : "Public",
+            name: on.name,
+            scope: on.scope,
+            type: on.type,
           },
           {
             channel: "EventReaction",
             scope: Scope,
             type: Type,
           },
-          (event, processAck) => react(event, reaction.scope, processAck),
+          (event, processAck) => react(event, on.scope, processAck),
         );
 
-        return on;
+        return result.on;
       },
-      scope: () => Scope,
-      type: () => Type,
+      scope: () =>
+        Scope,
+      type: () =>
+        Type,
     };
 
     Object.freeze(ServiceStream);

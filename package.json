@@ -1,7 +1,7 @@
 {
   "name": "atomservices",
-  "version": "0.5.0-alpha.9",
-  "description": "Providing Library for MicroServices Implementing EventSourcing Architecture",
+  "version": "0.5.0-alpha.11",
+  "description": "Providing Library for MicroServices Implementing EventSourcing",
   "main": "./lib/index.js",
   "typings": "./typings/index.d.ts",
   "scripts": {
@@ -29,14 +29,14 @@
   "license": "MIT",
   "repository": "git+https://github.com/atomservicesjs/atomservices",
   "dependencies": {
-    "atomservicescore": "^0.5.0-alpha.9",
+    "atomservicescore": "^0.5.0-alpha.11",
     "clone": "^2.1.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/clone": "^0.1.30",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.0.8",
+    "@types/node": "^12.0.10",
     "@types/sinon": "^7.0.13",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
@@ -44,8 +44,8 @@
     "nyc": "^14.1.1",
     "shelljs": "^0.8.3",
     "sinon": "^7.3.2",
-    "ts-node": "^8.2.0",
-    "tslint": "^5.17.0",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
     "typescript": "^3.5.2"
   },
   "nyc": {
