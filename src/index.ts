@@ -15,6 +15,7 @@ export {
 };
 
 export {
+  DispatchListening,
   DispatchResult,
   EventStream,
   IAtomCommand,
@@ -26,8 +27,11 @@ export {
   IEventHandler,
   IEventStream,
   IIdentifier,
+  IReaction,
   IService,
+  IServiceContainer,
   IServiceConfigs,
+  IServiceConfigsLevels,
   IServiceContext,
   IServiceEventStream,
   IServiceIdentifier,

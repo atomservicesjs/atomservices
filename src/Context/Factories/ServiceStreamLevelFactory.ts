@@ -1,18 +1,18 @@
-import { EventStream, IServiceLevelsConfigs, IServiceStreamLevel } from "atomservicescore";
+import { EventStream, IServiceConfigsLevels, IServiceStreamLevel } from "atomservicescore";
 
 const DefaultLevel: EventStream.StreamLevel = "Public";
 
 export const ServiceStreamLevelFactory = {
-  create: (type: string, levelsConfigs: IServiceLevelsConfigs): IServiceStreamLevel => ((Type, LevelsConfigs): IServiceStreamLevel => {
+  create: (type: string, configs: IServiceConfigsLevels): IServiceStreamLevel => ((Type, Configs): IServiceStreamLevel => {
     const ServiceLevel: IServiceStreamLevel = {
-      level: (name) => LevelsConfigs.levels ? LevelsConfigs.levels[name] || LevelsConfigs.levels._default : DefaultLevel,
+      level: (name) => Configs.levels ? Configs.levels[name] || Configs.levels._default : DefaultLevel,
       type: () => Type,
     };
 
     Object.freeze(ServiceLevel);
 
     return ServiceLevel;
-  })(type, levelsConfigs),
+  })(type, configs),
 };
 
 Object.freeze(ServiceStreamLevelFactory);
