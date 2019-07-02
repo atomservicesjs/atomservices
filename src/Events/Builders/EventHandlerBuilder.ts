@@ -4,9 +4,9 @@ export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult
     composed: {
       name: string;
       process: EventHandler.HandlerProcess<Event, ProcessResult, State>;
-      processEffect?: EventHandler.HandlerProcessEffect<Event, ProcessResult, Resulting>;
+      processEffect?: EventHandler.HandlerProcessEffect<Event, ProcessResult>;
     },
-): IEventHandler<Event, ProcessResult, State, Resulting> =>
+): IEventHandler<Event, ProcessResult, State> =>
   Object.defineProperties({}, {
     name: {
       configurable: false,
