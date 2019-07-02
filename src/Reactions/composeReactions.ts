@@ -11,7 +11,7 @@ interface IReactionsMap {
 
 export const composeReactions = (...reactions: IReaction[]): IReactions =>
   ((Reactions: IReaction[]): IReactions => {
-    const ReactionsMap = Reactions.reduce((result: IReactionsMap, reaction) => {
+    const REACTIONS_MAP = Reactions.reduce((result: IReactionsMap, reaction) => {
       if (result[reaction.scope] === undefined) {
         result[reaction.scope] = {};
       }
@@ -33,13 +33,17 @@ export const composeReactions = (...reactions: IReaction[]): IReactions =>
       forEach: (callback) => {
         Reactions.forEach((each) => callback(each));
 
+        for (const reaction of Reactions) {
+          callback(reaction);
+        }
+
         return Reactions.length;
       },
       resolve: (event, scope) => {
-        if (ReactionsMap[scope] &&
-          ReactionsMap[scope][event.type] &&
-          ReactionsMap[scope][event.type][event.name]) {
-          return ReactionsMap[scope][event.type][event.name];
+        if (REACTIONS_MAP[scope] &&
+          REACTIONS_MAP[scope][event.type] &&
+          REACTIONS_MAP[scope][event.type][event.name]) {
+          return REACTIONS_MAP[scope][event.type][event.name];
         } else {
           return [];
         }

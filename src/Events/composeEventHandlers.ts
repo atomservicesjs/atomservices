@@ -21,7 +21,7 @@ export const composeEventHandlers = (...eventHandlers: IEventHandler[]) =>
         return result;
       }, {} as IEventHandlersMap);
 
-      const Handlers: IEventHandlers = {
+      const HANDLERS: IEventHandlers = {
         forEach: (callback) => {
           const keys = Object.keys(HANDLERS_MAP);
 
@@ -31,13 +31,15 @@ export const composeEventHandlers = (...eventHandlers: IEventHandler[]) =>
 
           return keys.length;
         },
-        resolve: (event) => HANDLERS_MAP[event.name],
-        type: () => type,
+        resolve: (event) =>
+          HANDLERS_MAP[event.name],
+        type: () =>
+          type,
       };
 
-      Object.freeze(Handlers);
+      Object.freeze(HANDLERS);
 
-      return Handlers;
+      return HANDLERS;
     })(eventHandlers);
 
 Object.freeze(composeEventHandlers);

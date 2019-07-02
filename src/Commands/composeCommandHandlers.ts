@@ -21,7 +21,7 @@ export const composeCommandHandlers = (...commandHandlers: ICommandHandler[]) =>
         return result;
       }, {} as ICommandHandlersMap);
 
-      const Handlers: ICommandHandlers = {
+      const HANDLERS: ICommandHandlers = {
         forEach: (callback) => {
           const keys = Object.keys(HANDLERS_MAP);
 
@@ -31,13 +31,15 @@ export const composeCommandHandlers = (...commandHandlers: ICommandHandler[]) =>
 
           return keys.length;
         },
-        resolve: (command) => HANDLERS_MAP[command.name],
-        type: () => type,
+        resolve: (command) =>
+          HANDLERS_MAP[command.name],
+        type: () =>
+          type,
       };
 
-      Object.freeze(Handlers);
+      Object.freeze(HANDLERS);
 
-      return Handlers;
+      return HANDLERS;
     })(commandHandlers);
 
 Object.freeze(composeCommandHandlers);
