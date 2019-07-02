@@ -1,9 +1,10 @@
 import { IEvent } from "atomservicescore";
 
-export type EventNameType = "PROCESSED" | "UNHANDLED";
+export type EventNameType = "PROCESSED" | "RESULTED" | "UNHANDLED";
 
 export const EventNames = {
   PROCESSED: "PROCESSED",
+  RESULTED: "RESULTED",
   UNHANDLED: "UNHANDLED",
 };
 

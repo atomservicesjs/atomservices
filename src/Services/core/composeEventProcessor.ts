@@ -1,4 +1,4 @@
-import { IEventHandler, IEventStream, IIdentifier, IServiceConfigs, IServiceContainer } from "atomservicescore";
+import { IEvent, IEventHandler, IEventStream, IIdentifier, IServiceConfigs, IServiceContainer } from "atomservicescore";
 import { isNullOrUndefined } from "util";
 import { ServiceContextFactory } from "../../Context/Factories/ServiceContextFactory";
 import { composeEventHandlers } from "../../Events/composeEventHandlers";
@@ -25,6 +25,19 @@ export const composeEventProcessor = (
     EventsMap[name] = [];
   }
 
+  const Emitter = (eventName: string, event: IEvent, ...args: any[]) => {
+    const listeners = EventsMap[eventName];
+
+    for (const listener of listeners) {
+      listener({ event, scope: Scope }, ...args);
+    }
+  };
+
+  const Resulting = (event: IEvent) => async (result: any) => {
+    await ServiceContext.directTo(event._id, result);
+    Emitter(EventNames.RESULTED, event, result);
+  };
+
   const processor: IEventProcessor = {
     on: (eventName, listener) => {
       if (Array.isArray(EventsMap[eventName])) {
@@ -35,13 +48,14 @@ export const composeEventProcessor = (
       const Handler = EventHandlers.resolve(event);
 
       if (isNullOrUndefined(Handler)) {
-        const listeners = EventsMap[EventNames.UNHANDLED];
-        listeners.forEach((each) => each(EventNames.UNHANDLED, event, { scope: Scope, type: event.type, name: event.name }));
+        Emitter(EventNames.UNHANDLED, event);
       } else {
         const currentState = undefined;
-        const resulting: any = undefined;
+
         const result = await Handler.process(event, currentState);
-        await Handler.processEffect({ event, result }, resulting, ServiceContext);
+        Emitter(EventNames.PROCESSED, event, result);
+
+        await Handler.processEffect({ event, result }, Resulting(event), ServiceContext);
       }
 
       await processAck();

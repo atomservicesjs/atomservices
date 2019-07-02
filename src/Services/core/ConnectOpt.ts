@@ -24,3 +24,5 @@ export const DefaultConnectOpt: ConnectOpt = async (components) => {
 
   await Promise.all(ps);
 };
+
+Object.freeze(DefaultConnectOpt);
