@@ -24,7 +24,10 @@ export const composeCommandHandlers = (...commandHandlers: ICommandHandler[]) =>
       const Handlers: ICommandHandlers = {
         forEach: (callback) => {
           const keys = Object.keys(HANDLERS_MAP);
-          keys.forEach((name) => callback(HANDLERS_MAP[name]));
+
+          for (const name of keys) {
+            callback(HANDLERS_MAP[name]);
+          }
 
           return keys.length;
         },

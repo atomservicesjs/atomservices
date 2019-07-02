@@ -21,7 +21,7 @@ export const composeCommandDispatcher = (
     const ServiceIdentifier = ServiceIdentifierFactory.create(identifier, type);
 
     const Dispatcher: ICommandDispatcher = {
-      dispatch: async (command) => {
+      dispatch: async (command, listening) => {
         const Handler = CommandHandlers.resolve(command);
 
         if (isNullOrUndefined(Handler)) {
@@ -37,6 +37,10 @@ export const composeCommandDispatcher = (
             return DispatchResult.invalid(invalidAttributes);
           } else {
             const event = Handler.transform(command, ServiceIdentifier);
+
+            if (!isNullOrUndefined(listening)) {
+              ServiceEventStream.listenTo(event._id, listening);
+            }
 
             await ServiceEventStream.dispatch(event);
 

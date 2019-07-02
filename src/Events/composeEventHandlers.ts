@@ -9,7 +9,7 @@ interface IEventHandlersMap {
 export const composeEventHandlers = (...eventHandlers: IEventHandler[]) =>
   (type: string): IEventHandlers =>
     ((EventHandlers: IEventHandler[]): IEventHandlers => {
-      const HandlersMap = EventHandlers.reduce((result: IEventHandlersMap, handler) => {
+      const HANDLERS_MAP = EventHandlers.reduce((result: IEventHandlersMap, handler) => {
         const { name } = handler;
 
         if (result[name] === undefined) {
@@ -23,12 +23,15 @@ export const composeEventHandlers = (...eventHandlers: IEventHandler[]) =>
 
       const Handlers: IEventHandlers = {
         forEach: (callback) => {
-          const keys = Object.keys(HandlersMap);
-          keys.forEach((name) => callback(HandlersMap[name]));
+          const keys = Object.keys(HANDLERS_MAP);
+
+          for (const name of keys) {
+            callback(HANDLERS_MAP[name]);
+          }
 
           return keys.length;
         },
-        resolve: (event) => HandlersMap[event.name],
+        resolve: (event) => HANDLERS_MAP[event.name],
         type: () => type,
       };
 

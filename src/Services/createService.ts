@@ -4,6 +4,7 @@ import { ServiceEventStreamFactory } from "../Context/Factories/ServiceEventStre
 import { NoBoundCommandHandlersServiceException } from "../Exceptions/Core";
 import { composeEventProcessor } from "./core/composeEventProcessor";
 import { composeEventReactor } from "./core/composeEventReactor";
+import { ConnectOpt, DefaultConnectOpt } from "./core/ConnectOpt";
 
 export const createService = (
   container: IServiceContainer,
@@ -15,7 +16,11 @@ export const createService = (
     CommandHandlers?: ICommandHandler[];
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
-  } = {}): IService => ((Container, Identifier, EventStream, Configs, Components): IService => {
+  } = {},
+  opts: {
+    connectOpt?: ConnectOpt;
+  } = {},
+  ): IService => ((Container, Identifier, EventStream, Configs, Components, Opts): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
@@ -25,21 +30,21 @@ export const createService = (
     const EventProcessor = composeEventProcessor(Container, Identifier, EventStream)(Configs, ...EventHandlers);
     const EventReactor = composeEventReactor(Container, Identifier, EventStream)(Configs, ...Reactions);
     const ServiceEventStream = ServiceEventStreamFactory.create(EventStream, Container.scope(), Configs.type, Configs);
+    const { connectOpt = DefaultConnectOpt } = Opts;
 
     const Service: IService = {
       configs: () =>
         Configs,
-      connect: async () => {
-        const registes: Array<Promise<any>> = [];
-
-        EventHandlers.forEach((handler) => registes.push(ServiceEventStream.registerEventProcess(handler, EventProcessor.process)));
-        Reactions.forEach((reaction) => registes.push(ServiceEventStream.registerEventReact(reaction, EventReactor.react)));
-
-        await Promise.all(registes);
-      },
-      dispatch: async (command) => {
+      connect: async () => connectOpt({
+        EventHandlers,
+        EventProcessor,
+        EventReactor,
+        Reactions,
+        ServiceEventStream,
+      }),
+      dispatch: async (command, listening) => {
         if (CommandDispatcher) {
-          return CommandDispatcher.dispatch(command);
+          return CommandDispatcher.dispatch(command, listening);
         } else {
           throw NoBoundCommandHandlersServiceException(Container.scope(), Configs.type);
         }
@@ -53,6 +58,6 @@ export const createService = (
     Object.freeze(Service);
 
     return Service;
-  })(container, identifier, stream, configs, components);
+  })(container, identifier, stream, configs, components, opts);
 
 Object.freeze(createService);
