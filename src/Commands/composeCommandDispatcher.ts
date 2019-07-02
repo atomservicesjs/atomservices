@@ -13,48 +13,48 @@ export const composeCommandDispatcher = (
 ) => (
   configs: IServiceConfigs,
   ...commandHandlers: ICommandHandler[]
-): ICommandDispatcher => {
-    const { type } = configs;
-    const Scope: string = typeof scopeType === "string" ? scopeType : scopeType.scope();
-    const CommandHandlers = composeCommandHandlers(...commandHandlers)(type);
-    const ServiceEventStream = ServiceEventStreamFactory.create(stream, Scope, type, configs);
-    const ServiceIdentifier = ServiceIdentifierFactory.create(identifier, type);
+): ICommandDispatcher => (() => {
+  const { type } = configs;
+  const Scope: string = typeof scopeType === "string" ? scopeType : scopeType.scope();
+  const CommandHandlers = composeCommandHandlers(...commandHandlers)(type);
+  const ServiceEventStream = ServiceEventStreamFactory.create(stream, Scope, type, configs);
+  const ServiceIdentifier = ServiceIdentifierFactory.create(identifier, type);
 
-    const Dispatcher: ICommandDispatcher = {
-      dispatch: async (command, listening) => {
-        const Handler = CommandHandlers.resolve(command);
+  const DISPATCHER: ICommandDispatcher = {
+    dispatch: async (command, listening) => {
+      const Handler = CommandHandlers.resolve(command);
 
-        if (isNullOrUndefined(Handler)) {
-          const { name } = command;
+      if (isNullOrUndefined(Handler)) {
+        const { name } = command;
 
-          return DispatchResult.unhandled(type, name);
+        return DispatchResult.unhandled(type, name);
+      } else {
+        const validationResult = Handler.validate(command);
+
+        if (!validationResult.isValid) {
+          const { invalidAttributes } = validationResult;
+
+          return DispatchResult.invalid(invalidAttributes);
         } else {
-          const validationResult = Handler.validate(command);
+          const event = Handler.transform(command, ServiceIdentifier);
 
-          if (!validationResult.isValid) {
-            const { invalidAttributes } = validationResult;
-
-            return DispatchResult.invalid(invalidAttributes);
-          } else {
-            const event = Handler.transform(command, ServiceIdentifier);
-
-            if (!isNullOrUndefined(listening)) {
-              ServiceEventStream.listenTo(event._id, listening);
-            }
-
-            await ServiceEventStream.dispatch(event);
-
-            return DispatchResult.accept(event);
+          if (!isNullOrUndefined(listening)) {
+            ServiceEventStream.listenTo(event._id, listening);
           }
+
+          await ServiceEventStream.dispatch(event);
+
+          return DispatchResult.accept(event);
         }
-      },
-      scope: () => Scope,
-      type: () => type,
-    };
-
-    Object.freeze(Dispatcher);
-
-    return Dispatcher;
+      }
+    },
+    scope: () => Scope,
+    type: () => type,
   };
+
+  Object.freeze(DISPATCHER);
+
+  return DISPATCHER;
+})();
 
 Object.freeze(composeCommandDispatcher);

@@ -3,37 +3,38 @@ import {
   CombineInvalidScopeCommandDispatcherException,
 } from "../Exceptions/Core";
 import { ICommandDispatcher } from "./ICommandDispatcher";
-import { ICommandDispatching } from "./ICommandDispatching";
+import { ICommandDispatchers } from "./ICommandDispatchers";
 
 interface IDispatchersMap {
   [type: string]: ICommandDispatcher;
 }
 
-export const combineCommandDispatchers = (scope: string, ...dispatchers: ICommandDispatcher[]): ICommandDispatching =>
-  ((Scope, Dispatchers): ICommandDispatching => {
-    const DISPATCHERS = Dispatchers.reduce((result: IDispatchersMap, dispatcher) => {
+export const combineCommandDispatchers = (scope: string, ...dispatchers: ICommandDispatcher[]): ICommandDispatchers =>
+  ((Scope, Dispatchers): ICommandDispatchers => {
+    const DISPATCHERS_MAP = Dispatchers.reduce((result: IDispatchersMap, dispatcher) => {
       if (dispatcher.scope() === Scope) {
         const type = dispatcher.type();
 
         if (result[type]) {
+          result[type] = dispatcher;
+        } else {
           throw CombineDuplicatedCommandDispatcherException(type);
         }
 
-        result[type] = dispatcher;
-
-        return result;
       } else {
         throw CombineInvalidScopeCommandDispatcherException(dispatcher.scope());
       }
+
+      return result;
     }, {} as IDispatchersMap);
 
-    const Dispatching: ICommandDispatching = {
-      dispatch: (type, command) => DISPATCHERS[type].dispatch(command),
+    const DISPATCHERS: ICommandDispatchers = {
+      dispatch: (type, command, listening) => DISPATCHERS_MAP[type].dispatch(command, listening),
     };
 
-    Object.freeze(Dispatching);
+    Object.freeze(DISPATCHERS);
 
-    return Dispatching;
+    return DISPATCHERS;
   })(scope, dispatchers);
 
 Object.freeze(combineCommandDispatchers);

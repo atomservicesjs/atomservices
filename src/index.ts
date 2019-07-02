@@ -15,7 +15,6 @@ export {
 };
 
 export {
-  DispatchListening,
   DispatchResult,
   EventStream,
   IAtomCommand,
