@@ -1,6 +1,6 @@
 import { EventHandler, IEvent, IEventHandler } from "atomservicescore";
 
-export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult = any, State = any, Resulting = any>(
+export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult = any, State = any>(
     composed: {
       name: string;
       process: EventHandler.HandlerProcess<Event, ProcessResult, State>;
