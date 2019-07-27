@@ -9,6 +9,7 @@ describe("Commands/Builders/CommandHandlerBuilder.ts tests", () => {
       const transform: any = {};
       const validate: any = {};
       const expected: any = {
+        hook: {},
         name: "name",
         transform: {},
         validate: {},

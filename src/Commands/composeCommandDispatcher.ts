@@ -36,10 +36,20 @@ export const composeCommandDispatcher = (
 
           return DispatchResult.invalid(invalidAttributes);
         } else {
-          const event = Handler.transform(command, ServiceIdentifier);
+          // Apply Hook: Command
+          if (Handler.hook.command) {
+            command = await Handler.hook.command(command);
+          }
+
+          let event = Handler.transform(command, ServiceIdentifier);
 
           if (!isNullOrUndefined(listening)) {
             ServiceEventStream.listenTo(event._id, listening);
+          }
+
+          // Apply Hook: Event
+          if (Handler.hook.event) {
+            event = await Handler.hook.event(event);
           }
 
           await ServiceEventStream.dispatch(event);

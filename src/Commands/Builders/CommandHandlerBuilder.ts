@@ -5,9 +5,16 @@ export const CommandHandlerBuilder = <Command extends ICommand = ICommand, Event
     name: string;
     validate: CommandHandler.CommandValidate<Command>;
     transform: CommandHandler.CommandTransform<Command, Event>;
+    hook?: CommandHandler.ICommandHook<Command, Event>;
   },
 ): ICommandHandler<Command, Event> =>
   Object.defineProperties({}, {
+    hook: {
+      configurable: false,
+      enumerable: true,
+      value: composed.hook || {},
+      writable: false,
+    },
     name: {
       configurable: false,
       enumerable: true,

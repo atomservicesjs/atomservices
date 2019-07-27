@@ -16,9 +16,9 @@ export const combineCommandDispatchers = (scope: string, ...dispatchers: IComman
         const type = dispatcher.type();
 
         if (result[type]) {
-          result[type] = dispatcher;
-        } else {
           throw CombineDuplicatedCommandDispatcherException(type);
+        } else {
+          result[type] = dispatcher;
         }
 
       } else {
