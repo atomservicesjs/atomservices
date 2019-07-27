@@ -31,8 +31,6 @@ export const composeReactions = (...reactions: IReaction[]): IReactions =>
 
     const REACTIONS: IReactions = {
       forEach: (callback) => {
-        Reactions.forEach((each) => callback(each));
-
         for (const reaction of Reactions) {
           callback(reaction);
         }
