@@ -1,15 +1,13 @@
 import {
   ICommandHandler,
+  IEventStores,
   IEventStream,
   IIdentifier,
   IServiceConfigs,
   IServiceContainer,
-  IServiceStateRepository,
-  IStateRepositoryProvider,
 } from "atomservicescore";
 import { isNullOrUndefined } from "util";
-import { ServiceEventStreamFactory } from "../Context/Factories/ServiceEventStreamFactory";
-import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
+import { ServiceContextFactory } from "../Context/Factories/ServiceContextFactory";
 import { composeCommandHandlers } from "./composeCommandHandlers";
 import { DispatchResult } from "./DispatchResult";
 import { ICommandDispatcher } from "./ICommandDispatcher";
@@ -18,7 +16,9 @@ export const composeCommandDispatcher = (
   scopeType: string | IServiceContainer,
   identifier: IIdentifier,
   stream: IEventStream,
-  repositoryProvider?: IStateRepositoryProvider,
+  options: {
+    EventStores?: IEventStores,
+  } = {},
 ) => (
   configs: IServiceConfigs,
   ...commandHandlers: ICommandHandler[]
@@ -26,9 +26,7 @@ export const composeCommandDispatcher = (
   const { type } = configs;
   const Scope: string = typeof scopeType === "string" ? scopeType : scopeType.scope();
   const CommandHandlers = composeCommandHandlers(...commandHandlers)(type);
-  const ServiceEventStream = ServiceEventStreamFactory.create(stream, Scope, type, configs);
-  const ServiceIdentifier = ServiceIdentifierFactory.create(identifier, type);
-  const ServiceStateRepository = repositoryProvider ? repositoryProvider.provide(Scope, type) : undefined;
+  const ServiceContext = ServiceContextFactory.create(stream, identifier, Scope, type, configs, options);
 
   const DISPATCHER: ICommandDispatcher = {
     dispatch: async (command, listening) => {
@@ -51,14 +49,10 @@ export const composeCommandDispatcher = (
             command = await Handler.hook.command(command);
           }
 
-          let event = Handler.transform(command, ServiceIdentifier);
-
-          if (ServiceStateRepository) {
-            const last = await ServiceStateRepository.queryByAggregateID(event.aggregateID);
-          }
+          let event = Handler.transform(command, ServiceContext);
 
           if (!isNullOrUndefined(listening)) {
-            ServiceEventStream.listenTo(event._id, listening);
+            ServiceContext.listenTo(event._id, listening);
           }
 
           // #HOOK: Apply Event Hook
@@ -66,7 +60,7 @@ export const composeCommandDispatcher = (
             event = await Handler.hook.event(event);
           }
 
-          await ServiceEventStream.dispatch(event);
+          await ServiceContext.dispatch(event);
 
           return DispatchResult.accept(event);
         }
