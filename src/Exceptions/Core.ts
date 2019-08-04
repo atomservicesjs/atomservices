@@ -1,4 +1,4 @@
-// import { IEvent } from "atomservicescore";
+import { IEvent } from "atomservicescore";
 import Constants from "./Constants";
 import { createException } from "./createException";
 
@@ -13,20 +13,6 @@ export const CombineDuplicatedCommandDispatcherException = (type: string) =>
 
 export const CombineInvalidScopeCommandDispatcherException = (scope: string) =>
   createException(Constants["000005_CombineInvalidScopeCommandDispatchers"], `combine invalid scope command dispatchers - { scope: '${scope}' }`);
-
-export const NoBoundCommandHandlersServiceException = (scope: string, type: string) =>
-  createException(Constants["000051_NoBoundCommandHandlersService"], `no bound command handlers service - { scope: '${scope}', type: '${type} }`);
-
-/*
-export const DuplicatedServiceHashException = (container: string, service: string) =>
-  createException(
-    Constants["000007_DuplicatedServiceHash"],
-    `{ container: ${container}, service: ${service} }`,
-    {
-      container,
-      service,
-    },
-  );
 
 export const CurrentVersionQueryingErrorException = (error: Error, aggregateID: any, type: string, scope: string) =>
   createException(
@@ -64,6 +50,9 @@ export const EventPublishingErrorException = (error: Error, event: IEvent, scope
     },
   );
 
+export const NoBoundCommandHandlersServiceException = (scope: string, type: string) =>
+  createException(Constants["000051_NoBoundCommandHandlersService"], `no bound command handlers service - { scope: '${scope}', type: '${type} }`);
+
 export const EventVersionConflictedConcurrentException = (event: IEvent, currentVersion: number, scope: string) =>
   createException(
     Constants["000100_EventVersionConflictedConcurrent"],
@@ -75,4 +64,3 @@ export const EventVersionConflictedConcurrentException = (event: IEvent, current
       type: event.type,
     },
   );
-*/

@@ -1,4 +1,5 @@
 import { IEventStream, IServiceConfigs, IServiceEventStream } from "atomservicescore";
+import { EventPublishingErrorException } from "../../Exceptions/Core";
 import { ServiceStreamLevelFactory } from "./ServiceStreamLevelFactory";
 
 export const ServiceEventStreamFactory = {
@@ -13,8 +14,13 @@ export const ServiceEventStreamFactory = {
     const ServiceStream: IServiceEventStream = {
       directTo: (ref, data) =>
         EventStream.directTo(ref, data),
-      dispatch: async (event, isReplay = false) =>
-        EventStream.publish(event, { level: ServiceStreamLevel.level(event.name), scope: Scope }, isReplay),
+      dispatch: async (event, metadata) => {
+        try {
+          return EventStream.publish(event, { level: ServiceStreamLevel.level(event.name), scope: Scope }, metadata);
+        } catch (error) {
+          throw EventPublishingErrorException(error, event, Scope);
+        }
+      },
       listenTo: (ref, listener) =>
         EventStream.listenTo(ref, listener),
       registerEventProcess: async ({ name }, process) => {

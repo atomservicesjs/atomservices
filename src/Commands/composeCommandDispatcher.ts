@@ -1,4 +1,12 @@
-import { ICommandHandler, IEventStream, IIdentifier, IServiceConfigs, IServiceContainer } from "atomservicescore";
+import {
+  ICommandHandler,
+  IEventStream,
+  IIdentifier,
+  IServiceConfigs,
+  IServiceContainer,
+  IServiceStateRepository,
+  IStateRepositoryProvider,
+} from "atomservicescore";
 import { isNullOrUndefined } from "util";
 import { ServiceEventStreamFactory } from "../Context/Factories/ServiceEventStreamFactory";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
@@ -10,6 +18,7 @@ export const composeCommandDispatcher = (
   scopeType: string | IServiceContainer,
   identifier: IIdentifier,
   stream: IEventStream,
+  repositoryProvider?: IStateRepositoryProvider,
 ) => (
   configs: IServiceConfigs,
   ...commandHandlers: ICommandHandler[]
@@ -19,6 +28,7 @@ export const composeCommandDispatcher = (
   const CommandHandlers = composeCommandHandlers(...commandHandlers)(type);
   const ServiceEventStream = ServiceEventStreamFactory.create(stream, Scope, type, configs);
   const ServiceIdentifier = ServiceIdentifierFactory.create(identifier, type);
+  const ServiceStateRepository = repositoryProvider ? repositoryProvider.provide(Scope, type) : undefined;
 
   const DISPATCHER: ICommandDispatcher = {
     dispatch: async (command, listening) => {
@@ -36,18 +46,22 @@ export const composeCommandDispatcher = (
 
           return DispatchResult.invalid(invalidAttributes);
         } else {
-          // Apply Hook: Command
+          // #HOOK: Apply Command Hook
           if (Handler.hook.command) {
             command = await Handler.hook.command(command);
           }
 
           let event = Handler.transform(command, ServiceIdentifier);
 
+          if (ServiceStateRepository) {
+            const last = await ServiceStateRepository.queryByAggregateID(event.aggregateID);
+          }
+
           if (!isNullOrUndefined(listening)) {
             ServiceEventStream.listenTo(event._id, listening);
           }
 
-          // Apply Hook: Event
+          // #HOOK: Apply Event Hook
           if (Handler.hook.event) {
             event = await Handler.hook.event(event);
           }
