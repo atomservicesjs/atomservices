@@ -1,4 +1,7 @@
 import { ExtendException } from "./ExtendException";
+import { IExtendException } from "./IExtendException";
 
-export const createException = (meta: { code: string; name: string; }, message: string, ext: object = {}) =>
-  new ExtendException(meta.code, meta.name, message, ext);
+export const createException = (composed: { code: string; name: string; }, description: string, ext: object = {}): IExtendException =>
+  new ExtendException(composed.code, composed.name, description, ext);
+
+Object.freeze(createException);

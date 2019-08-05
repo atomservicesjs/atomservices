@@ -5,7 +5,7 @@ export const CommandBuilder = <
   Payloads = any,
   CreatedBy = any,
   >(
-    initial: {
+    composed: {
       name: string;
       version?: number;
       createdBy?: CreatedBy;
@@ -15,24 +15,24 @@ export const CommandBuilder = <
   let command = Object.defineProperty({}, "name", {
     configurable: false,
     enumerable: true,
-    value: initial.name,
+    value: composed.name,
     writable: false,
   });
 
-  if (initial.createdBy) {
+  if (composed.createdBy) {
     command = Object.defineProperty(command, "_createdBy", {
       configurable: false,
       enumerable: true,
-      value: initial.createdBy,
+      value: composed.createdBy,
       writable: false,
     });
   }
 
-  if (initial.version) {
+  if (composed.version) {
     command = Object.defineProperty(command, "_version", {
       configurable: false,
       enumerable: true,
-      value: initial.version,
+      value: composed.version,
       writable: false,
     });
   }
@@ -48,3 +48,5 @@ export const CommandBuilder = <
 
   return command;
 };
+
+Object.freeze(CommandBuilder);

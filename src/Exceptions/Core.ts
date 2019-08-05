@@ -2,24 +2,17 @@ import { IEvent } from "atomservicescore";
 import Constants from "./Constants";
 import { createException } from "./createException";
 
-export const CombineDuplicatedCommandHandlersException = (type: string, name: string) =>
-  createException(Constants["000001_CombineDuplicatedCommandHandlers"], `{ type: ${type}, name: ${name} }`);
+export const ComposeDuplicatedCommandHandlersException = (type: string, name: string) =>
+  createException(Constants["000001_ComposeDuplicatedCommandHandlers"], `compose duplicated command handlers - { type: '${type}', name: '${name}' }`);
 
-export const CombineDuplicatedEventHandlersException = (type: string, name: string) =>
-  createException(Constants["000002_CombineDuplicatedEventHandlers"], `{ type: ${type}, name: ${name} }`);
+export const ComposeDuplicatedEventHandlersException = (type: string, name: string) =>
+  createException(Constants["000002_ComposeDuplicatedEventHandlers"], `compose duplicated event handlers - { type: '${type}', name: '${name}' }`);
 
-export const CombineDuplicatedQueryHandlersException = (type: string, name: string) =>
-  createException(Constants["000003_CombineDuplicatedQueryHandlers"], `{ type: ${type}, name: ${name} }`);
+export const CombineDuplicatedCommandDispatcherException = (type: string) =>
+  createException(Constants["000004_CombineDuplicatedCommandDispatchers"], `combine duplicated command dispatchers - { type: '${type}' }`);
 
-export const DuplicatedServiceHashException = (container: string, service: string) =>
-  createException(
-    Constants["000007_DuplicatedServiceHash"],
-    `{ container: ${container}, service: ${service} }`,
-    {
-      container,
-      service,
-    },
-  );
+export const CombineInvalidScopeCommandDispatcherException = (scope: string) =>
+  createException(Constants["000005_CombineInvalidScopeCommandDispatchers"], `combine invalid scope command dispatchers - { scope: '${scope}' }`);
 
 export const CurrentVersionQueryingErrorException = (error: Error, aggregateID: any, type: string, scope: string) =>
   createException(
@@ -56,6 +49,9 @@ export const EventPublishingErrorException = (error: Error, event: IEvent, scope
       type: event.type,
     },
   );
+
+export const NoBoundCommandHandlersServiceException = (scope: string, type: string) =>
+  createException(Constants["000051_NoBoundCommandHandlersService"], `no bound command handlers service - { scope: '${scope}', type: '${type} }`);
 
 export const EventVersionConflictedConcurrentException = (event: IEvent, currentVersion: number, scope: string) =>
   createException(

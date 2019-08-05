@@ -1,7 +1,7 @@
 {
   "name": "atomservices",
-  "version": "0.4.0-alpha.9",
-  "description": "Providing Library for MicroServices Implementing EventSourcing Architecture",
+  "version": "0.5.0-alpha.22",
+  "description": "Providing Library Implementing Event-based Architecture",
   "main": "./lib/index.js",
   "typings": "./typings/index.d.ts",
   "scripts": {
@@ -21,30 +21,34 @@
     "aftertests": "node _scripts/aftertests",
     "test-all": "npm run test-mocha",
     "test-all-cvr": "npm run test-mocha-cvr",
-    "test-mocha": "mocha lib --recursive",
-    "test-mocha-cvr": "nyc mocha lib --recursive",
+    "test-mocha": "mocha -r ts-node/register/transpile-only './src/**/*.spec.ts' --timeout 60000 --exit",
+    "test-mocha-cvr": "nyc mocha -r ts-node/register/transpile-only './src/**/*.spec.ts' --timeout 60000 --exit",
     "prepublishOnly": "npm i && npm run build && npm run aftertests"
   },
   "author": "Architecode Corporation",
   "license": "MIT",
   "repository": "git+https://github.com/atomservicesjs/atomservices",
   "dependencies": {
-    "atomservicescore": "^0.4.0-alpha.9",
+    "atomservicescore": "^0.5.0-alpha.22",
     "clone": "^2.1.2"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^0.1.3",
     "@types/chai": "^4.1.7",
     "@types/clone": "^0.1.30",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^12.0.3",
-    "@types/sinon": "^7.0.12",
+    "@types/mocha": "^5.2.7",
+    "@types/mock-require": "^2.0.0",
+    "@types/node": "^12.6.9",
+    "@types/sinon": "^7.0.13",
     "chai": "^4.2.0",
-    "mocha": "^6.1.4",
+    "mocha": "^6.2.0",
     "mock-require": "^3.0.3",
-    "nyc": "^13.3.0",
+    "nyc": "^14.1.1",
     "shelljs": "^0.8.3",
     "sinon": "^7.3.2",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "source-map-support": "^0.5.12",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
   }
 }

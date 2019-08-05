@@ -1,3 +1,3 @@
 export { Builders } from "./Builders";
-export { combineEventHandlers } from "./combineEventHandlers";
+export { composeEventHandlers } from "./composeEventHandlers";
 export { IEventHandlers } from "./IEventHandlers";

@@ -1,157 +1,98 @@
 import { expect } from "chai";
+import * as sinon from "sinon";
 import { createContainer } from "./createContainer";
 
 describe("createContainer.ts tests", () => {
-  describe("#createContainer()", () => {
-    it("expect to create a container bootstrap", () => {
+  describe("#container.scope()", () => {
+    it("expect to get a container scope", () => {
       // arranges
-      const name = "Name";
+      const container = createContainer("Test");
 
       // acts
-      const container = createContainer({ name, services: [] });
+      const result = container.scope();
 
       // asserts
-      expect(typeof container).to.equal("function");
+      expect(result).to.equal("Test");
     });
   });
 
-  /* describe("#Container.configs()", () => {
-    it("expect to get container configs", () => {
+  describe("#container.isConnected", () => {
+    it("expect to get a status of connected", () => {
       // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const provider: any = {};
-      const container = createContainer(containerName, containerConfigs, provider);
+      const container = createContainer("Test");
 
       // acts
-      const result = container.configs();
+      const result = container.isConnected;
 
       // asserts
-      expect(result).to.equal(containerConfigs);
+      expect(result).to.equal(false);
+    });
+
+    it("expect to set a status of connected to throw an Error", () => {
+      // arranges
+      const container = createContainer("Test") as any;
+
+      // acts
+      const act = () => container.isConnected = true;
+
+      // asserts
+      expect(act).to.throw(Error);
     });
   });
 
-  describe("#Container.name()", () => {
-    it("expect to get a container name", () => {
+  describe("#container.registerService()", () => {
+    it("expect to register a service", async () => {
       // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const provider: any = {};
-      const container = createContainer(containerName, containerConfigs, provider);
-
-      // acts
-      const result = container.name();
-
-      // asserts
-      expect(result).to.equal(containerName);
-    });
-  });
-
-  describe("#Container.provide()", () => {
-    it("expect to call ContextProvider.provide()", () => {
-      // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const configs = {};
-      const provider: any = {
-        provide: sinon.spy(),
-      };
-      const container = createContainer(containerName, containerConfigs, provider);
-
-      // acts
-      container.provide("type", configs);
-
-      // asserts
-      expect(provider.provide.calledWith("type", configs)).to.equal(true);
-    });
-  });
-
-  describe("#Container.provide()", () => {
-    it("expect to call ContextProvider.provide()", () => {
-      // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const configs = {};
-      const provider: any = {
-        provide: sinon.spy(),
-      };
-      const container = createContainer(containerName, containerConfigs, provider);
-
-      // acts
-      container.provide("type", configs);
-
-      // asserts
-      expect(provider.provide.calledWith("type", configs)).to.equal(true);
-    });
-  });
-
-  describe("#Container.service()", () => {
-    it("expect to get service", () => {
-      // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const provider: any = {};
       const service: any = {
-        name: () => "test.service",
+        // tslint:disable-next-line: no-empty
+        connect: sinon.stub().callsFake(async () => { }),
       };
-      const container = createContainer(containerName, containerConfigs, provider);
+      const container = createContainer("Test");
+
+      // acts
+      const result = await container.registerService(service);
+
+      // asserts
+      expect(result).to.deep.equal(service);
+      expect(service.connect.notCalled).to.equal(true);
+    });
+  });
+
+  describe("#container.connect()", () => {
+    it("expect to connect a service by container, #1", async () => {
+      // arranges
+      const service: any = {
+        // tslint:disable-next-line: no-empty
+        connect: sinon.stub().callsFake(async () => { }),
+      };
+      const container = createContainer("Test");
+
+      // acts
       container.registerService(service);
-
-      // acts
-      const result1 = container.service("test.service");
-      const result2 = container.service("other.service");
+      await container.connect();
+      const result = container.isConnected;
 
       // asserts
-      expect(result1).to.equal(service);
-      expect(result2).to.equal(undefined);
+      expect(result).to.equal(true);
+      expect(service.connect.calledOnce).to.equal(true);
+    });
+
+    it("expect to connect a service by container, #2", async () => {
+      // arranges
+      const service: any = {
+        // tslint:disable-next-line: no-empty
+        connect: sinon.stub().callsFake(async () => { }),
+      };
+      const container = createContainer("Test");
+
+      // acts
+      await container.connect();
+      const result = container.isConnected;
+      await container.registerService(service);
+
+      // asserts
+      expect(result).to.equal(true);
+      expect(service.connect.calledOnce).to.equal(true);
     });
   });
-
-  describe("#Container.serviceNames()", () => {
-    it("expect to get an array of service names", () => {
-      // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const provider: any = {};
-      const service1: any = {
-        name: () => "test.service1",
-      };
-      const service2: any = {
-        name: () => "test.service2",
-      };
-      const container = createContainer(containerName, containerConfigs, provider);
-      container.registerService(service1);
-      container.registerService(service2);
-
-      // acts
-      const result = container.serviceNames();
-
-      // asserts
-      expect(result).to.deep.equal(["test.service1", "test.service2"]);
-    });
-  });
-
-  describe("#Container.services()", () => {
-    it("expect to get an array of services", () => {
-      // arranges
-      const containerName = "ContainerName";
-      const containerConfigs = {};
-      const provider: any = {};
-      const service1: any = {
-        name: () => "test.service1",
-      };
-      const service2: any = {
-        name: () => "test.service2",
-      };
-      const container = createContainer(containerName, containerConfigs, provider);
-      container.registerService(service1);
-      container.registerService(service2);
-
-      // acts
-      const result = container.services();
-
-      // asserts
-      expect(result).to.deep.equal([service1, service2]);
-    });
-  });*/
 });

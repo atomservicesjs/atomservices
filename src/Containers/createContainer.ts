@@ -1,66 +1,55 @@
-import { Containers, IContainer, IContainerConfigs, IService, Services } from "atomservicescore";
-import { DuplicatedServiceHashException } from "../Exceptions/Core";
+import { IService, IServiceContainer } from "atomservicescore";
 
-export const createContainer = (
-  container: {
-    name: string;
-    services: Services.ServiceBootstrap[],
-    configs?: IContainerConfigs;
-  },
-): Containers.ContainerBootstrap => (ContextProvider) =>
-    (async (ContainerName, ServiceBootstraps, Configs): Promise<IContainer> => {
-      const ServicesMap: { [hash: string]: IService; } = {};
-      const ServicesHashMap: { [name: string]: string; } = {};
+export const createContainer = (scope: string): IServiceContainer =>
+  ((Scope): IServiceContainer => {
+    let IsConnected = false;
+    const RegisteredServicePromises: Array<Promise<IService>> = [];
 
-      const bootstrapings = ServiceBootstraps.map((bootstrap) => bootstrap(ContextProvider));
-      const services = await Promise.all(bootstrapings);
-
-      for (const service of services) {
-        const ServiceName = service.name();
-        const servicename = ServiceName.toLowerCase();
-
-        if (ServicesHashMap[servicename] === undefined) {
-          const servicehash = service.hash(ContainerName);
-          ServicesHashMap[servicename] = servicehash;
-          ServicesMap[servicehash] = service;
-        } else {
-          throw DuplicatedServiceHashException(ContainerName, ServiceName);
-        }
-      }
-
-      const ContainerHash = Containers.ContainerHash.hash(ContainerName);
-
-      const ServiceSelector = (type: string) => {
-        const servicename = type.toLowerCase();
-        const servicehash = ServicesHashMap[servicename];
-
-        return ServicesMap[servicehash];
-      };
-
-      return {
-        bootstrap: async (bootstraper) => {
-          const service = await bootstraper(ContextProvider);
-
-          ServicesMap[service.name()] = service;
+    const container: any = Object.defineProperties({}, {
+      connect: {
+        configurable: false,
+        enumerable: true,
+        value: async () => {
+          const services = await Promise.all(RegisteredServicePromises);
+          await Promise.all(services.map((each) => each.connect()));
+          IsConnected = true;
         },
-        configs: () => Configs,
-        dispatch: (type, command, listener) => {
-          const Service = ServiceSelector(type);
+        writable: false,
+      },
+      isConnected: {
+        configurable: false,
+        enumerable: true,
+        get: () => IsConnected,
+      },
+      registerService: {
+        configurable: false,
+        enumerable: true,
+        value: (service: IService) => {
+          const promise = new Promise<IService>((resolve, reject) => {
+            if (IsConnected) {
+              service.connect()
+                .then(() => resolve(service))
+                .catch((error) => reject(error));
+            } else {
+              resolve(service);
+            }
+          });
 
-          return Service.dispatch(command, listener);
-        },
-        hash: () => ContainerHash,
-        name: () => ContainerName,
-        query: (type, query, listener) => {
-          const Service = ServiceSelector(type);
+          RegisteredServicePromises.push(promise);
 
-          return Service.query(query, listener);
+          return promise;
         },
-        service: (type) => ServiceSelector(type),
-        serviceNames: () => {
-          const ServiceInstances = Object.values(ServicesMap);
+        writable: false,
+      },
+      scope: {
+        configurable: false,
+        enumerable: true,
+        value: () => Scope,
+        writable: false,
+      },
+    });
 
-          return ServiceInstances.map((each) => each.name());
-        },
-      };
-    })(container.name, container.services, container.configs = {});
+    Object.freeze(container);
+
+    return container;
+  })(scope);

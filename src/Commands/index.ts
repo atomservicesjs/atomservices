@@ -1,12 +1,13 @@
-import * as Dispatcher from "./Dispatcher";
-
-export { Builders } from "./Builders";
-export { combineCommandHandlers } from "./combineCommandHandlers";
-export { DispatchResult } from "./Dispatcher/DispatchResult";
-export { ICommandDispatcher } from "./Dispatcher/ICommandDispatcher";
-export { ICommandHandlers } from "./ICommandHandlers";
-export { ValidateResult } from "./ValidateResult";
+import { DispatchResult } from "atomservicescore";
 
 export {
-  Dispatcher,
+  DispatchResult,
 };
+
+export { Builders } from "./Builders";
+export { combineCommandDispatchers } from "./combineCommandDispatchers";
+export { composeCommandDispatcher } from "./composeCommandDispatcher";
+export { composeCommandHandlers } from "./composeCommandHandlers";
+export { ICommandDispatcher } from "./ICommandDispatcher";
+export { ICommandDispatchers } from "./ICommandDispatchers";
+export { ICommandHandlers } from "./ICommandHandlers";

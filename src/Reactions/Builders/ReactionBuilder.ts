@@ -1,36 +1,36 @@
 import { IEvent, IReaction, Reaction } from "atomservicescore";
 
 export const ReactionBuilder = <Event extends IEvent = IEvent>(
-  initial: {
+  composed: {
     scope: string;
     type: string;
     name: string;
-    react: Reaction.ReactionReact;
+    react: Reaction.ReactionReact<Event>;
   },
 ): IReaction<Event> =>
   Object.defineProperties({}, {
     name: {
       configurable: false,
       enumerable: true,
-      value: initial.name,
+      value: composed.name,
       writable: false,
     },
     react: {
       configurable: false,
       enumerable: true,
-      value: initial.react,
+      value: composed.react,
       writable: false,
     },
     scope: {
       configurable: false,
       enumerable: true,
-      value: initial.scope,
+      value: composed.scope,
       writable: false,
     },
     type: {
       configurable: false,
       enumerable: true,
-      value: initial.type,
+      value: composed.type,
       writable: false,
     },
   });

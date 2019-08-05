@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { CommandHandlerBuilder } from "./CommandHandlerBuilder";
 
-describe("CommandHandlerBuilder.ts tests", () => {
+describe("Commands/Builders/CommandHandlerBuilder.ts tests", () => {
   describe("#CommandHandlerBuilder()", () => {
     it("expect to create a command handler builder", () => {
       // arranges
@@ -9,6 +9,7 @@ describe("CommandHandlerBuilder.ts tests", () => {
       const transform: any = {};
       const validate: any = {};
       const expected: any = {
+        hook: {},
         name: "name",
         transform: {},
         validate: {},

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { CommandBuilder } from "./CommandBuilder";
 
-describe("CommandBuilder.ts tests", () => {
+describe("Commands/Builder/CommandBuilder.ts tests", () => {
   describe("#CommandBuilder()", () => {
     it("expect to create a command with name as minimal required", () => {
       // arranges

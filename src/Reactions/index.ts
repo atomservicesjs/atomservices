@@ -1,3 +1,3 @@
 export { Builders } from "./Builders";
-export { combineReactions } from "./combineReactions";
+export { composeReactions } from "./composeReactions";
 export { IReactions } from "./IReactions";
