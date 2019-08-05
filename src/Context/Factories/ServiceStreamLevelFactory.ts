@@ -3,7 +3,10 @@ import { EventStream, IServiceConfigsLevels, IServiceStreamLevel } from "atomser
 const DefaultLevel: EventStream.StreamLevel = "Public";
 
 export const ServiceStreamLevelFactory = {
-  create: (type: string, configs: IServiceConfigsLevels): IServiceStreamLevel => ((Type, Configs): IServiceStreamLevel => {
+  create: (
+    type: string,
+    configs: IServiceConfigsLevels,
+  ): IServiceStreamLevel => ((Type, Configs): IServiceStreamLevel => {
     const ServiceLevel: IServiceStreamLevel = {
       level: (name) => Configs.levels ? Configs.levels[name] || Configs.levels._default : DefaultLevel,
       type: () => Type,

@@ -17,8 +17,8 @@ export const ServiceContextFactory = {
     options: {
       EventStores?: IEventStores,
     } = {},
-  ): IServiceContext => ((EStream, Identifier, Scope, Type, Configs, Options): IServiceContext => {
-    const ServiceStream = ServiceEventStreamFactory.create(EStream, Scope, Type, Configs);
+  ): IServiceContext => ((EventStream, Identifier, Scope, Type, Configs, Options): IServiceContext => {
+    const ServiceStream = ServiceEventStreamFactory.create(EventStream, Scope, Type, Configs);
     const ServiceIdentifier = ServiceIdentifierFactory.create(Identifier, Type);
     const { EventStores } = Options;
 
