@@ -1,11 +1,11 @@
-import { IIdentifier, IServiceIdentifier } from "atomservicescore";
+import { Core, Service } from "atomservicescore";
 
 export const ServiceIdentifierFactory = {
   create: (
-    identifier: IIdentifier,
+    identifier: Core.IIdentifier,
     type: string,
-  ): IServiceIdentifier => ((Identifier, Type): IServiceIdentifier => {
-    const ServiceIdentifier: IServiceIdentifier = {
+  ): Service.IServiceIdentifier => ((Identifier, Type): Service.IServiceIdentifier => {
+    const ServiceIdentifier: Service.IServiceIdentifier = {
       AggregateID: () => Identifier.AggregateID(Type),
       EventID: () => Identifier.EventID(Type),
       type: () => Type,

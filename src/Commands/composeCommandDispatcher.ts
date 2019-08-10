@@ -2,29 +2,25 @@ import {
   Core,
   ICommandHandler,
   IServiceConfigs,
-  IServiceContainer,
 } from "atomservicescore";
 import { isNullOrUndefined } from "util";
-import { ServiceContextFactory } from "../Context/Factories/ServiceContextFactory";
+import { composeServiceContext } from "../Services/core/composeServiceContext";
 import { composeCommandHandlers } from "./composeCommandHandlers";
 import { DispatchResult } from "./DispatchResult";
 import { ICommandDispatcher } from "./ICommandDispatcher";
 
 export const composeCommandDispatcher = (
-  scopeType: string | IServiceContainer,
+  scope: string,
   identifier: Core.IIdentifier,
   stream: Core.IEventStream,
-  options: {
-    EventStores?: Core.IEventStores,
-  } = {},
+  stores?: Core.IEventStores,
 ) => (
   configs: IServiceConfigs,
   ...commandHandlers: ICommandHandler[]
 ): ICommandDispatcher => (() => {
   const { type } = configs;
-  const Scope: string = typeof scopeType === "string" ? scopeType : scopeType.scope();
   const CommandHandlers = composeCommandHandlers(...commandHandlers)(type);
-  const ServiceContext = ServiceContextFactory.create(stream, identifier, Scope, type, configs, options);
+  const ServiceContext = composeServiceContext(scope, type, identifier, stream, configs, stores)(false);
 
   const DISPATCHER: ICommandDispatcher = {
     dispatch: async (command, listening) => {
@@ -64,7 +60,7 @@ export const composeCommandDispatcher = (
         }
       }
     },
-    scope: () => Scope,
+    scope: () => scope,
     type: () => type,
   };
 
