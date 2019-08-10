@@ -3,7 +3,7 @@ import { ICommand } from "atomservicescore";
 export const CommandBuilder = <
   Command extends ICommand = ICommand,
   Payloads = any,
-  CreatedBy = any,
+  CreatedBy = Date,
   >(
     composed: {
       name: string;
