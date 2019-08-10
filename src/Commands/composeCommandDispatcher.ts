@@ -1,8 +1,6 @@
 import {
+  Core,
   ICommandHandler,
-  IEventStores,
-  IEventStream,
-  IIdentifier,
   IServiceConfigs,
   IServiceContainer,
 } from "atomservicescore";
@@ -14,10 +12,10 @@ import { ICommandDispatcher } from "./ICommandDispatcher";
 
 export const composeCommandDispatcher = (
   scopeType: string | IServiceContainer,
-  identifier: IIdentifier,
-  stream: IEventStream,
+  identifier: Core.IIdentifier,
+  stream: Core.IEventStream,
   options: {
-    EventStores?: IEventStores,
+    EventStores?: Core.IEventStores,
   } = {},
 ) => (
   configs: IServiceConfigs,

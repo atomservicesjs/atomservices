@@ -1,31 +1,37 @@
-import { IEventStream, IIdentifier, IReaction, IServiceConfigs, IServiceContainer } from "atomservicescore";
-import { ServiceContextFactory } from "../../Context/Factories/ServiceContextFactory";
+import { Core, IReaction, IServiceConfigs } from "atomservicescore";
 import { composeReactions } from "../../Reactions/composeReactions";
+import { composeServiceContext } from "./composeServiceContext";
 import { IEventReactor } from "./IEventReactor";
 
 export const composeEventReactor = (
-  scopeType: string | IServiceContainer,
-  identifier: IIdentifier,
-  stream: IEventStream,
+  scope: string,
+  identifier: Core.IIdentifier,
+  stream: Core.IEventStream,
+  stores?: Core.IEventStores,
 ) => (
   configs: IServiceConfigs,
   ...reactions: IReaction[]
-): IEventReactor => ((ScopeType, Identifier, EventStream, Configs, Reactions): IEventReactor => {
-  const { type } = Configs;
-  const Scope: string = typeof ScopeType === "string" ? ScopeType : ScopeType.scope();
+): IEventReactor => ((Scope, Identifier, EventStream, EventStores, Configs, Reactions): IEventReactor => {
+  const { type: Type } = Configs;
   const EventReactions = composeReactions(...Reactions);
-  const ServiceContext = ServiceContextFactory.create(EventStream, Identifier, Scope, type, Configs);
+
+  const ComposeServiceContext = composeServiceContext(Scope, Type, Identifier, EventStream, Configs, EventStores);
 
   const reactor: IEventReactor = {
-    react: async (event, scope, processAck) => {
-      const reacts: Array<Promise<any>> = [];
-      const list = EventReactions.resolve(event, scope);
+    react: async (event, eventscope, metadata, processAck) => {
+      const collection = EventReactions.resolve(event, eventscope);
 
-      for (const reaction of list) {
-        reacts.push(reaction.react(event, ServiceContext));
+      if (collection.length > 0) {
+        const reacts: Array<Promise<any>> = [];
+        const ServiceContext = ComposeServiceContext(metadata.isReplay);
+
+        for (const reaction of collection) {
+          reacts.push(reaction.react(event, eventscope, ServiceContext, metadata));
+        }
+
+        await Promise.all(reacts);
       }
 
-      await Promise.all(reacts);
       await processAck();
     },
   };
@@ -33,6 +39,6 @@ export const composeEventReactor = (
   Object.freeze(reactor);
 
   return reactor;
-})(scopeType, identifier, stream, configs, reactions);
+})(scope, identifier, stream, stores, configs, reactions);
 
 Object.freeze(composeEventReactor);

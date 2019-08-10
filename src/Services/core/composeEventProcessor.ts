@@ -1,61 +1,36 @@
-import { IEvent, IEventHandler, IEventStream, IIdentifier, IServiceConfigs, IServiceContainer } from "atomservicescore";
-import { isNullOrUndefined } from "util";
-import { ServiceContextFactory } from "../../Context/Factories/ServiceContextFactory";
+import { Core, IEvent, IEventHandler, IServiceConfigs, Service } from "atomservicescore";
 import { composeEventHandlers } from "../../Events/composeEventHandlers";
-import { EventNames, IEventProcessor } from "./IEventProcessor";
+import { composeServiceContext } from "./composeServiceContext";
+import { IEventProcessor } from "./IEventProcessor";
 
 export const composeEventProcessor = (
-  scopeType: string | IServiceContainer,
-  identifier: IIdentifier,
-  stream: IEventStream,
+  scope: string,
+  identifier: Core.IIdentifier,
+  stream: Core.IEventStream,
+  stores?: Core.IEventStores,
 ) => (
   configs: IServiceConfigs,
   ...eventHandlers: IEventHandler[]
-): IEventProcessor => ((ScopeType, Identifier, EventStream, Configs, Handlers): IEventProcessor => {
-  const { type } = Configs;
-  const Scope: string = typeof ScopeType === "string" ? ScopeType : ScopeType.scope();
-  const EventHandlers = composeEventHandlers(...Handlers)(type);
-  const ServiceContext = ServiceContextFactory.create(EventStream, Identifier, Scope, type, Configs);
+): IEventProcessor => ((Scope, Identifier, EventStream, EventStores, Configs, Handlers): IEventProcessor => {
+  const { type: Type } = Configs;
+  const EventHandlers = composeEventHandlers(...Handlers)(Type);
 
-  const EventsMap: {
-    [EventName: string]: any[];
-  } = {};
-
-  for (const name of Object.keys(EventNames)) {
-    EventsMap[name] = [];
-  }
-
-  const Emitter = (eventName: string, event: IEvent, ...args: any[]) => {
-    const listeners = EventsMap[eventName];
-
-    for (const listener of listeners) {
-      listener({ event, scope: Scope }, ...args);
-    }
-  };
-
-  const Resulting = (event: IEvent) => async (result: any) => {
+  const ComposeResulting = (ServiceContext: Service.IServiceContext) => (event: IEvent) => async (result: any) => {
     await ServiceContext.directTo(event._id, result);
-    Emitter(EventNames.RESULTED, event, result);
   };
+  const ComposeServiceContext = composeServiceContext(Scope, Type, Identifier, EventStream, Configs, EventStores);
 
   const processor: IEventProcessor = {
-    on: (eventName, listener) => {
-      if (Array.isArray(EventsMap[eventName])) {
-        EventsMap[eventName].push(listener);
-      }
-    },
-    process: async (event, processAck) => {
+    process: async (event, metadata, processAck) => {
       const Handler = EventHandlers.resolve(event);
 
-      if (isNullOrUndefined(Handler)) {
-        Emitter(EventNames.UNHANDLED, event);
-      } else {
+      if (Handler) {
+        const ServiceContext = ComposeServiceContext(metadata.isReplay);
         const currentState = undefined;
 
-        const result = await Handler.process(event, currentState);
-        Emitter(EventNames.PROCESSED, event, result);
+        const result = await Handler.process(event, currentState, metadata);
 
-        await Handler.processEffect({ event, result }, Resulting(event), ServiceContext);
+        await Handler.processEffect({ event, result, metadata }, ComposeResulting(ServiceContext)(event), ServiceContext);
       }
 
       await processAck();
@@ -65,6 +40,6 @@ export const composeEventProcessor = (
   Object.freeze(processor);
 
   return processor;
-})(scopeType, identifier, stream, configs, eventHandlers);
+})(scope, identifier, stream, stores, configs, eventHandlers);
 
 Object.freeze(composeEventProcessor);

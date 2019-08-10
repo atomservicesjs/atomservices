@@ -15,8 +15,8 @@ export {
 };
 
 export {
+  Core,
   DispatchResult,
-  EventStream,
   IAtomCommand,
   IAtomEvent,
   IAtomState,
@@ -24,17 +24,11 @@ export {
   ICommandHandler,
   IEvent,
   IEventHandler,
-  IEventStream,
-  IIdentifier,
   IReaction,
   IService,
   IServiceContainer,
   IServiceConfigs,
   IServiceConfigsLevels,
-  IServiceContext,
-  IServiceEventStream,
-  IServiceIdentifier,
-  IServiceStreamLevel,
   IState,
   IValidationResultType,
 } from "atomservicescore";

@@ -1,18 +1,21 @@
-import { ICommandHandler, IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IService, IServiceConfigs, IServiceContainer } from "atomservicescore";
+import { Core, ICommandHandler, IEventHandler, IReaction, IService, IServiceConfigs, IServiceContainer } from "atomservicescore";
 import { composeCommandDispatcher } from "../Commands/composeCommandDispatcher";
-import { ServiceEventStreamFactory } from "../Context/Factories/ServiceEventStreamFactory";
+// import { ServiceEventStreamFactory } from "../Context/Factories/ServiceEventStreamFactory";
 import { NoBoundCommandHandlersServiceException } from "../Exceptions/Core";
-import { composeEventProcessor } from "./core/composeEventProcessor";
-import { composeEventReactor } from "./core/composeEventReactor";
-import { ConnectOpt, DefaultConnectOpt } from "./core/ConnectOpt";
+// import { composeEventProcessor } from "./core/composeEventProcessor";
+// import { composeEventReactor } from "./core/composeEventReactor";
+// import { ConnectOpt, DefaultConnectOpt } from "./core/ConnectOpt";
+import { IStreamConnector } from "./core/IStreamConnector";
+import { StreamConnector } from "./core/StreamConnector";
 
 export const createService = (
   container: IServiceContainer,
-  stream: IEventStream,
-  identifier: IIdentifier,
+  stream: Core.IEventStream,
+  identifier: Core.IIdentifier,
   configs: IServiceConfigs,
   options: {
-    EventStores?: IEventStores,
+    EventStores?: Core.IEventStores,
+    Connector?: IStreamConnector;
   } = {},
 ) => (
   components: {
@@ -20,31 +23,38 @@ export const createService = (
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
   } = {},
-  opts: {
-    connectOpt?: ConnectOpt;
-  } = {},
-  ): IService => ((Container, Identifier, EventStream, Configs, Components, Opts, Options): IService => {
+  ): IService => ((Container, EventStream, Identifier, Configs, Components, Options): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
       Reactions = [],
     } = Components;
+    const Scope = Container.scope();
+    const Type = Configs.type;
     const CommandDispatcher = composeCommandDispatcher(Container, Identifier, EventStream, Options)(Configs, ...CommandHandlers);
-    const EventProcessor = composeEventProcessor(Container, Identifier, EventStream)(Configs, ...EventHandlers);
-    const EventReactor = composeEventReactor(Container, Identifier, EventStream)(Configs, ...Reactions);
-    const ServiceEventStream = ServiceEventStreamFactory.create(EventStream, Container.scope(), Configs.type, Configs);
-    const { connectOpt = DefaultConnectOpt } = Opts;
+
+    // const EventProcessor = composeEventProcessor(Container, Identifier, EventStream)(Configs, ...EventHandlers);
+    // const EventReactor = composeEventReactor(Container, Identifier, EventStream)(Configs, ...Reactions);
+    // const ServiceEventStream = ServiceEventStreamFactory.create(EventStream, Container.scope(), Configs.type, Configs);
+    const {
+      Connector = StreamConnector,
+      EventStores,
+    } = Options;
 
     const Service: IService = {
       configs: () =>
         Configs,
-      connect: async () => connectOpt({
-        EventHandlers,
-        EventProcessor,
-        EventReactor,
-        Reactions,
-        ServiceEventStream,
-      }),
+      connect: () => Connector.connect(
+        Scope,
+        Type,
+        Configs,
+        EventStream,
+        {
+          EventHandlers,
+          Reactions,
+        },
+        EventStores,
+      ),
       dispatch: async (command, listening) => {
         if (CommandDispatcher) {
           return CommandDispatcher.dispatch(command, listening);
@@ -61,6 +71,6 @@ export const createService = (
     Object.freeze(Service);
 
     return Service;
-  })(container, identifier, stream, configs, components, opts, options);
+  })(container, stream, identifier, configs, components, options);
 
 Object.freeze(createService);
