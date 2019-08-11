@@ -1,11 +1,11 @@
-import { Core, ICommandHandler, IEventHandler, IReaction, IService, IServiceConfigs, IServiceContainer } from "atomservicescore";
+import { Core, ICommandHandler, IEventHandler, IReaction, IService, IServiceConfigs } from "atomservicescore";
 import { composeCommandDispatcher } from "../Commands/composeCommandDispatcher";
 import { NoBoundCommandHandlersServiceException } from "../Exceptions/Core";
 import { IStreamConnector } from "./core/IStreamConnector";
 import { StreamConnector } from "./core/StreamConnector";
 
 export const createService = (
-  container: IServiceContainer,
+  scope: string,
   identifier: Core.IIdentifier,
   stream: Core.IEventStream,
   configs: IServiceConfigs,
@@ -19,19 +19,18 @@ export const createService = (
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
   } = {},
-  ): IService => ((Container, Identifier, EventStream, Configs, Components, Options): IService => {
+  ): IService => ((Scope, Identifier, EventStream, Configs, Components, Options): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
       Reactions = [],
     } = Components;
-    const Scope = Container.scope();
     const Type = Configs.type;
     const {
       Connector = StreamConnector,
       EventStores,
     } = Options;
-    const CommandDispatcher = composeCommandDispatcher(Container.scope(), Identifier, EventStream, EventStores)(Configs, ...CommandHandlers);
+    const CommandDispatcher = composeCommandDispatcher(Scope, Identifier, EventStream, EventStores)(Configs, ...CommandHandlers);
 
     const Service: IService = {
       configs: () =>
@@ -53,11 +52,11 @@ export const createService = (
         if (CommandDispatcher) {
           return CommandDispatcher.dispatch(command, listening);
         } else {
-          throw NoBoundCommandHandlersServiceException(Container.scope(), Configs.type);
+          throw NoBoundCommandHandlersServiceException(Scope, Configs.type);
         }
       },
       scope: () =>
-        Container.scope(),
+        Scope,
       type: () =>
         Configs.type,
     };
@@ -65,6 +64,6 @@ export const createService = (
     Object.freeze(Service);
 
     return Service;
-  })(container, identifier, stream, configs, components, options);
+  })(scope, identifier, stream, configs, components, options);
 
 Object.freeze(createService);

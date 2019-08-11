@@ -4,7 +4,7 @@ import { createService } from "./createService";
 describe("createService.ts tests", () => {
   it("expect to create an instance of Service", async () => {
     // arranges
-    const container: any = { scope: () => "TestScope" };
+    const scope = "TestScope";
     const identifier: any = {};
     const stream: any = {};
     const configs: any = {
@@ -12,7 +12,7 @@ describe("createService.ts tests", () => {
     };
 
     // acts
-    const service = await createService(container, identifier, stream, configs)();
+    const service = await createService(scope, identifier, stream, configs)();
 
     // asserts
     expect(service.scope()).to.equal("TestScope");
