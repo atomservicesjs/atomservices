@@ -36,18 +36,19 @@ export const createService = (
     const Service: IService = {
       configs: () =>
         Configs,
-      connect: () => Connector.connect(
-        Scope,
-        Type,
-        Configs,
-        Identifier,
-        EventStream,
-        {
-          EventHandlers,
-          Reactions,
-        },
-        EventStores,
-      ),
+      connect: async () =>
+        Connector.connect(
+          Scope,
+          Type,
+          Configs,
+          Identifier,
+          EventStream,
+          {
+            EventHandlers,
+            Reactions,
+          },
+          EventStores,
+        ),
       dispatch: async (command, listening) => {
         if (CommandDispatcher) {
           return CommandDispatcher.dispatch(command, listening);
