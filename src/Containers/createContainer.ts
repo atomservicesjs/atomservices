@@ -1,7 +1,9 @@
 import { IService, IServiceContainer } from "atomservicescore";
 
-export const createContainer = (scope: string, ...services: IService[]): IServiceContainer =>
-  ((Scope, Services): IServiceContainer => {
+export const createContainer = (scope: string): IServiceContainer =>
+  ((Scope): IServiceContainer => {
+    const Services: IService[] = [];
+
     const container: any = Object.defineProperties({}, {
       connect: {
         configurable: false,
@@ -17,9 +19,15 @@ export const createContainer = (scope: string, ...services: IService[]): IServic
         value: () => Scope,
         writable: false,
       },
+      service: {
+        configurable: false,
+        enumerable: true,
+        value: (service: IService) => Services.push(service),
+        writable: false,
+      },
     });
 
     Object.freeze(container);
 
     return container;
-  })(scope, services);
+  })(scope);

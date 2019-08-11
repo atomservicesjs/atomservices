@@ -1,11 +1,11 @@
-import { Core, ICommandHandler, IEventHandler, IReaction, IService, IServiceConfigs } from "atomservicescore";
+import { Core, ICommandHandler, IEventHandler, IReaction, IService, IServiceConfigs, IServiceContainer } from "atomservicescore";
 import { composeCommandDispatcher } from "../Commands/composeCommandDispatcher";
 import { NoBoundCommandHandlersServiceException } from "../Exceptions/Core";
 import { IStreamConnector } from "./core/IStreamConnector";
 import { StreamConnector } from "./core/StreamConnector";
 
 export const createService = (
-  scope: string,
+  container: IServiceContainer,
   identifier: Core.IIdentifier,
   stream: Core.IEventStream,
   configs: IServiceConfigs,
@@ -19,13 +19,14 @@ export const createService = (
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
   } = {},
-  ): IService => ((Scope, Identifier, EventStream, Configs, Components, Options): IService => {
+  ): IService => ((Container, Identifier, EventStream, Configs, Components, Options): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
       Reactions = [],
     } = Components;
     const Type = Configs.type;
+    const Scope = Container.scope();
     const {
       Connector = StreamConnector,
       EventStores,
@@ -61,9 +62,10 @@ export const createService = (
         Configs.type,
     };
 
+    Container.service(Service);
     Object.freeze(Service);
 
     return Service;
-  })(scope, identifier, stream, configs, components, options);
+  })(container, identifier, stream, configs, components, options);
 
 Object.freeze(createService);

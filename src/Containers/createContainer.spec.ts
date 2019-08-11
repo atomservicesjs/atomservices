@@ -23,7 +23,8 @@ describe("createContainer.ts tests", () => {
         // tslint:disable-next-line: no-empty
         connect: sinon.stub().callsFake(async () => { }),
       };
-      const container = createContainer("Test", service);
+      const container = createContainer("Test");
+      container.service(service);
 
       // acts
       await container.connect();
