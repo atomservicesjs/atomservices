@@ -1,4 +1,4 @@
-import { Core, ICommandHandler, IEventHandler, IReaction, IService, IServiceConfigs, IServiceContainer } from "atomservicescore";
+import { ICommandHandler, IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IService, IServiceConfigs, IServiceContainer } from "atomservicescore";
 import { composeCommandDispatcher } from "../Commands/composeCommandDispatcher";
 import { NoBoundCommandHandlersServiceException } from "../Exceptions/Core";
 import { IStreamConnector } from "./core/IStreamConnector";
@@ -6,11 +6,11 @@ import { StreamConnector } from "./core/StreamConnector";
 
 export const createService = (
   container: IServiceContainer,
-  identifier: Core.IIdentifier,
-  stream: Core.IEventStream,
+  identifier: IIdentifier,
+  stream: IEventStream,
   configs: IServiceConfigs,
   options: {
-    EventStores?: Core.IEventStores,
+    EventStores?: IEventStores,
     Connector?: IStreamConnector;
   } = {},
 ) => (

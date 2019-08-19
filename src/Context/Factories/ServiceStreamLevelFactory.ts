@@ -1,6 +1,6 @@
-import { Core, IServiceConfigsLevels, Service } from "atomservicescore";
+import { EventStream, IServiceConfigsLevels, Service } from "atomservicescore";
 
-const DefaultLevel: Core.EventStream.StreamLevel = "Public";
+const DefaultLevel: EventStream.StreamLevel = "Public";
 
 export const ServiceStreamLevelFactory = {
   create: (

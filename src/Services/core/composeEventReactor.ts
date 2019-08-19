@@ -1,13 +1,13 @@
-import { Core, IReaction, IServiceConfigs } from "atomservicescore";
+import { IEventStores, IEventStream, IIdentifier, IReaction, IServiceConfigs } from "atomservicescore";
 import { composeReactions } from "../../Reactions/composeReactions";
 import { composeServiceContext } from "./composeServiceContext";
 import { IEventReactor } from "./IEventReactor";
 
 export const composeEventReactor = (
   scope: string,
-  identifier: Core.IIdentifier,
-  stream: Core.IEventStream,
-  stores?: Core.IEventStores,
+  identifier: IIdentifier,
+  stream: IEventStream,
+  stores?: IEventStores,
 ) => (
   configs: IServiceConfigs,
   ...reactions: IReaction[]

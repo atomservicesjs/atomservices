@@ -1,4 +1,4 @@
-import { Core } from "atomservicescore";
+import { EventStream } from "atomservicescore";
 
 /*
 export type EventNameType = "PROCESSED" | "RESULTED" | "UNHANDLED";
@@ -10,5 +10,5 @@ export const EventNames = {
 };*/
 
 export interface IEventProcessor {
-  process: Core.EventStream.EventProcess;
+  process: EventStream.EventProcess;
 }

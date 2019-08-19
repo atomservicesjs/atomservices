@@ -1,4 +1,4 @@
-import { Core, IEventHandler, IReaction, IServiceConfigs } from "atomservicescore";
+import { IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IServiceConfigs } from "atomservicescore";
 import { ServiceStreamLevelFactory } from "../../Context/Factories/ServiceStreamLevelFactory";
 import { composeEventProcessor } from "./composeEventProcessor";
 import { composeEventReactor } from "./composeEventReactor";
@@ -9,13 +9,13 @@ export const StreamConnector: IStreamConnector = {
     scope: string,
     type: string,
     configs: IServiceConfigs,
-    identifier: Core.IIdentifier,
-    stream: Core.IEventStream,
+    identifier: IIdentifier,
+    stream: IEventStream,
     components: {
       EventHandlers: IEventHandler[];
       Reactions: IReaction[];
     },
-    stores?: Core.IEventStores,
+    stores?: IEventStores,
   ) => {
     const { EventHandlers, Reactions } = components;
     const ps: Array<Promise<any>> = [];

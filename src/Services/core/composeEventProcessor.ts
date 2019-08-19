@@ -1,13 +1,13 @@
-import { Core, IEvent, IEventHandler, IServiceConfigs, Service } from "atomservicescore";
+import { IEvent, IEventHandler, IEventStores, IEventStream, IIdentifier, IServiceConfigs, Service } from "atomservicescore";
 import { composeEventHandlers } from "../../Events/composeEventHandlers";
 import { composeServiceContext } from "./composeServiceContext";
 import { IEventProcessor } from "./IEventProcessor";
 
 export const composeEventProcessor = (
   scope: string,
-  identifier: Core.IIdentifier,
-  stream: Core.IEventStream,
-  stores?: Core.IEventStores,
+  identifier: IIdentifier,
+  stream: IEventStream,
+  stores?: IEventStores,
 ) => (
   configs: IServiceConfigs,
   ...eventHandlers: IEventHandler[]

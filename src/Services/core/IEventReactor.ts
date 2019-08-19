@@ -1,5 +1,5 @@
-import { Core } from "atomservicescore";
+import { EventStream } from "atomservicescore";
 
 export interface IEventReactor {
-  react: Core.EventStream.EventReact;
+  react: EventStream.EventReact;
 }

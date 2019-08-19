@@ -15,7 +15,6 @@ export {
 };
 
 export {
-  Core,
   DispatchResult,
   IAtomCommand,
   IAtomEvent,
@@ -25,6 +24,9 @@ export {
   IEvent,
   IEventHandler,
   IReaction,
+  IEventStores,
+  IEventStream,
+  IIdentifier,
   IService,
   IServiceContainer,
   IServiceConfigs,

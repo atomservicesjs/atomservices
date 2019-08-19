@@ -1,4 +1,4 @@
-import { Core, IServiceConfigs, Service } from "atomservicescore";
+import { EventStream, IEventStores, IEventStream, IIdentifier, IServiceConfigs, Service } from "atomservicescore";
 import { ServiceIdentifierFactory } from "../../Context/Factories/ServiceIdentifierFactory";
 import { ServiceStreamLevelFactory } from "../../Context/Factories/ServiceStreamLevelFactory";
 import {
@@ -11,11 +11,11 @@ import {
 export const composeServiceContext = (
   scope: string,
   type: string,
-  identifier: Core.IIdentifier,
-  stream: Core.IEventStream,
+  identifier: IIdentifier,
+  stream: IEventStream,
   configs: IServiceConfigs,
-  stores?: Core.IEventStores,
-) => ((Scope, Type, Identifier, EventStream, Configs, EventStores) => {
+  stores?: IEventStores,
+) => ((Scope, Type, Identifier, EStream, Configs, EStores) => {
   const ServiceIdentifier = ServiceIdentifierFactory.create(Identifier, Type);
   const ServiceStreamLevel = ServiceStreamLevelFactory.create(Type, Configs);
 
@@ -23,13 +23,13 @@ export const composeServiceContext = (
     const Context: Service.IServiceContext = {
       AggregateID: () => ServiceIdentifier.AggregateID(),
       EventID: () => ServiceIdentifier.EventID(),
-      directTo: (ref, data) => EventStream.directTo(ref, data),
+      directTo: (ref, data) => EStream.directTo(ref, data),
       dispatch: async (event) => {
-        if (EventStores && !isReplay) {
+        if (EStores && !isReplay) {
           let currentVersion: number;
 
           try {
-            const meta = await EventStores.queryCurrentVersion(Scope, Type, event.aggregateID);
+            const meta = await EStores.queryCurrentVersion(Scope, Type, event.aggregateID);
             currentVersion = meta.version;
           } catch (error) {
             throw CurrentVersionQueryingErrorException(error, event.aggregateID, Type, Scope);
@@ -37,7 +37,7 @@ export const composeServiceContext = (
 
           if (currentVersion + 1 === event._version) {
             try {
-              await EventStores.storeEvent(Scope, event);
+              await EStores.storeEvent(Scope, event);
             } catch (error) {
               throw EventStoringErrorException(error, event, Scope);
             }
@@ -47,14 +47,14 @@ export const composeServiceContext = (
         }
 
         try {
-          const metadata: Core.EventStream.IStreamMetadata = { isReplay };
-          return EventStream.publish(event, metadata, { level: ServiceStreamLevel.level(event.name), scope: Scope });
+          const metadata: EventStream.IStreamMetadata = { isReplay };
+          return EStream.publish(event, metadata, { level: ServiceStreamLevel.level(event.name), scope: Scope });
         } catch (error) {
           throw EventPublishingErrorException(error, event, Scope);
         }
       },
       listenTo: (ref, listener) =>
-        EventStream.listenTo(ref, listener),
+        EStream.listenTo(ref, listener),
       scope: () => Scope,
       type: () => Type,
     };
