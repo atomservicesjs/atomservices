@@ -16,6 +16,7 @@ export {
 
 export {
   DispatchResult,
+  EventStream,
   IAtomCommand,
   IAtomEvent,
   IAtomState,
