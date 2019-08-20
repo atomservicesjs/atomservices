@@ -34,4 +34,5 @@ export {
   IServiceConfigsLevels,
   IState,
   IValidationResultType,
+  Service,
 } from "atomservicescore";
