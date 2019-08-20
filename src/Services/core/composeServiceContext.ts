@@ -1,4 +1,4 @@
-import { EventStream, IEventStores, IEventStream, IIdentifier, IServiceConfigs, Service } from "atomservicescore";
+import { EventStream, IEventStores, IEventStream, IIdentifier, IServiceConfigs, IServiceContext } from "atomservicescore";
 import { ServiceIdentifierFactory } from "../../Context/Factories/ServiceIdentifierFactory";
 import { ServiceStreamLevelFactory } from "../../Context/Factories/ServiceStreamLevelFactory";
 import {
@@ -19,8 +19,8 @@ export const composeServiceContext = (
   const ServiceIdentifier = ServiceIdentifierFactory.create(Identifier, Type);
   const ServiceStreamLevel = ServiceStreamLevelFactory.create(Type, Configs);
 
-  return (isReplay: boolean): Service.IServiceContext => {
-    const Context: Service.IServiceContext = {
+  return (isReplay: boolean): IServiceContext => {
+    const Context: IServiceContext = {
       AggregateID: () => ServiceIdentifier.AggregateID(),
       EventID: () => ServiceIdentifier.EventID(),
       directTo: (ref, data) => EStream.directTo(ref, data),

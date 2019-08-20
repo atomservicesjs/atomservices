@@ -32,7 +32,9 @@ export {
   IServiceContainer,
   IServiceConfigs,
   IServiceConfigsLevels,
+  IServiceContext,
+  IServiceIdentifier,
+  IServiceStreamLevel,
   IState,
   IValidationResultType,
-  Service,
 } from "atomservicescore";

@@ -1,4 +1,4 @@
-import { IEvent, IEventHandler, IEventStores, IEventStream, IIdentifier, IServiceConfigs, Service } from "atomservicescore";
+import { IEvent, IEventHandler, IEventStores, IEventStream, IIdentifier, IServiceConfigs, IServiceContext } from "atomservicescore";
 import { composeEventHandlers } from "../../Events/composeEventHandlers";
 import { composeServiceContext } from "./composeServiceContext";
 import { IEventProcessor } from "./IEventProcessor";
@@ -15,7 +15,7 @@ export const composeEventProcessor = (
   const { type: Type } = Configs;
   const EventHandlers = composeEventHandlers(...Handlers)(Type);
 
-  const ComposeResulting = (ServiceContext: Service.IServiceContext) => (event: IEvent) => async (result: any) => {
+  const ComposeResulting = (ServiceContext: IServiceContext) => (event: IEvent) => async (result: any) => {
     await ServiceContext.directTo(event._id, result);
   };
   const ComposeServiceContext = composeServiceContext(Scope, Type, Identifier, EventStream, Configs, EventStores);
