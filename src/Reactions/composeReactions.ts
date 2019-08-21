@@ -9,48 +9,51 @@ interface IReactionsMap {
   };
 }
 
-export const composeReactions = (...reactions: IReaction[]): IReactions =>
-  ((Reactions: IReaction[]): IReactions => {
-    const REACTIONS_MAP = Reactions.reduce((result: IReactionsMap, reaction) => {
-      if (result[reaction.scope] === undefined) {
-        result[reaction.scope] = {};
-      }
-
-      if (result[reaction.scope][reaction.type] === undefined) {
-        result[reaction.scope][reaction.type] = {};
-      }
-
-      if (result[reaction.scope][reaction.type][reaction.name] === undefined) {
-        result[reaction.scope][reaction.type][reaction.name] = [];
-      }
-
-      result[reaction.scope][reaction.type][reaction.name].push(reaction);
-
-      return result;
-    }, {} as IReactionsMap);
-
-    const REACTIONS: IReactions = {
-      forEach: (callback) => {
-        for (const reaction of Reactions) {
-          callback(reaction);
+export const composeReactions = (...reactions: IReaction[]) =>
+  (type: string): IReactions =>
+    ((Reactions: IReaction[], Type): IReactions => {
+      const REACTIONS_MAP = Reactions.reduce((result: IReactionsMap, reaction) => {
+        if (result[reaction.scope] === undefined) {
+          result[reaction.scope] = {};
         }
 
-        return Reactions.length;
-      },
-      resolve: (event, scope) => {
-        if (REACTIONS_MAP[scope] &&
-          REACTIONS_MAP[scope][event.type] &&
-          REACTIONS_MAP[scope][event.type][event.name]) {
-          return REACTIONS_MAP[scope][event.type][event.name];
-        } else {
-          return [];
+        if (result[reaction.scope][reaction.type] === undefined) {
+          result[reaction.scope][reaction.type] = {};
         }
-      },
-    };
 
-    Object.freeze(REACTIONS);
+        if (result[reaction.scope][reaction.type][reaction.name] === undefined) {
+          result[reaction.scope][reaction.type][reaction.name] = [];
+        }
 
-    return REACTIONS;
-  })(reactions);
+        result[reaction.scope][reaction.type][reaction.name].push(reaction);
+
+        return result;
+      }, {} as IReactionsMap);
+
+      const REACTIONS: IReactions = {
+        forEach: (callback) => {
+          for (const reaction of Reactions) {
+            callback(reaction);
+          }
+
+          return Reactions.length;
+        },
+        resolve: (event, scope) => {
+          if (REACTIONS_MAP[scope] &&
+            REACTIONS_MAP[scope][event.type] &&
+            REACTIONS_MAP[scope][event.type][event.name]) {
+            return REACTIONS_MAP[scope][event.type][event.name];
+          } else {
+            return [];
+          }
+        },
+        type: () =>
+          Type,
+      };
+
+      Object.freeze(REACTIONS);
+
+      return REACTIONS;
+    })(reactions, type);
 
 Object.freeze(composeReactions);

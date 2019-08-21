@@ -1,15 +1,10 @@
 import { expect } from "chai";
-import * as sinon from "sinon";
 import { createService } from "./createService";
 
 describe("createService.ts tests", () => {
   it("expect to create an instance of Service", async () => {
     // arranges
     const scope = "TestScope";
-    const container: any = {
-      scope: () => scope,
-      service: sinon.spy(),
-    };
     const identifier: any = {};
     const stream: any = {};
     const configs: any = {
@@ -17,7 +12,7 @@ describe("createService.ts tests", () => {
     };
 
     // acts
-    const service = await createService(container, identifier, stream, configs)();
+    const service = await createService(scope, identifier, stream, configs)();
 
     // asserts
     expect(service.scope()).to.equal("TestScope");

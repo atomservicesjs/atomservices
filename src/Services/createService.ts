@@ -1,17 +1,16 @@
-import { ICommandHandler, IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IService, IServiceConfigs, IServiceContainer } from "atomservicescore";
+import { ICommandHandler, IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IService, IServiceConfigs } from "atomservicescore";
 import { composeCommandDispatcher } from "../Commands/composeCommandDispatcher";
-import { NoBoundCommandHandlersServiceException } from "../Exceptions/Core";
-import { IStreamConnector } from "./core/IStreamConnector";
-import { StreamConnector } from "./core/StreamConnector";
+import { DefaultConnectStream } from "./core/DefaultConnectStream";
+import { IConnectStream } from "./core/IConnectStream";
 
 export const createService = (
-  container: IServiceContainer,
+  scope: string,
   identifier: IIdentifier,
   stream: IEventStream,
   configs: IServiceConfigs,
-  options: {
+  enhancers: {
     EventStores?: IEventStores,
-    Connector?: IStreamConnector;
+    ConnectStream?: IConnectStream;
   } = {},
 ) => (
   components: {
@@ -19,53 +18,47 @@ export const createService = (
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
   } = {},
-  ): IService => ((Container, Identifier, EventStream, Configs, Components, Options): IService => {
+  ): IService => ((Scope, Identifier, EventStream, Configs, Enhancers, Components): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
       Reactions = [],
     } = Components;
     const Type = Configs.type;
-    const Scope = Container.scope();
     const {
-      Connector = StreamConnector,
+      ConnectStream = DefaultConnectStream,
       EventStores,
-    } = Options;
+    } = Enhancers;
     const CommandDispatcher = composeCommandDispatcher(Scope, Identifier, EventStream, EventStores)(Configs, ...CommandHandlers);
 
     const Service: IService = {
       configs: () =>
         Configs,
       connect: async () =>
-        Connector.connect(
+        ConnectStream(
           Scope,
-          Type,
-          Configs,
           Identifier,
           EventStream,
+          Configs,
           {
             EventHandlers,
             Reactions,
           },
-          EventStores,
+          {
+            EventStores,
+          },
         ),
-      dispatch: async (command, listening) => {
-        if (CommandDispatcher) {
-          return CommandDispatcher.dispatch(command, listening);
-        } else {
-          throw NoBoundCommandHandlersServiceException(Scope, Configs.type);
-        }
-      },
+      dispatch: async (command, listening) =>
+        CommandDispatcher.dispatch(command, listening),
       scope: () =>
         Scope,
       type: () =>
-        Configs.type,
+        Type,
     };
 
-    Container.service(Service);
     Object.freeze(Service);
 
     return Service;
-  })(container, identifier, stream, configs, components, options);
+  })(scope, identifier, stream, configs, enhancers, components);
 
 Object.freeze(createService);

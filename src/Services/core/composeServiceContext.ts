@@ -6,6 +6,7 @@ import {
   EventPublishingErrorException,
   EventStoringErrorException,
   EventVersionConflictedConcurrentException,
+  NoEventStoresProvidedException,
 } from "../../Exceptions/Core";
 
 export const composeServiceContext = (
@@ -55,8 +56,17 @@ export const composeServiceContext = (
       },
       listenTo: (ref, listener) =>
         EStream.listenTo(ref, listener),
-      scope: () => Scope,
-      type: () => Type,
+      queryCurrentVersion: (aggregateID) => {
+        if (EStores) {
+          return EStores.queryCurrentVersion(Scope, Type, aggregateID);
+        } else {
+          throw NoEventStoresProvidedException();
+        }
+      },
+      scope: () =>
+        Scope,
+      type: () =>
+        Type,
     };
 
     Object.freeze(Context);

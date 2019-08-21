@@ -1,44 +1,47 @@
 import { IEventStores, IEventStream, IIdentifier, IReaction, IServiceConfigs } from "atomservicescore";
 import { composeReactions } from "../../Reactions/composeReactions";
 import { composeServiceContext } from "./composeServiceContext";
-import { IEventReactor } from "./IEventReactor";
+import { StreamProcessing } from "./StreamProcessing";
 
 export const composeEventReactor = (
   scope: string,
   identifier: IIdentifier,
   stream: IEventStream,
-  stores?: IEventStores,
-) => (
   configs: IServiceConfigs,
-  ...reactions: IReaction[]
-): IEventReactor => ((Scope, Identifier, EventStream, EventStores, Configs, Reactions): IEventReactor => {
+  reactions: IReaction[],
+  enhancers: {
+    EventStores?: IEventStores,
+  },
+) => ((Scope, Identifier, EventStream, Configs, Reactions, Enhancers) => {
   const { type: Type } = Configs;
-  const EventReactions = composeReactions(...Reactions);
-
+  const { EventStores } = Enhancers;
+  const EventReactions = composeReactions(...Reactions)(Type);
   const ComposeServiceContext = composeServiceContext(Scope, Type, Identifier, EventStream, Configs, EventStores);
 
-  const reactor: IEventReactor = {
-    react: async (event, eventscope, metadata, processAck) => {
-      const collection = EventReactions.resolve(event, eventscope);
+  const composeProcessing = (eventScope: string) => {
+    const processing: StreamProcessing = async (event, metadata, processAck) => {
+      const resolvedReactions = EventReactions.resolve(event, eventScope);
 
-      if (collection.length > 0) {
+      if (resolvedReactions.length > 0) {
         const reacts: Array<Promise<any>> = [];
         const ServiceContext = ComposeServiceContext(metadata.isReplay);
 
-        for (const reaction of collection) {
-          reacts.push(reaction.react(event, eventscope, ServiceContext, metadata));
+        for (const reaction of resolvedReactions) {
+          reacts.push(reaction.react(event, ServiceContext, metadata));
         }
 
         await Promise.all(reacts);
       }
 
       await processAck();
-    },
+    };
+
+    Object.freeze(processing);
+
+    return processing;
   };
 
-  Object.freeze(reactor);
-
-  return reactor;
-})(scope, identifier, stream, stores, configs, reactions);
+  return composeProcessing;
+}) (scope, identifier, stream, configs, reactions, enhancers);
 
 Object.freeze(composeEventReactor);

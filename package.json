@@ -1,6 +1,6 @@
 {
   "name": "atomservices",
-  "version": "0.6.0-alpha.7",
+  "version": "0.6.0-alpha.13",
   "description": "Providing Library Implementing Event-based Architecture",
   "main": "./lib/index.js",
   "typings": "./typings/index.d.ts",
@@ -29,7 +29,7 @@
   "license": "MIT",
   "repository": "git+https://github.com/atomservicesjs/atomservices",
   "dependencies": {
-    "atomservicescore": "0.6.0-alpha.7",
+    "atomservicescore": "0.6.0-alpha.13",
     "clone": "^2.1.2"
   },
   "devDependencies": {
@@ -48,7 +48,7 @@
     "sinon": "^7.4.1",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.3.0",
-    "tslint": "^5.18.0",
+    "tslint": "^5.19.0",
     "typescript": "^3.5.3"
   }
 }
