@@ -4,15 +4,15 @@ import { createService } from "./createService";
 describe("createService.ts tests", () => {
   it("expect to create an instance of Service", async () => {
     // arranges
-    const scope = "TestScope";
     const identifier: any = {};
     const stream: any = {};
     const configs: any = {
+      scope: "TestScope",
       type: "TestType",
     };
 
     // acts
-    const service = await createService(scope, identifier, stream, configs)();
+    const service = await createService(identifier, stream, configs)();
 
     // asserts
     expect(service.scope()).to.equal("TestScope");

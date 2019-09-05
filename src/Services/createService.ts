@@ -4,7 +4,6 @@ import { DefaultConnectStream } from "./core/DefaultConnectStream";
 import { IConnectStream } from "./core/IConnectStream";
 
 export const createService = (
-  scope: string,
   identifier: IIdentifier,
   stream: IEventStream,
   configs: IServiceConfigs,
@@ -18,12 +17,13 @@ export const createService = (
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
   } = {},
-  ): IService => ((Scope, Identifier, EventStream, Configs, Enhancers, Components): IService => {
+  ): IService => ((Identifier, EventStream, Configs, Enhancers, Components): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
       Reactions = [],
     } = Components;
+    const Scope = Configs.scope;
     const Type = Configs.type;
     const {
       ConnectStream = DefaultConnectStream,
@@ -59,6 +59,6 @@ export const createService = (
     Object.freeze(Service);
 
     return Service;
-  })(scope, identifier, stream, configs, enhancers, components);
+  })(identifier, stream, configs, enhancers, components);
 
 Object.freeze(createService);
