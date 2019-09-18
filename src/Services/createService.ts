@@ -29,7 +29,7 @@ export const createService = (
       ConnectStream = DefaultConnectStream,
       EventStores,
     } = Enhancers;
-    const CommandDispatcher = composeCommandDispatcher(Scope, Identifier, EventStream, EventStores)(Configs, ...CommandHandlers);
+    const CommandDispatcher = composeCommandDispatcher(Identifier, EventStream, EventStores)(Configs, ...CommandHandlers);
 
     const Service: IService = {
       configs: () =>

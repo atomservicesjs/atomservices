@@ -12,7 +12,6 @@ import { DispatchResult } from "./DispatchResult";
 import { ICommandDispatcher } from "./ICommandDispatcher";
 
 export const composeCommandDispatcher = (
-  scope: string,
   identifier: IIdentifier,
   stream: IEventStream,
   stores?: IEventStores,
@@ -20,7 +19,7 @@ export const composeCommandDispatcher = (
   configs: IServiceConfigs,
   ...commandHandlers: ICommandHandler[]
 ): ICommandDispatcher => (() => {
-  const { type } = configs;
+  const { scope, type } = configs;
   const CommandHandlers = composeCommandHandlers(...commandHandlers)(type);
   const ServiceContext = composeServiceContext(scope, type, identifier, stream, configs, stores)(false);
 
