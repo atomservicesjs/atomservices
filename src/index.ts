@@ -4,6 +4,7 @@ import * as Context from "./Context";
 import * as Events from "./Events";
 import * as Reactions from "./Reactions";
 import * as Services from "./Services";
+import * as States from "./States";
 
 export {
   Commands,
@@ -12,6 +13,7 @@ export {
   Events,
   Reactions,
   Services,
+  States,
 };
 
 export {
