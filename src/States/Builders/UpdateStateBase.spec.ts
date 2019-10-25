@@ -21,6 +21,9 @@ describe("UpdateStateBase.ts tests", () => {
         _updatedAt: _createdAt,
         _updatedBy: "_x_createdBy",
         _version: 1,
+        prop_a: "a",
+        prop_b: "b",
+        prop_c: "c",
       };
       const expected = {
         _id: "1234567890",
@@ -30,6 +33,9 @@ describe("UpdateStateBase.ts tests", () => {
         _updatedAt: now,
         _updatedBy: "_createdBy",
         _version: 2,
+        prop_a: "a",
+        prop_b: "b",
+        prop_c: "c",
       };
 
       // acts
