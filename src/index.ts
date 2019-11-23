@@ -34,6 +34,7 @@ export {
   IServiceContainer,
   IServiceConfigs,
   IServiceConfigsLevels,
+  IServiceContainerConfigs,
   IServiceContext,
   IServiceIdentifier,
   IServiceStreamLevel,
