@@ -2,6 +2,7 @@ import * as Commands from "./Commands";
 import * as Containers from "./Containers";
 import * as Context from "./Context";
 import * as Events from "./Events";
+import * as Identifiers from "./Identifiers";
 import * as Reactions from "./Reactions";
 import * as Services from "./Services";
 import * as States from "./States";
@@ -11,6 +12,7 @@ export {
   Containers,
   Context,
   Events,
+  Identifiers,
   Reactions,
   Services,
   States,
