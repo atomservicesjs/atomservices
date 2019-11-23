@@ -1,14 +1,15 @@
 import { ICommandHandler, IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IService, IServiceConfigs } from "atomservicescore";
 import { composeCommandDispatcher } from "../Commands/composeCommandDispatcher";
+import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
 import { DefaultConnectStream } from "./core/DefaultConnectStream";
 import { IConnectStream } from "./core/IConnectStream";
 
 export const createService = (
-  identifier: IIdentifier,
   stream: IEventStream,
   configs: IServiceConfigs,
   enhancers: {
-    EventStores?: IEventStores,
+    EventStores?: IEventStores;
+    Identifier?: IIdentifier;
     ConnectStream?: IConnectStream;
   } = {},
 ) => (
@@ -17,7 +18,7 @@ export const createService = (
     EventHandlers?: IEventHandler[];
     Reactions?: IReaction[];
   } = {},
-  ): IService => ((Identifier, EventStream, Configs, Enhancers, Components): IService => {
+  ): IService => ((EventStream, Configs, Enhancers, Components): IService => {
     const {
       CommandHandlers = [],
       EventHandlers = [],
@@ -27,6 +28,7 @@ export const createService = (
     const Type = Configs.type;
     const {
       ConnectStream = DefaultConnectStream,
+      Identifier = UUIDIdentifier,
       EventStores,
     } = Enhancers;
     const CommandDispatcher = composeCommandDispatcher(Identifier, EventStream, EventStores)(Configs, ...CommandHandlers);
@@ -37,7 +39,6 @@ export const createService = (
       connect: async () =>
         ConnectStream(
           Scope,
-          Identifier,
           EventStream,
           Configs,
           {
@@ -46,6 +47,7 @@ export const createService = (
           },
           {
             EventStores,
+            Identifier,
           },
         ),
       dispatch: async (command, listening) =>
@@ -59,6 +61,6 @@ export const createService = (
     Object.freeze(Service);
 
     return Service;
-  })(identifier, stream, configs, enhancers, components);
+  })(stream, configs, enhancers, components);
 
 Object.freeze(createService);

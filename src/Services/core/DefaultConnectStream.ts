@@ -1,24 +1,21 @@
-import { IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IServiceConfigs } from "atomservicescore";
+import { IReaction } from "atomservicescore";
 import { ServiceStreamLevelFactory } from "../../Context/Factories/ServiceStreamLevelFactory";
+import { UUIDIdentifier } from "../../Identifiers/UUIDIdentifier";
 import { composeEventProcessor } from "./composeEventProcessor";
 import { composeEventReactor } from "./composeEventReactor";
 import { IConnectStream } from "./IConnectStream";
 
 export const DefaultConnectStream: IConnectStream = async (
-  scope: string,
-  identifier: IIdentifier,
-  stream: IEventStream,
-  configs: IServiceConfigs,
-  components: {
-    EventHandlers?: IEventHandler[];
-    Reactions?: IReaction[];
-  },
-  enhancers: {
-    EventStores?: IEventStores,
-  },
+  scope,
+  stream,
+  configs,
+  components,
+  enhancers,
 ) => {
   const { EventHandlers = [], Reactions = [] } = components;
   const { type } = configs;
+  const { Identifier = UUIDIdentifier } = enhancers;
+  const identifier = Identifier;
 
   const ps: Array<Promise<any>> = [];
   const Levels = ServiceStreamLevelFactory.create(type, configs);
@@ -32,10 +29,10 @@ export const DefaultConnectStream: IConnectStream = async (
         scope,
         type,
       }, {
-        channel: "EventHandler",
-        scope,
-        type,
-      },
+      channel: "EventHandler",
+      scope,
+      type,
+    },
       EventProcessor,
     ));
   }
