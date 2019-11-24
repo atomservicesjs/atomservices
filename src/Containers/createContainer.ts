@@ -1,7 +1,7 @@
-import { IService, IServiceContainer } from "atomservicescore";
+import { IService, IServiceContainer, IServiceContainerConfigs } from "atomservicescore";
 
-export const createContainer = (...services: IService[]): IServiceContainer =>
-  ((Services): IServiceContainer => {
+export const createContainer = (configs: IServiceContainerConfigs, ...services: IService[]): IServiceContainer =>
+  ((Configs, Services): IServiceContainer => {
     const container: IServiceContainer = {
       connect: async () => {
         await Promise.all(Services.map((each) => each.connect()));
@@ -11,4 +11,4 @@ export const createContainer = (...services: IService[]): IServiceContainer =>
     Object.freeze(container);
 
     return container;
-  })(services);
+  })(configs, services);
