@@ -1,10 +1,10 @@
 import { EventHandler, IEvent, IEventHandler } from "atomservicescore";
 
-export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult = any, State = any>(
+export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult = EventHandler.AnyProcessResult, State = EventHandler.AnyState>(
     composed: {
       name: string;
-      process: EventHandler.HandlerProcess<Event, ProcessResult, State>;
-      processEffect?: EventHandler.HandlerProcessEffect<Event, ProcessResult>;
+      process: EventHandler.EventProcessHandle<Event, ProcessResult, State>;
+      processEffect?: EventHandler.EventProcessEffectHandle<Event, ProcessResult>;
     },
 ): IEventHandler<Event, ProcessResult, State> =>
   Object.defineProperties({}, {
@@ -23,7 +23,7 @@ export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult
     processEffect: {
       configurable: false,
       enumerable: true,
-      value: composed.processEffect || EventHandler.DefaultEventProcessEffect,
+      value: composed.processEffect ? composed.processEffect : undefined,
       writable: false,
     },
   });

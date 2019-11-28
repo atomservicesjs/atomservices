@@ -1,66 +1,45 @@
-import { ICommandHandler, IEventHandler, IEventStores, IEventStream, IIdentifier, IReaction, IService, IServiceConfigs } from "atomservicescore";
-import { composeCommandDispatcher } from "../Commands/composeCommandDispatcher";
+import { IManagedService, IService, IServiceDefinition } from "atomservicescore";
+import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
+import { ServiceStreamLevelFactory } from "../Context/Factories/ServiceStreamLevelFactory";
+import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
-import { DefaultConnectStream } from "./core/DefaultConnectStream";
-import { IConnectStream } from "./core/IConnectStream";
+import { composeServiceContext } from "./core/composeServiceContext";
+import { StreamConnect } from "./core/StreamConnect";
 
-export const createService = (
-  stream: IEventStream,
-  configs: IServiceConfigs,
-  enhancers: {
-    EventStores?: IEventStores;
-    Identifier?: IIdentifier;
-    ConnectStream?: IConnectStream;
-  } = {},
-) => (
-  components: {
-    CommandHandlers?: ICommandHandler[];
-    EventHandlers?: IEventHandler[];
-    Reactions?: IReaction[];
-  } = {},
-  ): IService => ((EventStream, Configs, Enhancers, Components): IService => {
-    const {
-      CommandHandlers = [],
-      EventHandlers = [],
-      Reactions = [],
-    } = Components;
-    const Scope = Configs.scope;
-    const Type = Configs.type;
-    const {
-      ConnectStream = DefaultConnectStream,
-      Identifier = UUIDIdentifier,
-      EventStores,
-    } = Enhancers;
-    const CommandDispatcher = composeCommandDispatcher(Identifier, EventStream, EventStores)(Configs, ...CommandHandlers);
+export const createService = (service: IService): IManagedService => ((SERVICE): IManagedService => {
+  const InMemoryStream: any = {};
+  const {
+    EventHandlers = [],
+    EventStores,
+    EventStream = InMemoryStream,
+    Identifier = UUIDIdentifier,
+    configs = {},
+    scope = GlobalScope,
+    type,
+  } = SERVICE;
+  const definition: IServiceDefinition = {
+    EventHandlers,
+    EventStores,
+    EventStream,
+    ServiceIdentifier: ServiceIdentifierFactory.create(Identifier, type),
+    ServiceStreamLevel: ServiceStreamLevelFactory.create(configs),
+    configs,
+    scope,
+    type,
+  };
 
-    const Service: IService = {
-      configs: () =>
-        Configs,
-      connect: async () =>
-        ConnectStream(
-          Scope,
-          EventStream,
-          Configs,
-          {
-            EventHandlers,
-            Reactions,
-          },
-          {
-            EventStores,
-            Identifier,
-          },
-        ),
-      dispatch: async (command, listening) =>
-        CommandDispatcher.dispatch(command, listening),
-      scope: () =>
-        Scope,
-      type: () =>
-        Type,
-    };
+  const Service: any = {
+    connect: async () =>
+      StreamConnect(definition),
+    context: () =>
+      composeServiceContext(definition)(false),
+    scope: () =>
+      scope,
+    type: () =>
+      type,
+  };
 
-    Object.freeze(Service);
+  Object.freeze(Service);
 
-    return Service;
-  })(stream, configs, enhancers, components);
-
-Object.freeze(createService);
+  return Service;
+})(service);

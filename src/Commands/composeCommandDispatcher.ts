@@ -1,3 +1,4 @@
+/*
 import {
   ICommandHandler,
   IEventStores,
@@ -71,3 +72,4 @@ export const composeCommandDispatcher = (
 })();
 
 Object.freeze(composeCommandDispatcher);
+*/

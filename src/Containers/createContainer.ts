@@ -1,3 +1,4 @@
+/*
 import { IService, IServiceContainer, IServiceContainerConfigs } from "atomservicescore";
 
 export const createContainer = (configs: IServiceContainerConfigs, ...services: IService[]): IServiceContainer =>
@@ -12,3 +13,4 @@ export const createContainer = (configs: IServiceContainerConfigs, ...services: 
 
     return container;
   })(configs, services);
+*/

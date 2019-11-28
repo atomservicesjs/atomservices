@@ -1,6 +1,6 @@
-export { DefaultConnectStream } from "./DefaultConnectStream";
-export { IConnectStream } from "./IConnectStream";
+export { IStreamConnect } from "./IStreamConnect";
+export { StreamConnect } from "./StreamConnect";
 export { StreamProcessing } from "./StreamProcessing";
-export { composeEventProcessor } from "./composeEventProcessor";
-export { composeEventReactor } from "./composeEventReactor";
-export { composeServiceContext } from "./composeServiceContext";
+// export { composeEventProcessor } from "./composeEventProcessor";
+// export { composeEventReactor } from "./composeEventReactor";
+// export { composeServiceContext } from "./composeServiceContext";
