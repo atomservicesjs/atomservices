@@ -4,12 +4,13 @@ import { ServiceStreamLevelFactory } from "../Context/Factories/ServiceStreamLev
 import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
 import { composeServiceContext } from "./core/composeServiceContext";
-import { StreamConnect } from "./core/StreamConnect";
+import { connectStream } from "./core/connectStream";
 
 export const createService = (service: IService): IManagedService => ((SERVICE): IManagedService => {
   const InMemoryStream: any = {};
   const {
     EventHandlers = [],
+    Reactions = [],
     EventStores,
     EventStream = InMemoryStream,
     Identifier = UUIDIdentifier,
@@ -21,6 +22,7 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
     EventHandlers,
     EventStores,
     EventStream,
+    Reactions,
     ServiceIdentifier: ServiceIdentifierFactory.create(Identifier, type),
     ServiceStreamLevel: ServiceStreamLevelFactory.create(configs),
     configs,
@@ -30,7 +32,7 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
 
   const Service: any = {
     connect: async () =>
-      StreamConnect(definition),
+      connectStream(definition),
     context: () =>
       composeServiceContext(definition)(false),
     scope: () =>
