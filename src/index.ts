@@ -42,7 +42,7 @@ export {
   IServiceContext,
   IServiceDefinition,
   IServiceIdentifier,
-  IServiceStreamLevel,
+  IServiceStream,
   IServiceStreamDefinition,
   IState,
   IValidationResultType,

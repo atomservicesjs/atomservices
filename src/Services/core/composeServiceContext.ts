@@ -13,7 +13,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
     EventStores,
     EventStream,
     ServiceIdentifier,
-    ServiceStreamLevel,
+    ServiceStream,
     scope,
     type,
   } = definition;
@@ -51,7 +51,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
         }
 
         try {
-          const on = { level: ServiceStreamLevel.level(event.name), scope };
+          const on = { level: ServiceStream.level(event.name), scope };
           const metadata = MetadataRefiner.dispatch({ isReplay });
           return EventStream.publish(on, metadata, event);
         } catch (error) {

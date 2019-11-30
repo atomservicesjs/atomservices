@@ -9,7 +9,7 @@ export const connectStream = async (definition: IServiceDefinition) => (async (D
   const Stream: IServiceStreamDefinition = Object.freeze({
     handlers: {
       events: Definition.EventHandlers.reduce((result, { name }) => {
-        const level = Definition.ServiceStreamLevel.level(name);
+        const level = Definition.ServiceStream.level(name);
         result.push({ level, name });
 
         return result;

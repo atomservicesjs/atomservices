@@ -1,6 +1,6 @@
 import { IManagedService, IService, IServiceDefinition } from "atomservicescore";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
-import { ServiceStreamLevelFactory } from "../Context/Factories/ServiceStreamLevelFactory";
+import { ServiceStreamFactory } from "../Context/Factories/ServiceStreamFactory";
 import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
 import { composeServiceContext } from "./core/composeServiceContext";
@@ -24,7 +24,7 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
     EventStream,
     Reactions,
     ServiceIdentifier: ServiceIdentifierFactory.create(Identifier, type),
-    ServiceStreamLevel: ServiceStreamLevelFactory.create(configs),
+    ServiceStream: ServiceStreamFactory.create(configs),
     configs,
     scope,
     type,
