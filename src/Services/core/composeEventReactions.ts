@@ -19,7 +19,7 @@ export const composeEventReactions = (definition: IServiceDefinition): EventStre
       const reacts = [];
 
       for (const reaction of reactions) {
-        const ServiceContext = ServiceContextComposing(metadata.isReplay);
+        const ServiceContext = ServiceContextComposing(metadata);
         reacts.push(reaction.react(event, ServiceContext, metadata));
       }
 

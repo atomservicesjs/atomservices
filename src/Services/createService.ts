@@ -34,7 +34,7 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
     connect: async () =>
       connectStream(definition),
     context: () =>
-      composeServiceContext(definition)(false),
+      composeServiceContext(definition)({ isReplay: false }),
     scope: () =>
       scope,
     type: () =>

@@ -6,6 +6,7 @@ import {
   EventVersionConflictedConcurrentException,
   NoEventStoresProvidedException,
 } from "../../Exceptions/Core";
+import { MetadataRefiner } from "./MetadataRefiner";
 
 export const composeServiceContext = (definition: IServiceDefinition) => {
   const {
@@ -17,7 +18,9 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
     type,
   } = definition;
 
-  return (isReplay: boolean): IServiceContext => {
+  return (options?: { isReplay: boolean; }): IServiceContext => {
+    const isReplay = options && options.isReplay || false;
+
     const context: IServiceContext = {
       AggregateID: () =>
         ServiceIdentifier.AggregateID(),
@@ -49,7 +52,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
 
         try {
           const on = { level: ServiceStreamLevel.level(event.name), scope };
-          const metadata = { isReplay };
+          const metadata = MetadataRefiner.dispatch({ isReplay });
           return EventStream.publish(on, metadata, event);
         } catch (error) {
           throw EventPublishingErrorException(error, event, scope);

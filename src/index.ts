@@ -43,6 +43,7 @@ export {
   IServiceDefinition,
   IServiceIdentifier,
   IServiceStreamLevel,
+  IServiceStreamDefinition,
   IState,
   IValidationResultType,
 } from "atomservicescore";

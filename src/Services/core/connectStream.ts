@@ -1,4 +1,4 @@
-import { EventStream, IServiceDefinition } from "atomservicescore";
+import { EventStream, IServiceDefinition, IServiceStreamDefinition } from "atomservicescore";
 import { composeEventProcess } from "./composeEventProcess";
 import { composeEventReactions } from "./composeEventReactions";
 
@@ -6,7 +6,7 @@ export const connectStream = async (definition: IServiceDefinition) => (async (D
   const EventProcess = composeEventProcess(Definition);
   const EventReactions = composeEventReactions(Definition);
 
-  const Stream: EventStream.IServiceStreamDefinition = Object.freeze({
+  const Stream: IServiceStreamDefinition = Object.freeze({
     handlers: {
       events: Definition.EventHandlers.reduce((result, { name }) => {
         const level = Definition.ServiceStreamLevel.level(name);
@@ -25,5 +25,6 @@ export const connectStream = async (definition: IServiceDefinition) => (async (D
   });
 
   Definition.EventStream.subscribe(Stream);
+
   await Definition.EventStream.connect();
 })(definition);
