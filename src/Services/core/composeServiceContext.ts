@@ -1,4 +1,5 @@
 import { IServiceContext, IServiceDefinition } from "atomservicescore";
+import { composeEventHandlers } from "../../Events/composeEventHandlers";
 import {
   CurrentVersionQueryingErrorException,
   EventPublishingErrorException,
@@ -6,11 +7,11 @@ import {
   EventVersionConflictedConcurrentException,
   NoEventStoresProvidedException,
 } from "../../Exceptions/Core";
+import { LocalDirectStream } from "../../Streams/LocalDirectStream";
 import { MetadataRefiner } from "./MetadataRefiner";
 
 export const composeServiceContext = (definition: IServiceDefinition) => {
   const {
-    // EventHandlers,
     EventStores,
     EventStream,
     ServiceIdentifier,
@@ -19,8 +20,8 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
     type,
   } = definition;
 
-  return (options?: { isReplay: boolean; }): IServiceContext => {
-    const isReplay = options && options.isReplay || false;
+  return (options: { isReplay?: boolean; } = {}): IServiceContext => {
+    const isReplay = options.isReplay || false;
 
     const context: IServiceContext = {
       AggregateID: () =>
@@ -51,15 +52,40 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
           }
         }
 
+        let metadata = MetadataRefiner.dispatch({ isReplay });
+        const processType = ServiceStream.processType(name);
+
+        if (processType === "synchronous") {
+          const EventHandlers = composeEventHandlers(...definition.EventHandlers)(type);
+          const ServiceContextComposing = composeServiceContext(definition);
+
+          const EventHandler = EventHandlers.resolve(event);
+
+          if (EventHandler) {
+            metadata = MetadataRefiner.consume(metadata);
+            // tslint:disable-next-line: no-console
+            console.log(metadata);
+            const ServiceContext = ServiceContextComposing(metadata);
+            const currentState = undefined;
+
+            const result = await EventHandler.process(event, currentState, metadata);
+            const resulting = (data: any) => LocalDirectStream.directTo(event._id, data);
+
+            if (EventHandler.processEffect) {
+              await EventHandler.processEffect({ event, metadata, result }, resulting, ServiceContext);
+            }
+          }
+        }
+
         try {
           const on = { level: ServiceStream.level(event.name), scope };
-          const metadata = MetadataRefiner.dispatch({ isReplay });
+
           return EventStream.publish(on, metadata, event);
         } catch (error) {
           throw EventPublishingErrorException(error, event, scope);
         }
       },
-      listenTo: (ref, listener) =>
+      listenTo: async (ref, listener) =>
         EventStream.listenTo(ref, listener),
       queryCurrentVersion: (aggregateID) => {
         if (EventStores) {

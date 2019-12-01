@@ -10,11 +10,11 @@ export const composeEventProcess = (definition: IServiceDefinition): EventStream
 
   return Object.freeze(async (event, metadata, processAck) => {
     const EventHandler = EventHandlers.resolve(event);
-    metadata = MetadataRefiner.consume(metadata);
-    // tslint:disable-next-line: no-console
-    console.log(metadata);
 
     if (EventHandler) {
+      metadata = MetadataRefiner.consume(metadata);
+      // tslint:disable-next-line: no-console
+      console.log(metadata);
       const ServiceContext = ServiceContextComposing(metadata);
       const currentState = undefined;
 

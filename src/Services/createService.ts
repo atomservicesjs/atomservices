@@ -31,11 +31,14 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
     type,
   };
 
-  const Service: any = {
+  const Service: IManagedService = {
     connect: async () =>
       connectStream(definition),
-    context: () =>
-      composeServiceContext(definition)({ isReplay: false }),
+    context: (options) =>
+      composeServiceContext(definition)(options),
+    dispatch: async (command, listening) => {
+
+    },
     scope: () =>
       scope,
     type: () =>
