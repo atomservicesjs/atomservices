@@ -6,10 +6,12 @@ import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
 import { LocalInMemoryEventStream } from "../Streams";
 import { composeServiceContext } from "./core/composeServiceContext";
 import { connectStream } from "./core/connectStream";
+import { createCommandDispatcher } from "./core/createCommandDispatcher";
 
 export const createService = (service: IService): IManagedService => ((SERVICE): IManagedService => {
   const InMemoryStream: IEventStream = LocalInMemoryEventStream;
   const {
+    CommandHandlers = [],
     EventHandlers = [],
     Reactions = [],
     EventStores,
@@ -20,6 +22,7 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
     type,
   } = SERVICE;
   const definition: IServiceDefinition = {
+    CommandHandlers,
     EventHandlers,
     EventStores,
     EventStream,
@@ -30,15 +33,15 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
     scope,
     type,
   };
+  const CommandDispatcher = createCommandDispatcher(definition);
 
   const Service: IManagedService = {
     connect: async () =>
       connectStream(definition),
     context: (options) =>
       composeServiceContext(definition)(options),
-    dispatch: async (command, listening) => {
-
-    },
+    dispatch: async (command, listening) =>
+      CommandDispatcher.dispatch(command, listening),
     scope: () =>
       scope,
     type: () =>
