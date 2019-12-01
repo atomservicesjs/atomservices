@@ -10,6 +10,7 @@ import { MetadataRefiner } from "./MetadataRefiner";
 
 export const composeServiceContext = (definition: IServiceDefinition) => {
   const {
+    // EventHandlers,
     EventStores,
     EventStream,
     ServiceIdentifier,

@@ -1,6 +1,8 @@
-import { EventStream, IServiceDefinition, IServiceStreamDefinition } from "atomservicescore";
-import { composeEventProcess } from "./composeEventProcess";
-import { composeEventReactions } from "./composeEventReactions";
+import { IServiceDefinition, IServiceStreamDefinition } from "atomservicescore";
+import { composeEventProcess } from "../composeEventProcess";
+import { composeEventReactions } from "../composeEventReactions";
+import { mapHandlersEvents } from "./mapHandlersEvents";
+import { mapReactionsEvents } from "./mapReactionsEvents";
 
 export const connectStream = async (definition: IServiceDefinition) => (async (Definition) => {
   const EventProcess = composeEventProcess(Definition);
@@ -8,16 +10,11 @@ export const connectStream = async (definition: IServiceDefinition) => (async (D
 
   const Stream: IServiceStreamDefinition = Object.freeze({
     handlers: {
-      events: Definition.EventHandlers.reduce((result, { name }) => {
-        const level = Definition.ServiceStream.level(name);
-        result.push({ level, name });
-
-        return result;
-      }, [] as Array<{ name: string; level: EventStream.StreamLevel; }>),
+      events: mapHandlersEvents(Definition),
       processing: EventProcess,
     },
     reactions: {
-      events: Definition.Reactions,
+      events: mapReactionsEvents(Definition),
       processes: EventReactions,
     },
     scope: Definition.scope,

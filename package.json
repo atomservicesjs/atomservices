@@ -29,7 +29,7 @@
   "license": "MIT",
   "repository": "git+https://github.com/atomservicesjs/atomservices",
   "dependencies": {
-    "atomservicescore": "^0.7.0-alpha.18",
+    "atomservicescore": "^0.7.0-alpha.19",
     "uuid": "^3.3.3"
   },
   "devDependencies": {

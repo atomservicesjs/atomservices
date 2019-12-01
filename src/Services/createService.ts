@@ -1,13 +1,14 @@
-import { IManagedService, IService, IServiceDefinition } from "atomservicescore";
+import { IEventStream, IManagedService, IService, IServiceDefinition } from "atomservicescore";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
 import { ServiceStreamFactory } from "../Context/Factories/ServiceStreamFactory";
 import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
+import { LocalInMemoryEventStream } from "../Streams";
 import { composeServiceContext } from "./core/composeServiceContext";
 import { connectStream } from "./core/connectStream";
 
 export const createService = (service: IService): IManagedService => ((SERVICE): IManagedService => {
-  const InMemoryStream: any = {};
+  const InMemoryStream: IEventStream = LocalInMemoryEventStream;
   const {
     EventHandlers = [],
     Reactions = [],
