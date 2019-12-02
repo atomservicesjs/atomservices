@@ -13,8 +13,6 @@ export const composeEventProcess = (definition: IServiceDefinition): EventStream
 
     if (EventHandler) {
       metadata = MetadataRefiner.consume(metadata);
-      // tslint:disable-next-line: no-console
-      console.log(metadata);
       const ServiceContext = ServiceContextComposing(metadata);
       const currentState = undefined;
 

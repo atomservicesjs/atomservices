@@ -1,6 +1,6 @@
-import { IAtomEvent, IAtomState } from "atomservicescore";
+import { IAtomState, IEvent } from "atomservicescore";
 
-export const CreateStateBase = <State extends IAtomState>(event: IAtomEvent): State =>
+export const CreateStateBase = <State extends IAtomState>(event: IEvent): State =>
   Object.defineProperties({}, {
     _id: {
       configurable: false,

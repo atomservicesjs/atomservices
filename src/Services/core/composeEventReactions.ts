@@ -1,6 +1,7 @@
 import { EventStream, IServiceDefinition } from "atomservicescore";
 import { composeReactions } from "../../Reactions/composeReactions";
 import { composeServiceContext } from "./composeServiceContext";
+import { MetadataRefiner } from "./MetadataRefiner";
 
 export const composeEventReactions = (definition: IServiceDefinition): EventStream.IReactStreamProcesses => ((Definition): EventStream.IReactStreamProcesses => {
   const Reactions = composeReactions(...Definition.Reactions)(Definition.type);
@@ -15,8 +16,9 @@ export const composeEventReactions = (definition: IServiceDefinition): EventStre
 
   return scopes.reduce((result, scope) => {
     const processing: EventStream.StreamProcessing = async (event, metadata, processAck) => {
-      const reactions = Reactions.resolve(event, scope);
       const reacts = [];
+      const reactions = Reactions.resolve(event, scope);
+      metadata = MetadataRefiner.consume(metadata);
 
       for (const reaction of reactions) {
         const ServiceContext = ServiceContextComposing(metadata);
