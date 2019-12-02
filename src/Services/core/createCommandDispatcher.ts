@@ -22,14 +22,14 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
         const ServiceContext = ServiceContextComposing({ isReplay: false });
 
         // #HOOK: Apply Command Hook
-        if (CommandHandler.hook.command) {
+        if (CommandHandler.hook && CommandHandler.hook.command) {
           command = await CommandHandler.hook.command(command);
         }
 
         let event = CommandHandler.transform(command, ServiceContext);
 
         // #HOOK: Apply Event Hook
-        if (CommandHandler.hook.event) {
+        if (CommandHandler.hook && CommandHandler.hook.event) {
           event = await CommandHandler.hook.event(event);
         }
 

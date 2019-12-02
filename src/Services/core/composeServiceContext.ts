@@ -53,7 +53,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
         }
 
         let metadata = MetadataRefiner.dispatch({ isReplay });
-        const processType = ServiceStream.processType(name);
+        const processType = ServiceStream.processType(event.name);
 
         if (processType === "synchronous") {
           const EventHandlers = composeEventHandlers(...definition.EventHandlers)(type);
