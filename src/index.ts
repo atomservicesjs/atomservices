@@ -38,7 +38,6 @@ export {
   IService,
   IServiceContainer,
   IServiceConfigs,
-  IServiceContainerConfigs,
   IServiceContext,
   IServiceDefinition,
   IServiceIdentifier,

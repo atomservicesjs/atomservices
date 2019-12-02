@@ -32,13 +32,17 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
         EventStream.directTo(ref, data),
       dispatch: async (event) => {
         if (EventStores && !isReplay) {
-          let currentVersion: number;
+          let version: number;
 
           try {
-            const { version } = await EventStores.queryCurrentVersion(scope, type, event.aggregateID);
-            currentVersion = version;
+            version = (await EventStores.queryCurrentVersion(scope, type, event.aggregateID)).version;
           } catch (error) {
             throw CurrentVersionQueryingErrorException(error, event.aggregateID, type, scope);
+          }
+          const currentVersion = version;
+
+          if (event._version === undefined && ServiceStream.allowNoVersion(event.name)) {
+            event._version = currentVersion + 1;
           }
 
           if (currentVersion + 1 === event._version) {

@@ -6,6 +6,7 @@ const DefaultProcessType: EventProcessType = "asynchronous";
 export const ServiceStreamFactory = {
   create: (configs: IServiceConfigs): IServiceStream => ((Configs): IServiceStream => {
     const ServiceStream: IServiceStream = {
+      allowNoVersion: (name) => (Configs.events && Configs.events[name] ? (Configs.events[name].allowNoVersion || false) : false),
       level: (name) => (Configs.events && Configs.events[name]) ? (Configs.events[name].level || (Configs.events.__ && Configs.events.__.level) || DefaultLevel) : DefaultLevel,
       processType: (name) => (Configs.events && Configs.events[name]) ? (Configs.events[name].processType || DefaultProcessType) : DefaultProcessType,
     };
