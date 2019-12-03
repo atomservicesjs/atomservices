@@ -1,5 +1,5 @@
 import * as Commands from "./Commands";
-// import * as Containers from "./Containers";
+import * as Containers from "./Containers";
 import * as Context from "./Context";
 import * as Events from "./Events";
 import * as Identifiers from "./Identifiers";
@@ -11,7 +11,7 @@ export { GlobalScope } from "./GlobalScope";
 
 export {
   Commands,
-  // Containers,
+  Containers,
   Context,
   Events,
   Identifiers,

@@ -1,4 +1,4 @@
-import { IEventStream, IManagedService, IService, IServiceDefinition } from "atomservicescore";
+import { IManagedService, IService, IServiceContainer, IServiceDefinition } from "atomservicescore";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
 import { ServiceStreamFactory } from "../Context/Factories/ServiceStreamFactory";
 import { GlobalScope } from "../GlobalScope";
@@ -8,17 +8,16 @@ import { composeServiceContext } from "./core/composeServiceContext";
 import { connectStream } from "./core/connectStream";
 import { createCommandDispatcher } from "./core/createCommandDispatcher";
 
-export const createService = (service: IService): IManagedService => ((SERVICE): IManagedService => {
-  const InMemoryStream: IEventStream = LocalInMemoryEventStream;
+export const createService = (service: IService, container?: IServiceContainer): IManagedService => ((SERVICE, CONTAINER): IManagedService => {
   const {
     CommandHandlers = [],
     EventHandlers = [],
     Reactions = [],
-    EventStores,
-    EventStream = InMemoryStream,
-    Identifier = UUIDIdentifier,
+    EventStores = (CONTAINER && CONTAINER.EventStores),
+    EventStream = (CONTAINER && CONTAINER.EventStream) || LocalInMemoryEventStream,
+    Identifier = (CONTAINER && CONTAINER.Identifier) || UUIDIdentifier,
     configs = {},
-    scope = GlobalScope,
+    scope = (CONTAINER && CONTAINER.scope) || GlobalScope,
     type,
   } = SERVICE;
   const definition: IServiceDefinition = {
@@ -51,4 +50,4 @@ export const createService = (service: IService): IManagedService => ((SERVICE):
   Object.freeze(Service);
 
   return Service;
-})(service);
+})(service, container);

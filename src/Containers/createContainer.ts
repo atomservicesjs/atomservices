@@ -1,16 +1,17 @@
-/*
-import { IService, IServiceContainer, IServiceContainerConfigs } from "atomservicescore";
+import { IManagedServiceContainer, IServiceContainer } from "atomservicescore";
+import { createService } from "../Services/createService";
 
-export const createContainer = (configs: IServiceContainerConfigs, ...services: IService[]): IServiceContainer =>
-  ((Configs, Services): IServiceContainer => {
-    const container: IServiceContainer = {
+export const createContainer = (container: IServiceContainer): IManagedServiceContainer =>
+  ((CONTAINER): IManagedServiceContainer => {
+    const Container: IManagedServiceContainer = {
       connect: async () => {
-        await Promise.all(Services.map((each) => each.connect()));
+        const Services = CONTAINER.Services.map((SERVICE) => createService(SERVICE, CONTAINER));
+
+        await Promise.all(Services.map((service) => service.connect()));
       },
     };
 
-    Object.freeze(container);
+    Object.freeze(Container);
 
-    return container;
-  })(configs, services);
-*/
+    return Container;
+  })(container);
