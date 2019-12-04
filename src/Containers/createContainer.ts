@@ -3,21 +3,19 @@ import { createService } from "../Services/createService";
 
 export const createContainer = (container: IServiceContainer): IManagedServiceContainer =>
   ((CONTAINER): IManagedServiceContainer => {
-    let SERVICES: { [type: string]: IManagedService } = {};
+    const SERVICES = CONTAINER.Services.reduce((result, SERVICE) => {
+      const service = createService(SERVICE, CONTAINER);
+      const type = service.type();
+      result[type] = service;
+
+      return result;
+    }, {} as { [type: string]: IManagedService; });
 
     const Container: IManagedServiceContainer = {
       connect: async () => {
-        const Services = CONTAINER.Services.map((SERVICE) => createService(SERVICE, CONTAINER));
-        await Promise.all(Services.map((service) => service.connect()));
-
-        SERVICES = Services.reduce((result, service) => {
-          const type = service.type();
-          result[type] = service;
-
-          return result;
-        }, SERVICES);
+        await Promise.all(Object.keys(SERVICES).map((type) => SERVICES[type].connect()));
       },
-      dispatch: (type) => async (command, listening) => {
+      dispatch: async (type, command, listening) => {
         const service = SERVICES[type];
 
         return service.dispatch(command, listening);
