@@ -16,6 +16,7 @@ export const createService = (service: IService, container?: IServiceContainer):
     EventStores = (CONTAINER && CONTAINER.EventStores),
     EventStream = (CONTAINER && CONTAINER.EventStream) || LocalInMemoryEventStream,
     Identifier = (CONTAINER && CONTAINER.Identifier) || UUIDIdentifier,
+    Notifiers = [],
     configs = {},
     scope = (CONTAINER && CONTAINER.scope) || GlobalScope,
     type,
@@ -48,6 +49,21 @@ export const createService = (service: IService, container?: IServiceContainer):
   };
 
   Object.freeze(Service);
+
+  const event = {
+    component: {
+      name: type,
+      type: "Service",
+    },
+    name: "SERVICE_CREATED",
+    payloads: {
+      configs,
+      scope,
+      type,
+    },
+  };
+
+  Notifiers.forEach((each) => each.on(event));
 
   return Service;
 })(service, container);
