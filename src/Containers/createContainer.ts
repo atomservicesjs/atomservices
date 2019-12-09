@@ -5,7 +5,7 @@ import { createService } from "../Services/createService";
 export const createContainer = (container: IServiceContainer): IManagedServiceContainer =>
   ((CONTAINER): IManagedServiceContainer => {
     const ContainerNotifiers = CONTAINER.Notifiers || [];
-    const Notifiers = composeNotifiers(...ContainerNotifiers);
+    const NOTIFIERS = composeNotifiers(...ContainerNotifiers);
 
     const SERVICES = CONTAINER.Services.reduce((result, SERVICE) => {
       const service = createService(SERVICE, CONTAINER);
@@ -18,6 +18,8 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
     const Container: IManagedServiceContainer = {
       connect: async () => {
         await Promise.all(Object.keys(SERVICES).map((type) => SERVICES[type].connect()));
+
+        NOTIFIERS.emit(ContainersNotifyData.CONTAINER_CONNECTED(CONTAINER.scope));
       },
       dispatch: async (type, command, listening) => {
         const service = SERVICES[type];
@@ -30,7 +32,7 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
 
     Object.freeze(Container);
 
-    Notifiers.emit(ContainersNotifyData.CONTAINER_CREATED(CONTAINER.scope, {
+    NOTIFIERS.emit(ContainersNotifyData.CONTAINER_CREATED(CONTAINER.scope, {
       scope: CONTAINER.scope,
       // tslint:disable-next-line: object-literal-sort-keys
       defined: {

@@ -13,9 +13,13 @@ export class NotifyObject implements INotifyObject {
       name: data.component.name,
       type: data.component.type,
     };
-    this.fields = {
-      ...data.fields,
-    };
+
+    if (data.fields) {
+      this.fields = {
+        ...data.fields,
+      };
+    }
+
     this.message = data.message;
   }
 }
