@@ -60,6 +60,11 @@ export const createService = (service: IService, container?: IServiceContainer):
     type: SERVICE.type,
     // tslint:disable-next-line: object-literal-sort-keys
     configs: SERVICE.configs,
+    defined: {
+      EventStores: (SERVICE.EventStores && true) || false,
+      EventStream: (SERVICE.EventStream && true) || false,
+      Identifier: (SERVICE.Identifier && true) || false,
+    },
   }));
 
   return Service;

@@ -33,9 +33,11 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
     Notifiers.emit(ContainersNotifyData.CONTAINER_CREATED(CONTAINER.scope, {
       scope: CONTAINER.scope,
       // tslint:disable-next-line: object-literal-sort-keys
-      hasDefinedEventStores: CONTAINER.EventStores && true,
-      hasDefinedEventStream: CONTAINER.EventStream && true,
-      hasDefinedIdentifier: CONTAINER.Identifier && true,
+      defined: {
+        EventStores: (CONTAINER.EventStores && true) || false,
+        EventStream: (CONTAINER.EventStream && true) || false,
+        Identifier: (CONTAINER.Identifier && true) || false,
+      },
     }));
 
     return Container;
