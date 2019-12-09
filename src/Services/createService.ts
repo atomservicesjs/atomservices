@@ -55,14 +55,12 @@ export const createService = (service: IService, container?: IServiceContainer):
 
   Object.freeze(Service);
 
-  Notifiers.emit(ServicesNotifyData.SERVICE_CREATED(
-    type,
-    {
-      configs,
-      scope,
-      type,
-    },
-  ));
+  Notifiers.emit(ServicesNotifyData.SERVICE_CREATED(type, {
+    scope: SERVICE.scope,
+    type: SERVICE.type,
+    // tslint:disable-next-line: object-literal-sort-keys
+    configs: SERVICE.configs,
+  }));
 
   return Service;
 })(service, container);
