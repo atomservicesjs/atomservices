@@ -3,6 +3,8 @@ import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifier
 import { ServiceStreamFactory } from "../Context/Factories/ServiceStreamFactory";
 import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
+import { composeNotifiers } from "../Notifiers/composeNotifiers";
+import { ServicesNotifyData } from "../Notifiers/data/ServicesNotifyData";
 import { LocalInMemoryEventStream } from "../Streams";
 import { composeServiceContext } from "./core/composeServiceContext";
 import { connectStream } from "./core/connectStream";
@@ -16,11 +18,14 @@ export const createService = (service: IService, container?: IServiceContainer):
     EventStores = (CONTAINER && CONTAINER.EventStores),
     EventStream = (CONTAINER && CONTAINER.EventStream) || LocalInMemoryEventStream,
     Identifier = (CONTAINER && CONTAINER.Identifier) || UUIDIdentifier,
-    Notifiers = [],
     configs = {},
     scope = (CONTAINER && CONTAINER.scope) || GlobalScope,
     type,
   } = SERVICE;
+  const ContainerNotifiers = (CONTAINER && CONTAINER.Notifiers) || [];
+  const ServiceNotifiers = SERVICE.Notifiers || [];
+  const Notifiers = composeNotifiers(...ServiceNotifiers, ...ContainerNotifiers);
+
   const definition: IServiceDefinition = {
     CommandHandlers,
     EventHandlers,
@@ -50,20 +55,14 @@ export const createService = (service: IService, container?: IServiceContainer):
 
   Object.freeze(Service);
 
-  const event = {
-    component: {
-      name: type,
-      type: "Service",
-    },
-    name: "SERVICE_CREATED",
-    payloads: {
+  Notifiers.emit(ServicesNotifyData.SERVICE_CREATED(
+    type,
+    {
       configs,
       scope,
       type,
     },
-  };
-
-  Notifiers.forEach((each) => each.on(event));
+  ));
 
   return Service;
 })(service, container);
