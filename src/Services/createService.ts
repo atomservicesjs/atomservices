@@ -3,8 +3,7 @@ import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifier
 import { ServiceStreamFactory } from "../Context/Factories/ServiceStreamFactory";
 import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
-import { composeNotifiers } from "../Notifiers/composeNotifiers";
-import { ServicesNotifyData } from "../Notifiers/data/ServicesNotifyData";
+import { composeNotifiers, ServicesNotifyData } from "../Notifiers";
 import { LocalInMemoryEventStream } from "../Streams";
 import { composeServiceContext } from "./core/composeServiceContext";
 import { connectStream } from "./core/connectStream";
@@ -24,7 +23,7 @@ export const createService = (service: IService, container?: IServiceContainer):
   } = SERVICE;
   const ContainerNotifiers = (CONTAINER && CONTAINER.Notifiers) || [];
   const ServiceNotifiers = SERVICE.Notifiers || [];
-  const Notifiers = composeNotifiers(...ServiceNotifiers, ...ContainerNotifiers);
+  const NOTIFIERS = composeNotifiers(...ServiceNotifiers, ...ContainerNotifiers);
 
   const definition: IServiceDefinition = {
     CommandHandlers,
@@ -41,8 +40,10 @@ export const createService = (service: IService, container?: IServiceContainer):
   const CommandDispatcher = createCommandDispatcher(definition);
 
   const Service: IManagedService = {
-    connect: async () =>
-      connectStream(definition),
+    connect: async () => {
+      connectStream(definition);
+      NOTIFIERS.emit(ServicesNotifyData.SERVICE_CONNECTED(SERVICE.type));
+    },
     context: (options) =>
       composeServiceContext(definition)(options),
     dispatch: async (command, listening) =>
@@ -55,7 +56,7 @@ export const createService = (service: IService, container?: IServiceContainer):
 
   Object.freeze(Service);
 
-  Notifiers.emit(ServicesNotifyData.SERVICE_CREATED(type, {
+  NOTIFIERS.emit(ServicesNotifyData.SERVICE_CREATED(type, {
     scope: SERVICE.scope,
     type: SERVICE.type,
     // tslint:disable-next-line: object-literal-sort-keys
