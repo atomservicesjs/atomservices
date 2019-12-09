@@ -10,8 +10,13 @@ export const composeNotifiers = (...notifiers: INotifier[]): INotifiers => ((Not
       const obj = new NotifyObject(data);
 
       Notifiers.forEach((notifier) => {
-        notifier.log(log);
-        notifier.on(obj);
+        if (notifier.log) {
+          notifier.log(log);
+        }
+
+        if (notifier.on) {
+          notifier.on(obj);
+        }
       });
     },
   };
