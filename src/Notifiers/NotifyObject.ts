@@ -3,6 +3,7 @@ import { INotifyData } from "./INotifyData";
 
 export class NotifyObject implements INotifyObject {
   public readonly action: string;
+  public readonly level: string;
   public readonly component: { type: string; name: string; };
   public readonly fields: { [field: string]: any; };
   public readonly message: string;
@@ -10,6 +11,7 @@ export class NotifyObject implements INotifyObject {
 
   constructor(data: INotifyData) {
     this.action = data.action;
+    this.level = data.level;
     this.component = {
       name: data.component.name,
       type: data.component.type,

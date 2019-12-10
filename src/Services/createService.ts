@@ -1,5 +1,4 @@
 import { IManagedService, IService, IServiceContainer, IServiceDefinition } from "atomservicescore";
-import * as UUID from "uuid";
 import { ServiceConfigurateFactory } from "../Context/Factories/ServiceConfigurateFactory";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
 import { GlobalScope } from "../GlobalScope";
@@ -48,25 +47,22 @@ export const createService = (service: IService, container?: IServiceContainer):
     context: (options) =>
       composeServiceContext(definition)(options),
     dispatch: async (command, listening) => {
-      const _id = UUID.v4();
       NOTIFIERS.emit(ServicesNotifyData.SERVICE_COMMAND_DISPATCHING(SERVICE.type, {
-        _id,
         name: command.name,
-      }));
+      },
+        command));
 
       const result = await CommandDispatcher.dispatch(command, listening);
 
       if (!result.accept) {
         if (result.status === "invalid") {
           NOTIFIERS.emit(ServicesNotifyData.SERVICE_COMMAND_INVALID(SERVICE.type, {
-            _id,
             name: command.name,
           }));
         }
 
         if (result.status === "unhandled") {
           NOTIFIERS.emit(ServicesNotifyData.SERVICE_COMMAND_UNHANDLED(SERVICE.type, {
-            _id,
             name: command.name,
           }));
         }

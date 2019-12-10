@@ -1,5 +1,6 @@
 export interface INotifyData {
   action: string;
+  level: string;
   component: {
     type: string;
     name: string;
