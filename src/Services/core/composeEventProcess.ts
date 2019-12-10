@@ -26,6 +26,7 @@ export const composeEventProcess = (definition: IServiceDefinition): EventStream
 
       Notifiers.emit(ServicesNotifyData.SERVICE_EVENT_HANDLED(event.type, {
         eventID: event._id,
+        metadata,
         scope: Definition.scope,
         type: Definition.type,
         // tslint:disable-next-line: object-literal-sort-keys
@@ -36,6 +37,7 @@ export const composeEventProcess = (definition: IServiceDefinition): EventStream
         _version: event._version,
       }, {
         event,
+        metadata,
         result,
       }));
     }

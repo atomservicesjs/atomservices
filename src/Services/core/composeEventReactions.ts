@@ -38,6 +38,7 @@ export const composeEventReactions = (definition: IServiceDefinition): EventStre
           // tslint:disable-next-line: object-literal-sort-keys
           event: {
             eventID: event._id,
+            metadata,
             scope,
             type: event.type,
             // tslint:disable-next-line: object-literal-sort-keys
@@ -49,6 +50,7 @@ export const composeEventReactions = (definition: IServiceDefinition): EventStre
           },
         }, {
           event,
+          metadata,
         }));
       }
       await processAck();
