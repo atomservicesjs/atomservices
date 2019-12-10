@@ -2,10 +2,10 @@ import { INotifyObject } from "atomservicescore";
 import { INotifyData } from "./INotifyData";
 
 export class NotifyObject implements INotifyObject {
-  public action: string;
-  public component: { type: string; name: string; };
-  public fields: { [field: string]: any; };
-  public message: string;
+  public readonly action: string;
+  public readonly component: { type: string; name: string; };
+  public readonly fields: { [field: string]: any; };
+  public readonly message: string;
 
   constructor(data: INotifyData) {
     this.action = data.action;
