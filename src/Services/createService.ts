@@ -46,8 +46,12 @@ export const createService = (service: IService, container?: IServiceContainer):
     },
     context: (options) =>
       composeServiceContext(definition)(options),
-    dispatch: async (command, listening) =>
-      CommandDispatcher.dispatch(command, listening),
+    dispatch: async (command, listening) => {
+      NOTIFIERS.emit(ServicesNotifyData.SERVICE_COMMAND_DISPATCHING(SERVICE.type, command));
+      const result = await CommandDispatcher.dispatch(command, listening);
+
+      return result;
+    },
     scope: () =>
       scope,
     type: () =>
