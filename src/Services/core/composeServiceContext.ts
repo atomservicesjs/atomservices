@@ -102,6 +102,18 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
       },
       listenTo: async (ref, listener) =>
         EventStream.listenTo(ref, listener),
+      notify: (data) =>
+        Notifiers.emit({
+          action: data.action,
+          component: {
+            name: definition.type,
+            type: "Service",
+          },
+          fields: data.fields,
+          level: data.level,
+          message: data.message,
+          obj: data.obj,
+        }),
       queryCurrentVersion: (aggregateID) => {
         if (EventStores) {
           return EventStores.queryCurrentVersion(scope, type, aggregateID);
