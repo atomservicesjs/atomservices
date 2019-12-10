@@ -8,4 +8,7 @@ export interface INotifyData {
     [field: string]: any;
   };
   message: string;
+  obj?: {
+    [key: string]: any;
+  };
 }

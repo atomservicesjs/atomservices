@@ -6,6 +6,7 @@ export class NotifyObject implements INotifyObject {
   public readonly component: { type: string; name: string; };
   public readonly fields: { [field: string]: any; };
   public readonly message: string;
+  public readonly obj: { [key: string]: any; };
 
   constructor(data: INotifyData) {
     this.action = data.action;
@@ -24,5 +25,11 @@ export class NotifyObject implements INotifyObject {
       .replace("$$ACTION$$", data.action)
       .replace("$$NAME$$", data.component.name)
       .replace("$$TYPE$$", data.component.type);
+
+    if (data.obj) {
+      this.obj = {
+        ...data.obj,
+      };
+    }
   }
 }

@@ -6,15 +6,14 @@ import { NotifyObject } from "./NotifyObject";
 export const composeNotifiers = (...notifiers: INotifier[]): INotifiers => ((Notifiers): INotifiers => {
   const NOTIFIERS: INotifiers = {
     emit: (data) => {
-      const log = new NotifyLog(data);
-      const obj = new NotifyObject(data);
-
       Notifiers.forEach((notifier) => {
         if (notifier.log) {
+          const log = new NotifyLog(data);
           notifier.log(log);
         }
 
         if (notifier.on) {
+          const obj = new NotifyObject(data);
           notifier.on(obj);
         }
       });
