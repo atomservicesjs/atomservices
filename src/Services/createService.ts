@@ -1,6 +1,6 @@
 import { IManagedService, IService, IServiceContainer, IServiceDefinition } from "atomservicescore";
+import { ServiceConfigurateFactory } from "../Context/Factories/ServiceConfigurateFactory";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
-import { ServiceStreamFactory } from "../Context/Factories/ServiceStreamFactory";
 import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
 import { composeNotifiers, ServicesNotifyData } from "../Notifiers";
@@ -31,8 +31,8 @@ export const createService = (service: IService, container?: IServiceContainer):
     EventStores,
     EventStream,
     Reactions,
+    ServiceConfigurate: ServiceConfigurateFactory.create(configs),
     ServiceIdentifier: ServiceIdentifierFactory.create(Identifier, type),
-    ServiceStream: ServiceStreamFactory.create(configs),
     configs,
     scope,
     type,

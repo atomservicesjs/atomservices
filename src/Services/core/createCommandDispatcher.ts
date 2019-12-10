@@ -6,7 +6,7 @@ import { LocalDirectStream } from "../../Streams";
 import { composeServiceContext } from "./composeServiceContext";
 
 export const createCommandDispatcher = (definition: IServiceDefinition): ICommandDispatcher => ((Definition) => {
-  const { ServiceStream, type } = Definition;
+  const { ServiceConfigurate, type } = Definition;
   const CommandHandlers = composeCommandHandlers(...Definition.CommandHandlers)(type);
   const ServiceContextComposing = composeServiceContext(Definition);
 
@@ -35,7 +35,7 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
 
         // #LISTENING
         if (listening) {
-          const processType = ServiceStream.processType(event.name);
+          const processType = ServiceConfigurate.processType(event.name);
 
           if (processType === "synchronous") {
             LocalDirectStream.listenTo(event._id, listening);

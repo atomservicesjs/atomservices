@@ -14,8 +14,8 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
   const {
     EventStores,
     EventStream,
+    ServiceConfigurate,
     ServiceIdentifier,
-    ServiceStream,
     scope,
     type,
   } = definition;
@@ -41,7 +41,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
           }
           const currentVersion = version;
 
-          if (event._version === undefined && ServiceStream.allowNoVersion(event.name)) {
+          if (event._version === undefined && ServiceConfigurate.allowDynamicVersion(event.name)) {
             event._version = currentVersion + 1;
           }
 
@@ -57,7 +57,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
         }
 
         let metadata = MetadataRefiner.dispatch({ isReplay });
-        const processType = ServiceStream.processType(event.name);
+        const processType = ServiceConfigurate.processType(event.name);
 
         if (processType === "synchronous") {
           const EventHandlers = composeEventHandlers(...definition.EventHandlers)(type);
@@ -80,7 +80,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
         }
 
         try {
-          const on = { level: ServiceStream.level(event.name), scope };
+          const on = { level: ServiceConfigurate.level(event.name), scope };
 
           return EventStream.publish(on, metadata, event);
         } catch (error) {

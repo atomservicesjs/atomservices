@@ -2,8 +2,8 @@ import { EventStream, IServiceDefinition } from "atomservicescore";
 
 export const mapHandlersEvents = (definition: IServiceDefinition): Array<{ name: string; level: EventStream.StreamLevel; }> =>
   definition.EventHandlers.reduce((result, { name }) => {
-    const level = definition.ServiceStream.level(name);
-    const processType = definition.ServiceStream.processType(name);
+    const level = definition.ServiceConfigurate.level(name);
+    const processType = definition.ServiceConfigurate.processType(name);
 
     if (processType === "asynchronous") {
       result.push({ name, level });
