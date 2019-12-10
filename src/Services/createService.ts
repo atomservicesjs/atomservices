@@ -30,6 +30,7 @@ export const createService = (service: IService, container?: IServiceContainer):
     EventHandlers,
     EventStores,
     EventStream,
+    Notifiers: NOTIFIERS,
     Reactions,
     ServiceConfigurate: ServiceConfigurateFactory.create(configs),
     ServiceIdentifier: ServiceIdentifierFactory.create(Identifier, type),
@@ -48,22 +49,48 @@ export const createService = (service: IService, container?: IServiceContainer):
       composeServiceContext(definition)(options),
     dispatch: async (command, listening) => {
       NOTIFIERS.emit(ServicesNotifyData.SERVICE_COMMAND_DISPATCHING(SERVICE.type, {
+        scope: SERVICE.scope,
+        type: SERVICE.type,
+        // tslint:disable-next-line: object-literal-sort-keys
         name: command.name,
-      },
-        command));
+      }, {
+        command,
+      }));
 
       const result = await CommandDispatcher.dispatch(command, listening);
 
       if (!result.accept) {
+        if (result.status === "error") {
+          NOTIFIERS.error(ServicesNotifyData.SERVICE_COMMAND_ERROR(SERVICE.type, {
+            scope: SERVICE.scope,
+            type: SERVICE.type,
+            // tslint:disable-next-line: object-literal-sort-keys
+            name: command.name,
+          }, {
+            command,
+          }), result.error);
+        }
+
         if (result.status === "invalid") {
           NOTIFIERS.emit(ServicesNotifyData.SERVICE_COMMAND_INVALID(SERVICE.type, {
+            scope: SERVICE.scope,
+            type: SERVICE.type,
+            // tslint:disable-next-line: object-literal-sort-keys
             name: command.name,
+            invalidAttributes: result.invalidAttributes,
+          }, {
+            command,
           }));
         }
 
         if (result.status === "unhandled") {
           NOTIFIERS.emit(ServicesNotifyData.SERVICE_COMMAND_UNHANDLED(SERVICE.type, {
+            scope: SERVICE.scope,
+            type: SERVICE.type,
+            // tslint:disable-next-line: object-literal-sort-keys
             name: command.name,
+          }, {
+            command,
           }));
         }
       }

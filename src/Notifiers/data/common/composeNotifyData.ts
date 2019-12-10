@@ -1,4 +1,4 @@
-import { INotifyData } from "../../INotifyData";
+import { INotifyData } from "atomservicescore";
 import { IConstantData } from "./IConstantData";
 
 type ComposingNotifyData = (data: IConstantData) => (

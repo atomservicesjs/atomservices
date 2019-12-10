@@ -1,5 +1,4 @@
-import { INotifyLog } from "atomservicescore";
-import { INotifyData } from "./INotifyData";
+import { INotifyData, INotifyLog } from "atomservicescore";
 
 export class NotifyLog implements INotifyLog {
   public readonly action: string;
@@ -8,7 +7,7 @@ export class NotifyLog implements INotifyLog {
   public readonly fields: { [field: string]: any; };
   public readonly message: string;
 
-  constructor(data: INotifyData) {
+  constructor(data: INotifyData, error?: Error) {
     this.action = data.action;
     this.level = data.level;
     this.component = {
@@ -20,6 +19,13 @@ export class NotifyLog implements INotifyLog {
       this.fields = {
         ...data.fields,
       };
+
+      if (error) {
+        this.fields.error = {
+          message: error.message,
+          name: error.name,
+        };
+      }
     }
 
     this.message = data.message

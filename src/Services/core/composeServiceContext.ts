@@ -7,6 +7,7 @@ import {
   EventVersionConflictedConcurrentException,
   NoEventStoresProvidedException,
 } from "../../Exceptions/Core";
+import { ServicesNotifyData } from "../../Notifiers";
 import { LocalDirectStream } from "../../Streams/LocalDirectStream";
 import { MetadataRefiner } from "./MetadataRefiner";
 
@@ -14,6 +15,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
   const {
     EventStores,
     EventStream,
+    Notifiers,
     ServiceConfigurate,
     ServiceIdentifier,
     scope,
@@ -82,7 +84,18 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
         try {
           const on = { level: ServiceConfigurate.level(event.name), scope };
 
-          return EventStream.publish(on, metadata, event);
+          await EventStream.publish(on, metadata, event);
+          Notifiers.emit(ServicesNotifyData.SERVICE_EVENT_DISPATCHED(type, {
+            eventID: event._id,
+            scope,
+            type,
+            // tslint:disable-next-line: object-literal-sort-keys
+            name: event.name,
+            aggregateID: event.aggregateID,
+            _createdAt: event._createdAt,
+            _createdBy: event._createdBy,
+            _version: event._version,
+          }, { event }));
         } catch (error) {
           throw EventPublishingErrorException(error, event, scope);
         }

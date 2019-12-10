@@ -15,6 +15,14 @@ export const DispatchResult = {
       },
       status: "accepted",
     }),
+  error: (type: string, name: string, error: Error): DispatchResultType.IErrorDispatchResult =>
+    ({
+      accept: false,
+      error,
+      name,
+      status: "error",
+      type,
+    }),
   invalid: (invalidAttributes: any): DispatchResultType.IInvalidDispatchResult =>
     ({
       accept: false,

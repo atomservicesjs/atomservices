@@ -12,41 +12,52 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
 
   const CommandDispatcher: ICommandDispatcher = {
     dispatch: async (command, listening) => {
-      const CommandHandler = CommandHandlers.resolve(command);
+      const { name } = command;
 
-      if (CommandHandler === undefined) {
-        const { name } = command;
+      try {
+        const CommandHandler = CommandHandlers.resolve(command);
 
-        return DispatchResult.unhandled(type, name);
-      } else {
-        const ServiceContext = ServiceContextComposing({ isReplay: false });
+        if (CommandHandler === undefined) {
 
-        // #HOOK: Apply Command Hook
-        if (CommandHandler.hook && CommandHandler.hook.command) {
-          command = await CommandHandler.hook.command(command);
-        }
-
-        let event = CommandHandler.transform(command, ServiceContext);
-
-        // #HOOK: Apply Event Hook
-        if (CommandHandler.hook && CommandHandler.hook.event) {
-          event = await CommandHandler.hook.event(event);
-        }
-
-        // #LISTENING
-        if (listening) {
-          const processType = ServiceConfigurate.processType(event.name);
-
-          if (processType === "synchronous") {
-            LocalDirectStream.listenTo(event._id, listening);
-          } else {
-            ServiceContext.listenTo(event._id, listening);
+          return DispatchResult.unhandled(type, name);
+        } else {
+          // #DISPATCH PROCESS: Apply COMMAND HOOK
+          if (CommandHandler.hook && CommandHandler.hook.command) {
+            command = await CommandHandler.hook.command(command);
           }
+
+          // #DISPATCH PROCESS: Validate Command
+          const { invalidAttributes, isValid } = CommandHandler.validate(command);
+
+          if (!isValid) {
+            return DispatchResult.invalid(invalidAttributes);
+          }
+
+          const ServiceContext = ServiceContextComposing({ isReplay: false });
+          let event = CommandHandler.transform(command, ServiceContext);
+
+          // #DISPATCH PROCESS: Apply EVENT HOOK
+          if (CommandHandler.hook && CommandHandler.hook.event) {
+            event = await CommandHandler.hook.event(event);
+          }
+
+          // #DISPATCH PROCESS: Apply LISTENING
+          if (listening) {
+            const processType = ServiceConfigurate.processType(event.name);
+
+            if (processType === "synchronous") {
+              LocalDirectStream.listenTo(event._id, listening);
+            } else {
+              ServiceContext.listenTo(event._id, listening);
+            }
+          }
+
+          await ServiceContext.dispatch(event);
+
+          return DispatchResult.accept(event);
         }
-
-        await ServiceContext.dispatch(event);
-
-        return DispatchResult.accept(event);
+      } catch (error) {
+        return DispatchResult.error(type, name, error);
       }
     },
     scope: () => Definition.scope,
