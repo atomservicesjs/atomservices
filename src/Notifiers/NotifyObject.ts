@@ -20,6 +20,9 @@ export class NotifyObject implements INotifyObject {
       };
     }
 
-    this.message = data.message;
+    this.message = data.message
+      .replace("$$ACTION$$", data.action)
+      .replace("$$NAME$$", data.component.name)
+      .replace("$$TYPE$$", data.component.type);
   }
 }
