@@ -9,23 +9,27 @@ import {
 } from "../../Exceptions/Core";
 import { ServicesNotifyData } from "../../Notifiers";
 import { LocalDirectStream } from "../../Streams/LocalDirectStream";
+import { managedEventProcess } from "./managedEventProcess";
 import { MetadataRefiner } from "./MetadataRefiner";
 
-export const composeServiceContext = (definition: IServiceDefinition) => {
+export const composeServiceContext = (definition: IServiceDefinition) => ((Definition) => {
   const {
     EventStores,
     EventStream,
     Notifiers,
     ServiceConfigurate,
     ServiceIdentifier,
+    ServiceStateStores,
     scope,
     type,
-  } = definition;
+  } = Definition;
+
+  const EventHandlers = composeEventHandlers(...definition.EventHandlers)(type);
 
   return (options: { isReplay?: boolean; } = {}): IServiceContext => {
     const isReplay = options.isReplay || false;
 
-    const context: IServiceContext = {
+    const ServiceContext: IServiceContext = {
       AggregateID: () =>
         ServiceIdentifier.AggregateID(),
       EventID: () =>
@@ -33,6 +37,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
       directTo: (ref, data) =>
         EventStream.directTo(ref, data),
       dispatch: async (event) => {
+        // STORE EVENT
         if (EventStores && !isReplay) {
           let version: number;
 
@@ -58,29 +63,21 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
           }
         }
 
-        let metadata = MetadataRefiner.dispatch({ isReplay });
+        // PREPARE
+        const metadata = MetadataRefiner.dispatch({ isReplay });
         const processType = ServiceConfigurate.processType(event.name);
 
+        // SYNC PROCESS
         if (processType === "synchronous") {
-          const EventHandlers = composeEventHandlers(...definition.EventHandlers)(type);
-          const ServiceContextComposing = composeServiceContext(definition);
-
           const EventHandler = EventHandlers.resolve(event);
 
           if (EventHandler) {
-            metadata = MetadataRefiner.consume(metadata);
-            const ServiceContext = ServiceContextComposing(metadata);
-            const currentState = undefined;
-
-            const result = await EventHandler.process(event, currentState, metadata);
             const resulting = (data: any) => LocalDirectStream.directTo(event._id, data);
-
-            if (EventHandler.processEffect) {
-              await EventHandler.processEffect({ event, metadata, result }, resulting, ServiceContext);
-            }
+            await managedEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores);
           }
         }
 
+        // PUBLISH EVENT
         try {
           const on = { level: ServiceConfigurate.level(event.name), scope };
 
@@ -127,6 +124,6 @@ export const composeServiceContext = (definition: IServiceDefinition) => {
         type,
     };
 
-    return context;
+    return ServiceContext;
   };
-};
+})(definition);

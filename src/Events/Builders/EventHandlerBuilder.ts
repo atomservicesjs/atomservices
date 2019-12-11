@@ -1,12 +1,12 @@
 import { EventHandler, IEvent, IEventHandler } from "atomservicescore";
 
-export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult = EventHandler.AnyProcessResult, State = EventHandler.AnyState>(
+export const EventHandlerBuilder = <Event extends IEvent = IEvent, ProcessResult = EventHandler.AnyProcessResult>(
     composed: {
       name: string;
-      process: EventHandler.EventProcessHandle<Event, ProcessResult, State>;
+      process: EventHandler.EventProcessHandle<Event, ProcessResult>;
       processEffect?: EventHandler.EventProcessEffectHandle<Event, ProcessResult>;
     },
-): IEventHandler<Event, ProcessResult, State> =>
+): IEventHandler<Event, ProcessResult> =>
   Object.defineProperties({}, {
     name: {
       configurable: false,
