@@ -73,7 +73,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
 
           if (EventHandler) {
             const resulting = (data: any) => LocalDirectStream.directTo(event._id, data);
-            await managedEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores);
+            await managedEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores)(Definition, event, metadata);
           }
         }
 

@@ -16,7 +16,7 @@ export const composeEventProcess = (definition: IServiceDefinition): EventStream
       const ServiceContext = composingServiceContext(metadata);
       const resulting = composeEventResulting(ServiceContext, event);
 
-      await managedEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores);
+      await managedEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores)(Definition, event, metadata);
     }
 
     await processAck();
