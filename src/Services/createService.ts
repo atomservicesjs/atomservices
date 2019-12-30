@@ -49,7 +49,7 @@ export const createService = (service: IService, container?: IServiceContainer):
       connectStream(definition);
 
       if (StateStores) {
-        await StateStores.connect(EventStores);
+        await StateStores.connect(definition);
       }
 
       NOTIFIERS.emit(ServicesNotifyData.SERVICE_CONNECTED(SERVICE.type));

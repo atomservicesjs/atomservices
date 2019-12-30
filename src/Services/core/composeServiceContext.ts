@@ -5,6 +5,7 @@ import {
   EventPublishingErrorException,
   EventStoringErrorException,
   EventVersionConflictedConcurrentException,
+  NoAllowedDynamicVersionErrorException,
   NoEventStoresProvidedException,
 } from "../../Exceptions/Core";
 import { ServicesNotifyData } from "../../Notifiers";
@@ -37,6 +38,8 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
       directTo: (ref, data) =>
         EventStream.directTo(ref, data),
       dispatch: async (event) => {
+        let eventVersion = event._version ? event._version : undefined;
+
         // STORE EVENT
         if (EventStores && !isReplay) {
           let version: number;
@@ -46,13 +49,19 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
           } catch (error) {
             throw CurrentVersionQueryingErrorException(error, event.aggregateID, type, scope);
           }
+
           const currentVersion = version;
 
-          if (event._version === undefined && ServiceConfigurate.allowDynamicVersion(event.name)) {
-            event._version = currentVersion + 1;
+          if (eventVersion === undefined) {
+            if (ServiceConfigurate.allowDynamicVersion(event.name)) {
+              eventVersion = currentVersion + 1;
+              event._version = eventVersion;
+            } else {
+              throw NoAllowedDynamicVersionErrorException(event, scope);
+            }
           }
 
-          if (currentVersion + 1 === event._version) {
+          if (currentVersion + 1 === eventVersion) {
             try {
               await EventStores.storeEvent(scope, event);
             } catch (error) {
@@ -60,6 +69,15 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
             }
           } else {
             throw EventVersionConflictedConcurrentException(event, currentVersion, scope);
+          }
+        } else {
+          if (eventVersion === undefined) {
+            if (ServiceConfigurate.allowDynamicVersion(event.name)) {
+              eventVersion = 1;
+              event._version = eventVersion;
+            } else {
+              throw NoAllowedDynamicVersionErrorException(event, scope);
+            }
           }
         }
 
@@ -91,8 +109,13 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
             aggregateID: event.aggregateID,
             _createdAt: event._createdAt,
             _createdBy: event._createdBy,
-            _version: event._version,
+            _version: eventVersion,
           }, { event }));
+
+          return {
+            id: event._id,
+            version: eventVersion,
+          };
         } catch (error) {
           throw EventPublishingErrorException(error, event, scope);
         }

@@ -52,9 +52,16 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
             }
           }
 
-          await ServiceContext.dispatch(event);
+          const { id, version } = await ServiceContext.dispatch(event);
 
-          return DispatchResult.accept(event);
+          return DispatchResult.accept({
+            _createdAt: event._createdAt,
+            _id: id,
+            _version: version,
+            aggregateID: event.aggregateID,
+            name: event.name,
+            type: event.type,
+          });
         }
       } catch (error) {
         return DispatchResult.error(type, name, error);

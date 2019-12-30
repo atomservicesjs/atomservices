@@ -13,6 +13,7 @@ export const EventVersionConflictedConcurrent = "EventVersionConflictedConcurren
 export const CurrentVersionQueryingError = "CurrentVersionQueryingError";
 export const EventStoringError = "EventStoringError";
 export const EventPublishingError = "EventPublishingError";
+export const NoAllowedDynamicVersionError = "NoAllowedDynamicVersionError";
 export const NoEventStoresProvided = "NoEventStoresProvided";
 
 export default {
@@ -24,5 +25,6 @@ export default {
   "000101_CurrentVersionQueryingError": { code: "000101", name: CurrentVersionQueryingError },
   "000102_EventStoringError": { code: "000102", name: EventStoringError },
   "000103_EventPublishingError": { code: "000103", name: EventPublishingError },
+  "000108_NoAllowedDynamicVersionError": { code: "000108", name: NoAllowedDynamicVersionError },
   "000110_NoEventStoresProvided": { code: "000110", name: NoEventStoresProvided },
 };
