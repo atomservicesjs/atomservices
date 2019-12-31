@@ -8,8 +8,8 @@ export const ServiceStateStoresFactory = {
   ): IServiceStateStores | undefined => ((Scope, Type, StateStores): IServiceStateStores | undefined => {
     if (StateStores) {
       const ServiceStateStores: IServiceStateStores = {
-        applyEvent: (state, event) =>
-          StateStores.applyEvent(Scope, Type, state, event),
+        applyEvents: (events) =>
+          StateStores.applyEvents(Scope, Type, events),
         queryByAggregateID: (aggregateID) =>
           StateStores.queryByAggregateID(Scope, Type, aggregateID),
         queryCurrentVersion: (aggregateID) =>
