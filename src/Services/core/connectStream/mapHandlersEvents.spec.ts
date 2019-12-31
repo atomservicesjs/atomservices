@@ -11,7 +11,7 @@ describe("mapHandlersEvents.ts tests", () => {
         { name: "C" },
         { name: "D" },
       ];
-      const ServiceStream: any = {
+      const ServiceConfigurate: any = {
         level: (name: string) => {
           const Scopes = ["B", "C"];
 
@@ -33,7 +33,7 @@ describe("mapHandlersEvents.ts tests", () => {
       };
       const definition: any = {
         EventHandlers,
-        ServiceStream,
+        ServiceConfigurate,
       };
       const expected: any = [
         { name: "A", level: "Public" },
