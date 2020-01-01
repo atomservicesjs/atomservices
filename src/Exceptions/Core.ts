@@ -9,6 +9,9 @@ export const ComposeDuplicatedCommandHandlersException = (type: string, name: st
 export const ComposeDuplicatedEventHandlersException = (type: string, name: string) =>
   createException(Constants["000002_ComposeDuplicatedEventHandlers"], `compose duplicated event handlers - { type: '${type}', name: '${name}' }`);
 
+export const ComposeDuplicatedStateHandlersException = (type: string, name: string) =>
+  createException(Constants["000003_ComposeDuplicatedStateHandlers"], `compose duplicated state handlers - { type: '${type}', name: '${name}' }`);
+
 export const CombineDuplicatedCommandDispatcherException = (type: string) =>
   createException(Constants["000004_CombineDuplicatedCommandDispatchers"], `combine duplicated command dispatchers - { type: '${type}' }`);
 
