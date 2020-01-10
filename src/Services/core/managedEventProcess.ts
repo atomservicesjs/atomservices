@@ -1,4 +1,4 @@
-import { EventStream, IEvent, IEventHandler, INotifiers, IServiceContext, IServiceStateStores } from "atomservicescore";
+import { EventStream, IEvent, IEventHandler, INotifiers, IServiceContext } from "atomservicescore";
 import { ServicesNotifyData } from "../../Notifiers";
 import { MetadataRefiner } from "./MetadataRefiner";
 
@@ -7,7 +7,7 @@ export const managedEventProcess = (
   ServiceContext: IServiceContext,
   resulting: (result: any) => Promise<void>,
   Notifiers: INotifiers,
-  ServiceStateStores?: IServiceStateStores,
+  ServiceStateStores: any,
 ) =>
   async (service: { scope: string; type: string; }, event: IEvent, metadata: EventStream.IStreamMetadata) => {
     metadata = MetadataRefiner.consume(metadata);
