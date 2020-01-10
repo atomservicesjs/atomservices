@@ -40,7 +40,7 @@ export const LocalEventStream: EventStream.IEventPublishing & EventStream.IEvent
       });
     }
   },
-  publish: async (on, metadata, event) => {
+  publish: async ({ event, metadata, on }) => {
     const { level, scope } = on;
     const { type } = event;
     const ex = endpoints.toExchange({ level, scope, type });

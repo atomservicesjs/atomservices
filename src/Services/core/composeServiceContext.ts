@@ -99,7 +99,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
         try {
           const on = { level: ServiceConfigurate.level(event.name), scope };
 
-          await EventStream.publish(on, metadata, event);
+          await EventStream.publish({ event, metadata, on });
           Notifiers.emit(ServicesNotifyData.SERVICE_EVENT_DISPATCHED(type, {
             eventID: event._id,
             scope,
