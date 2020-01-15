@@ -6,7 +6,7 @@ export const MetadataRefiner = {
     const now = Date.now();
     let duration: any;
 
-    const { time } = meta.dispatch;
+    const { time } = meta.dispatch || {};
 
     if (time) {
       duration = now - time;

@@ -13,6 +13,8 @@ import { LocalDirectStream } from "../../Streams/LocalDirectStream";
 import { managedEventProcess } from "./managedEventProcess";
 import { MetadataRefiner } from "./MetadataRefiner";
 
+export const isEventVersionDefined = (eventVersion: any) => (eventVersion && eventVersion >= 0);
+
 export const composeServiceContext = (definition: IServiceDefinition) => ((Definition) => {
   const {
     EventStores,
@@ -37,7 +39,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
       directTo: (ref, data) =>
         EventStream.directTo(ref, data),
       dispatch: async (event) => {
-        let eventVersion = event._version ? event._version : undefined;
+        let eventVersion = event._version;
 
         // STORE EVENT
         if (EventStores && !isReplay) {
@@ -51,7 +53,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
 
           const currentVersion = version;
 
-          if (eventVersion === undefined) {
+          if (!isEventVersionDefined(eventVersion)) {
             if (ServiceConfigurate.allowDynamicVersion(event.name)) {
               eventVersion = currentVersion + 1;
               event._version = eventVersion;
@@ -70,7 +72,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
             throw EventVersionConflictedConcurrentException(event, currentVersion, scope);
           }
         } else {
-          if (eventVersion === undefined) {
+          if (!isEventVersionDefined(eventVersion)) {
             if (ServiceConfigurate.allowDynamicVersion(event.name)) {
               eventVersion = 1;
               event._version = eventVersion;
