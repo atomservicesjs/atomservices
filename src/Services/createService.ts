@@ -1,7 +1,6 @@
 import { IManagedService, IService, IServiceContainer, IServiceDefinition } from "atomservicescore";
 import { ServiceConfigurateFactory } from "../Context/Factories/ServiceConfigurateFactory";
 import { ServiceIdentifierFactory } from "../Context/Factories/ServiceIdentifierFactory";
-import { ServiceStateStoresFactory } from "../Context/Factories/ServiceStateStoresFactory";
 import { GlobalScope } from "../GlobalScope";
 import { UUIDIdentifier } from "../Identifiers/UUIDIdentifier";
 import { composeNotifiers, ServicesNotifyData } from "../Notifiers";
@@ -14,9 +13,9 @@ export const createService = (service: IService, container?: IServiceContainer):
   const {
     CommandHandlers = [],
     EventHandlers = [],
+    StateHandlers = [],
     Reactions = [],
     EventStores = (CONTAINER && CONTAINER.EventStores),
-    StateStores = (CONTAINER && CONTAINER.StateStores),
     EventStream = (CONTAINER && CONTAINER.EventStream) || LocalInMemoryEventStream,
     Identifier = (CONTAINER && CONTAINER.Identifier) || UUIDIdentifier,
     configs = {},
@@ -36,7 +35,7 @@ export const createService = (service: IService, container?: IServiceContainer):
     Reactions,
     ServiceConfigurate: ServiceConfigurateFactory.create(configs),
     ServiceIdentifier: ServiceIdentifierFactory.create(Identifier, type),
-    ServiceStateStores: ServiceStateStoresFactory.create(scope, type, StateStores),
+    StateHandlers,
     configs,
     scope,
     type,
@@ -47,10 +46,6 @@ export const createService = (service: IService, container?: IServiceContainer):
   const Service: IManagedService = {
     connect: async () => {
       connectStream(definition);
-
-      if (StateStores) {
-        await StateStores.connect(definition);
-      }
 
       NOTIFIERS.emit(ServicesNotifyData.SERVICE_CONNECTED(SERVICE.type));
     },

@@ -8,7 +8,7 @@ export const connectStream = async (definition: IServiceDefinition) => (async (D
   const EventProcess = composeEventProcess(Definition);
   const EventReactions = composeEventReactions(Definition);
 
-  const Stream: IServiceStreamDefinition = Object.freeze({
+  const StreamDefinition: IServiceStreamDefinition = Object.freeze({
     handlers: {
       events: mapHandlersEvents(Definition),
       processing: EventProcess,
@@ -21,7 +21,7 @@ export const connectStream = async (definition: IServiceDefinition) => (async (D
     type: Definition.type,
   });
 
-  Definition.EventStream.subscribe(Stream);
+  Definition.EventStream.subscribe(StreamDefinition);
 
   await Definition.EventStream.connect();
 })(definition);

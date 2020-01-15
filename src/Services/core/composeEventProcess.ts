@@ -7,7 +7,8 @@ import { managedEventProcess } from "./managedEventProcess";
 export const composeEventProcess = (definition: IServiceDefinition): EventStream.StreamProcessing => ((Definition): EventStream.StreamProcessing => {
   const EventHandlers = composeEventHandlers(...Definition.EventHandlers)(Definition.type);
   const composingServiceContext = composeServiceContext(Definition);
-  const { Notifiers, ServiceStateStores } = Definition;
+  const { Notifiers } = Definition;
+  const ServiceStateStores: any = {};
 
   const EventProcess: EventStream.StreamProcessing = async (event, metadata, processAck) => {
     const EventHandler = EventHandlers.resolve(event);

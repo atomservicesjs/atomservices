@@ -20,7 +20,6 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
     Notifiers,
     ServiceConfigurate,
     ServiceIdentifier,
-    ServiceStateStores,
     scope,
     type,
   } = Definition;
@@ -84,6 +83,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
         // PREPARE
         const metadata = MetadataRefiner.dispatch({ isReplay });
         const processType = ServiceConfigurate.processType(event.name);
+        const ServiceStateStores: any = {};
 
         // SYNC PROCESS
         if (processType === "synchronous") {
