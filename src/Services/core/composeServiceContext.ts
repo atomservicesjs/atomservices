@@ -10,8 +10,9 @@ import {
 } from "../../Exceptions/Core";
 import { ServicesNotifyData } from "../../Notifiers";
 import { LocalDirectStream } from "../../Streams/LocalDirectStream";
-import { managedEventProcess } from "./managedEventProcess";
 import { MetadataRefiner } from "./MetadataRefiner";
+
+import { operateEventProcess } from "./operateEventProcess";
 
 export const isEventVersionDefined = (eventVersion: any) => (eventVersion && eventVersion >= 0);
 
@@ -93,7 +94,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
 
           if (EventHandler) {
             const resulting = (data: any) => LocalDirectStream.directTo(event._id, data);
-            await managedEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores)(Definition, event, metadata);
+            await operateEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores)(Definition, event, metadata);
           }
         }
 

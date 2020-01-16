@@ -12,4 +12,5 @@ export const ServicesData = {
   SERVICE_EVENT_DISPATCHED: { action: "SERVICE_EVENT_DISPATCHED", level: "info", message: "[Service: $$NAME$$] Event Dispatched", type } as IConstantData,
   SERVICE_EVENT_HANDLED: { action: "SERVICE_EVENT_HANDLED", level: "info", message: "[Service: $$NAME$$] Event Handled", type } as IConstantData,
   SERVICE_EVENT_REACTED: { action: "SERVICE_EVENT_REACTED", level: "info", message: "[Service: $$NAME$$] Event Reacted", type } as IConstantData,
+  SERVICE_EVENT_UNHANDLED_ERROR: { action: "SERVICE_EVENT_UNHANDLED_ERROR", level: "error", message: "[Service: $$NAME$$] Event Unhandled Error", type } as IConstantData,
 };

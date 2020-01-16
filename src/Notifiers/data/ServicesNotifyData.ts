@@ -11,4 +11,5 @@ export const ServicesNotifyData = {
   SERVICE_EVENT_DISPATCHED: composeNotifyData(ServicesData.SERVICE_EVENT_DISPATCHED),
   SERVICE_EVENT_HANDLED: composeNotifyData(ServicesData.SERVICE_EVENT_HANDLED),
   SERVICE_EVENT_REACTED: composeNotifyData(ServicesData.SERVICE_EVENT_REACTED),
+  SERVICE_EVENT_UNHANDLED_ERROR: composeNotifyData(ServicesData.SERVICE_EVENT_UNHANDLED_ERROR),
 };

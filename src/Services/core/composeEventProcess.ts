@@ -2,7 +2,7 @@ import { EventStream, IServiceDefinition } from "atomservicescore";
 import { composeEventHandlers } from "../../Events/composeEventHandlers";
 import { composeEventResulting } from "./composeEventResulting";
 import { composeServiceContext } from "./composeServiceContext";
-import { managedEventProcess } from "./managedEventProcess";
+import { operateEventProcess } from "./operateEventProcess";
 
 export const composeEventProcess = (definition: IServiceDefinition): EventStream.StreamProcessing => ((Definition): EventStream.StreamProcessing => {
   const EventHandlers = composeEventHandlers(...Definition.EventHandlers)(Definition.type);
@@ -20,7 +20,7 @@ export const composeEventProcess = (definition: IServiceDefinition): EventStream
         const ServiceContext = composingServiceContext(metadata);
         const resulting = composeEventResulting(ServiceContext, event);
 
-        await managedEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores)(Definition, event, metadata);
+        await operateEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores)(Definition, event, metadata);
       }
     }
 
