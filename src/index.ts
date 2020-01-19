@@ -46,10 +46,9 @@ export {
   IServiceContext,
   IServiceDefinition,
   IServiceIdentifier,
-  IServiceStateStores,
   IServiceStreamDefinition,
   IState,
+  IStateApplier,
   IStateHandler,
-  IStateStores,
   IValidationResultType,
 } from "atomservicescore";

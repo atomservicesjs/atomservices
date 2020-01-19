@@ -22,14 +22,10 @@ export const composeStateHandlers = (...stateHandlers: IStateHandler[]) =>
       }, {} as IStateHandlersMap);
 
       const HANDLERS: IStateHandlers = {
-        apply: async (events) => {
-          for (const event of events) {
-            const handler = HANDLERS_MAP[event.name];
-            await handler.apply(event);
-          }
+        apply: async (event) => {
+          const handler = HANDLERS_MAP[event.name];
+          await handler.apply(event);
         },
-        resolve: (event) =>
-          HANDLERS_MAP[event.name],
         type: () =>
           type,
       };

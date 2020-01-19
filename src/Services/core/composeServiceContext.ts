@@ -1,5 +1,12 @@
 import { IServiceContext, IServiceDefinition } from "atomservicescore";
 import { composeEventHandlers } from "../../Events/composeEventHandlers";
+import { composeStateApplier } from "../../States/composeStateApplier";
+import { composeStateHandlers } from "../../States/composeStateHandlers";
+
+import { ServicesNotifyData } from "../../Notifiers";
+import { LocalDirectStream } from "../../Streams/LocalDirectStream";
+import { MetadataRefiner } from "./MetadataRefiner";
+
 import {
   CurrentVersionQueryingErrorException,
   EventPublishingErrorException,
@@ -8,9 +15,6 @@ import {
   NoAllowedDynamicVersionErrorException,
   NoEventStoresProvidedException,
 } from "../../Exceptions/Core";
-import { ServicesNotifyData } from "../../Notifiers";
-import { LocalDirectStream } from "../../Streams/LocalDirectStream";
-import { MetadataRefiner } from "./MetadataRefiner";
 
 import { operateEventProcess } from "./operateEventProcess";
 
@@ -28,6 +32,8 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
   } = Definition;
 
   const EventHandlers = composeEventHandlers(...definition.EventHandlers)(type);
+  const StateHandlers = composeStateHandlers(...definition.StateHandlers)(type);
+  const StateApplier = composeStateApplier({ StateHandlers });
 
   return (options: { isReplay?: boolean; } = {}): IServiceContext => {
     const isReplay = options.isReplay || false;
@@ -86,7 +92,6 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
         // PREPARE
         const metadata = MetadataRefiner.dispatch({ isReplay });
         const processType = ServiceConfigurate.processType(event.name);
-        const ServiceStateStores: any = {};
 
         // SYNC PROCESS
         if (processType === "synchronous") {
@@ -94,7 +99,7 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
 
           if (EventHandler) {
             const resulting = (data: any) => LocalDirectStream.directTo(event._id, data);
-            await operateEventProcess(EventHandler, ServiceContext, resulting, Notifiers, ServiceStateStores)(Definition, event, metadata);
+            await operateEventProcess(EventHandler, StateApplier, ServiceContext, resulting, Notifiers)(Definition, event, metadata);
           }
         }
 
