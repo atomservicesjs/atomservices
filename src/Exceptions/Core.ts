@@ -67,10 +67,10 @@ export const EventPublishingErrorException = (error: Error, event: IEvent, scope
     },
   );
 
-export const NoAllowedDynamicVersionErrorException = (event: IEvent, scope: string) =>
+export const NotAllowedDynamicVersionErrorException = (event: IEvent, scope: string) =>
   createException(
-    Constants["000108_NoAllowedDynamicVersionError"],
-    `no versions events not allowed`,
+    Constants["000108_NotAllowedDynamicVersionError"],
+    `dynamic-version events not allowed`,
     {
       event,
       scope,

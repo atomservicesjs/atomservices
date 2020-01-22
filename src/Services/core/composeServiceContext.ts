@@ -1,4 +1,4 @@
-import { IServiceContext, IServiceDefinition } from "atomservicescore";
+import { IEvent, IServiceContext, IServiceDefinition } from "atomservicescore";
 import { composeEventHandlers } from "../../Events/composeEventHandlers";
 import { composeStateApplier } from "../../States/composeStateApplier";
 import { composeStateHandlers } from "../../States/composeStateHandlers";
@@ -12,13 +12,13 @@ import {
   EventPublishingErrorException,
   EventStoringErrorException,
   EventVersionConflictedConcurrentException,
-  NoAllowedDynamicVersionErrorException,
   NoEventStoresProvidedException,
+  NotAllowedDynamicVersionErrorException,
 } from "../../Exceptions/Core";
 
 import { operateEventProcess } from "./operateEventProcess";
 
-export const isEventVersionDefined = (eventVersion: any) => (eventVersion && eventVersion >= 0);
+export const isEventVersionDefined = (event: IEvent) => (event._version && event._version > 0);
 
 export const composeServiceContext = (definition: IServiceDefinition) => ((Definition) => {
   const {
@@ -60,12 +60,12 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
 
           const currentVersion = version;
 
-          if (!isEventVersionDefined(eventVersion)) {
+          if (!isEventVersionDefined(event)) {
             if (ServiceConfigurate.allowDynamicVersion(event.name)) {
               eventVersion = currentVersion + 1;
               event._version = eventVersion;
             } else {
-              throw NoAllowedDynamicVersionErrorException(event, scope);
+              throw NotAllowedDynamicVersionErrorException(event, scope);
             }
           }
 
@@ -79,12 +79,12 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
             throw EventVersionConflictedConcurrentException(event, currentVersion, scope);
           }
         } else {
-          if (!isEventVersionDefined(eventVersion)) {
+          if (!isEventVersionDefined(event)) {
             if (ServiceConfigurate.allowDynamicVersion(event.name)) {
               eventVersion = 1;
               event._version = eventVersion;
             } else {
-              throw NoAllowedDynamicVersionErrorException(event, scope);
+              throw NotAllowedDynamicVersionErrorException(event, scope);
             }
           }
         }
