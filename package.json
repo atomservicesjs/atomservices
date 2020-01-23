@@ -1,6 +1,6 @@
 {
   "name": "atomservices",
-  "version": "0.7.0-alpha.74",
+  "version": "0.7.0-alpha.75",
   "description": "Providing Library Implementing Events Architecture",
   "main": "./lib/index.js",
   "typings": "./typings/index.d.ts",
@@ -29,7 +29,7 @@
   "license": "MIT",
   "repository": "git+https://github.com/atomservicesjs/atomservices",
   "dependencies": {
-    "atomservicescore": "0.7.0-alpha.98",
+    "atomservicescore": "0.7.0-alpha.100",
     "uuid": "3.4.0"
   },
   "devDependencies": {
