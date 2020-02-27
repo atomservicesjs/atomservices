@@ -38,6 +38,8 @@ describe("mapHandlersEvents.ts tests", () => {
       const expected: any = [
         { name: "A", level: "Public" },
         { name: "B", level: "Scope" },
+        { name: "C", level: "Scope" },
+        { name: "D", level: "Public" },
       ];
 
       // acts
