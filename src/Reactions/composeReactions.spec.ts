@@ -15,9 +15,10 @@ describe("composeReactions.ts tests", () => {
       scope: "TEST",
       type: "Test",
     };
+    const type = "test";
 
     // acts
-    const result = composeReactions(reaction1, reaction2);
+    const result = composeReactions(reaction1, reaction2)(type);
 
     // asserts
     expect(result).to.be.an("object");
@@ -41,7 +42,8 @@ describe("composeReactions.ts tests", () => {
         scope: "Scope",
         type: "Type",
       };
-      const reactions = composeReactions(reaction1, reaction2, reaction3);
+      const type = "test";
+      const reactions = composeReactions(reaction1, reaction2, reaction3)(type);
       const event: any = {
         name: "Event_C",
         type: "Type",
@@ -72,7 +74,8 @@ describe("composeReactions.ts tests", () => {
         scope: "Scope",
         type: "Type",
       };
-      const reactions = composeReactions(reaction1, reaction2, reaction3);
+      const type = "test";
+      const reactions = composeReactions(reaction1, reaction2, reaction3)(type);
       const event: any = {
         name: "Event_A",
         type: "Type",
@@ -105,7 +108,8 @@ describe("composeReactions.ts tests", () => {
         scope: "Scope",
         type: "Type",
       };
-      const reactions = composeReactions(reaction1, reaction2, reaction3);
+      const type = "test";
+      const reactions = composeReactions(reaction1, reaction2, reaction3)(type);
       const callback = sinon.spy();
 
       // acts
@@ -117,6 +121,20 @@ describe("composeReactions.ts tests", () => {
       expect(callback.getCall(0).calledWith(reaction1)).to.equal(true);
       expect(callback.getCall(1).calledWith(reaction2)).to.equal(true);
       expect(callback.getCall(2).calledWith(reaction3)).to.equal(true);
+    });
+  });
+
+  describe("Reactions.forEach()", () => {
+    it("expect to callback with reaction", async () => {
+      // arranges
+      const type = "test";
+      const reactions = composeReactions()(type);
+
+      // acts
+      const result = reactions.type();
+
+      // asserts
+      expect(result).to.equal(type);
     });
   });
 });

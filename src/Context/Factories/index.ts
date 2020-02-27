@@ -1,13 +1,9 @@
-import { ServiceContextFactory } from "./ServiceContextFactory";
-import { ServiceEventStreamFactory } from "./ServiceEventStreamFactory";
+import { ServiceConfigurateFactory } from "./ServiceConfigurateFactory";
 import { ServiceIdentifierFactory } from "./ServiceIdentifierFactory";
-import { ServiceStreamLevelFactory } from "./ServiceStreamLevelFactory";
 
 export const Factories = {
-  ServiceContextFactory,
-  ServiceEventStreamFactory,
+  ServiceConfigurateFactory,
   ServiceIdentifierFactory,
-  ServiceStreamLevelFactory,
 };
 
 Object.freeze(Factories);

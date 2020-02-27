@@ -8,7 +8,7 @@ interface IEventHandlersMap {
 
 export const composeEventHandlers = (...eventHandlers: IEventHandler[]) =>
   (type: string): IEventHandlers =>
-    ((EventHandlers: IEventHandler[]): IEventHandlers => {
+    ((EventHandlers: IEventHandler[], Type): IEventHandlers => {
       const HANDLERS_MAP = EventHandlers.reduce((result: IEventHandlersMap, handler) => {
         const { name } = handler;
 
@@ -34,12 +34,12 @@ export const composeEventHandlers = (...eventHandlers: IEventHandler[]) =>
         resolve: (event) =>
           HANDLERS_MAP[event.name],
         type: () =>
-          type,
+          Type,
       };
 
       Object.freeze(HANDLERS);
 
       return HANDLERS;
-    })(eventHandlers);
+    })(eventHandlers, type);
 
 Object.freeze(composeEventHandlers);

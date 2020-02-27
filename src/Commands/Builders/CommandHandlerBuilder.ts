@@ -9,28 +9,29 @@ export const CommandHandlerBuilder = <Command extends ICommand = ICommand, Event
   },
 ): ICommandHandler<Command, Event> =>
   Object.defineProperties({}, {
-    hook: {
-      configurable: false,
-      enumerable: true,
-      value: composed.hook || {},
-      writable: false,
-    },
     name: {
       configurable: false,
       enumerable: true,
       value: composed.name,
       writable: false,
     },
-    transform: {
+    // tslint:disable-next-line: object-literal-sort-keys
+    hook: {
       configurable: false,
       enumerable: true,
-      value: composed.transform,
+      value: composed.hook || {},
       writable: false,
     },
     validate: {
       configurable: false,
       enumerable: true,
       value: composed.validate,
+      writable: false,
+    },
+    transform: {
+      configurable: false,
+      enumerable: true,
+      value: composed.transform,
       writable: false,
     },
   });

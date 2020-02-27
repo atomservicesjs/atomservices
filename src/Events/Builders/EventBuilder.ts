@@ -16,15 +16,18 @@ export const EventBuilder = <
     },
     payloads?: Payloads,
 ): IEvent<EventID, AggregateID> => {
-  let event: any = {
-    _createdAt: new Date(),
-  };
-
-  event = Object.defineProperties(event, {
+  let event = Object.defineProperties({}, {
     _id: {
       configurable: false,
       enumerable: true,
       value: composed.id,
+      writable: false,
+    },
+
+    _createdAt: {
+      configurable: false,
+      enumerable: true,
+      value: new Date(),
       writable: false,
     },
     _version: {

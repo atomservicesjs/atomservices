@@ -1,19 +1,37 @@
-import { DispatchResult as DispatchResultType, IEvent } from "atomservicescore";
+import { DispatchResult as DispatchResultType } from "atomservicescore";
 
 export const DispatchResult = {
-  accept: (event: IEvent, ext: { [key: string]: any; } = {}): DispatchResultType.IAcceptDispatchResult =>
+  accept: (
+    ref: {
+      _createdAt: Date;
+      _id: any;
+      _version: number;
+      aggregateID: any;
+      name: string;
+      type: string;
+    },
+    ext: { [key: string]: any; } = {},
+  ): DispatchResultType.IAcceptDispatchResult =>
     ({
       accept: true,
       ref: {
-        _createdAt: event._createdAt,
-        _id: event._id,
-        _version: event._version,
-        aggregateID: event.aggregateID,
-        name: event.name,
-        type: event.type,
+        _createdAt: ref._createdAt,
+        _id: ref._id,
+        _version: ref._version,
+        aggregateID: ref.aggregateID,
+        name: ref.name,
+        type: ref.type,
         ...ext,
       },
       status: "accepted",
+    }),
+  error: (type: string, name: string, error: Error): DispatchResultType.IErrorDispatchResult =>
+    ({
+      accept: false,
+      error,
+      name,
+      status: "error",
+      type,
     }),
   invalid: (invalidAttributes: any): DispatchResultType.IInvalidDispatchResult =>
     ({

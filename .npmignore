@@ -8,6 +8,7 @@
 # Files
 *.yml
 .gitignore
+.nycrc.json
 
 README.md
 tsconfig.json
