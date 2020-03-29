@@ -5,7 +5,7 @@ export const DispatchResult = {
     ref: {
       _createdAt: Date;
       _id: any;
-      _version: number;
+      _version: number | undefined;
       aggregateID: any;
       name: string;
       type: string;

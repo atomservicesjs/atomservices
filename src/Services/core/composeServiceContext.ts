@@ -46,45 +46,53 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
       directTo: (ref, data) =>
         EventStream.directTo(ref, data),
       dispatch: async (event) => {
-        let eventVersion = event._version;
+        const versioning = ServiceConfigurate.versioning(event.name);
+        let eventVersion: number | undefined;
 
-        // STORE EVENT
-        if (EventStores && !isReplay) {
-          let version: number;
+        // VERSIONING
+        if (versioning === "None") {
+          eventVersion = undefined;
+        } else {
+          eventVersion = event._version;
 
-          try {
-            version = (await EventStores.queryCurrentVersion(scope, type, event.aggregateID)).version;
-          } catch (error) {
-            throw CurrentVersionQueryingErrorException(error, event.aggregateID, type, scope);
-          }
+          // STORE EVENT
+          if (EventStores && !isReplay) {
+            let version: number;
 
-          const currentVersion = version;
-
-          if (!isEventVersionDefined(event)) {
-            if (ServiceConfigurate.allowDynamicVersion(event.name)) {
-              eventVersion = currentVersion + 1;
-              event._version = eventVersion;
-            } else {
-              throw NotAllowedDynamicVersionErrorException(event, scope);
-            }
-          }
-
-          if (currentVersion + 1 === eventVersion) {
             try {
-              await EventStores.storeEvent(scope, event);
+              version = (await EventStores.queryCurrentVersion(scope, type, event.aggregateID)).version;
             } catch (error) {
-              throw EventStoringErrorException(error, event, scope);
+              throw CurrentVersionQueryingErrorException(error, event.aggregateID, type, scope);
+            }
+
+            const currentVersion = version;
+
+            if (!isEventVersionDefined(event)) {
+              if (versioning === "Dynamic") {
+                eventVersion = currentVersion + 1;
+                event._version = eventVersion;
+              } else {
+                throw NotAllowedDynamicVersionErrorException(event, scope);
+              }
+            }
+
+            if (currentVersion + 1 === eventVersion) {
+              try {
+                await EventStores.storeEvent(scope, event);
+              } catch (error) {
+                throw EventStoringErrorException(error, event, scope);
+              }
+            } else {
+              throw EventVersionConflictedConcurrentException(event, currentVersion, scope);
             }
           } else {
-            throw EventVersionConflictedConcurrentException(event, currentVersion, scope);
-          }
-        } else {
-          if (!isEventVersionDefined(event)) {
-            if (ServiceConfigurate.allowDynamicVersion(event.name)) {
-              eventVersion = 1;
-              event._version = eventVersion;
-            } else {
-              throw NotAllowedDynamicVersionErrorException(event, scope);
+            if (!isEventVersionDefined(event)) {
+              if (versioning === "Dynamic") {
+                eventVersion = -1;
+                event._version = eventVersion;
+              } else {
+                throw NotAllowedDynamicVersionErrorException(event, scope);
+              }
             }
           }
         }
@@ -119,11 +127,6 @@ export const composeServiceContext = (definition: IServiceDefinition) => ((Defin
             _createdBy: event._createdBy,
             _version: eventVersion,
           }, { event }));
-
-          return {
-            id: event._id,
-            version: eventVersion,
-          };
         } catch (error) {
           throw EventPublishingErrorException(error, event, scope);
         }

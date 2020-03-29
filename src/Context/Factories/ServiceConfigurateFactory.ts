@@ -1,27 +1,21 @@
-import { EventProcessType, EventStream, IServiceConfigs, IServiceConfigurate } from "atomservicescore";
+import { EventProcessType, EventVersioning, EventStream, IServiceConfigs, IServiceConfigurate } from "atomservicescore";
 
-const DefaultAllowDynamicVersion: boolean = false;
+const DefaultVersioning: EventVersioning = "None";
 const DefaultLevel: EventStream.StreamLevel = "Public";
 const DefaultProcessType: EventProcessType = "asynchronous";
 
 export const ServiceConfigurateFactory = {
   create: (configs: IServiceConfigs): IServiceConfigurate => ((Configs): IServiceConfigurate => {
     const ServiceStream: IServiceConfigurate = {
-      allowDynamicVersion: (name) => {
-        const event = (Configs.events && Configs.events[name]) || {};
-
-        if (typeof event.allowDynamicVersion === "boolean") {
-          return event.allowDynamicVersion;
-        } else if (Configs.service && typeof Configs.service.allowDynamicVersion === "boolean") {
-          return Configs.service.allowDynamicVersion;
-        } else {
-          return DefaultAllowDynamicVersion;
-        }
-      },
       level: (name) => (Configs.events && Configs.events[name]) ?
-        (Configs.events[name].level || (Configs.service && Configs.service.level) || DefaultLevel) : DefaultLevel,
+        (Configs.events[name].level || (Configs.service && Configs.service.level) || DefaultLevel) :
+        (Configs.service && Configs.service.level) || DefaultLevel,
       processType: (name) => (Configs.events && Configs.events[name]) ?
-        (Configs.events[name].processType || (Configs.service && Configs.service.processType) || DefaultProcessType) : DefaultProcessType,
+        (Configs.events[name].processType || (Configs.service && Configs.service.processType) || DefaultProcessType) :
+        (Configs.service && Configs.service.processType) || DefaultProcessType,
+      versioning: (name) => (Configs.events && Configs.events[name]) ?
+        (Configs.events[name].versioning || (Configs.service && Configs.service.versioning) || DefaultVersioning) :
+        (Configs.service && Configs.service.versioning) || DefaultVersioning,
     };
 
     Object.freeze(ServiceStream);
