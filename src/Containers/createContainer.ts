@@ -21,6 +21,11 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
 
         NOTIFIERS.emit(ContainersNotifyData.CONTAINER_CONNECTED(CONTAINER.scope));
       },
+      composeDispatch: (type) => async (command, listening) => {
+        const service = SERVICES[type];
+
+        return service.dispatch(command, listening);
+      },
       dispatch: async (type, command, listening) => {
         const service = SERVICES[type];
 
