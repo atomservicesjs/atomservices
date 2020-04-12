@@ -27,14 +27,18 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
           IsConnected = true;
         }
       },
-      composeDispatch: (type, isAutoConnect = false) => async (command, listening) => {
-        if (isAutoConnect && !IsConnected) {
-          await Container.connect();
-        }
+      composeDispatch: (type, options: { isAutoConnect?: boolean; } = {}) => {
+        const { isAutoConnect = false } = options;
 
-        const service = SERVICES[type];
+        return async (command, listening) => {
+          if (isAutoConnect && !IsConnected) {
+            await Container.connect();
+          }
 
-        return service.dispatch(command, listening);
+          const service = SERVICES[type];
+
+          return service.dispatch(command, listening);
+        };
       },
       dispatch: async (type, command, listening) => {
         const service = SERVICES[type];
