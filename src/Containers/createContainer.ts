@@ -27,7 +27,7 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
           IsConnected = true;
         }
       },
-      composeDispatch: (type, options: { isAutoConnect?: boolean; } = {}) => {
+      composeDispatch: (type, options = {}) => {
         const { isAutoConnect = false } = options;
 
         return async (command, listening) => {
