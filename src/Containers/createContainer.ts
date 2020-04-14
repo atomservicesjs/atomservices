@@ -15,38 +15,44 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
       return result;
     }, {} as { [type: string]: IManagedService; });
 
-    let IsConnected = false;
+    const ResolveService = (type: string) => SERVICES[type];
+
 
     const Container: IManagedServiceContainer = {
-      connect: async () => {
-        if (!IsConnected) {
-          await Promise.all(Object.keys(SERVICES).map((type) => SERVICES[type].connect()));
+      connect: (() => {
+        let IsConnected = false;
 
-          NOTIFIERS.emit(ContainersNotifyData.CONTAINER_CONNECTED(CONTAINER.scope));
+        return async () => {
+          if (!IsConnected) {
+            await Promise.all(Object.keys(SERVICES).map((type) => SERVICES[type].connect()));
+            IsConnected = true;
 
-          IsConnected = true;
-        }
-      },
+            NOTIFIERS.emit(ContainersNotifyData.CONTAINER_CONNECTED(CONTAINER.scope));
+          }
+        };
+      })(),
       composeDispatch: (type, options = {}) => {
         const { isAutoConnect = false } = options;
 
         return async (command, listening) => {
-          if (isAutoConnect && !IsConnected) {
+          if (isAutoConnect) {
             await Container.connect();
           }
 
-          const service = SERVICES[type];
+          const service = ResolveService(type);
 
           return service.dispatch(command, listening);
         };
       },
       dispatch: async (type, command, listening) => {
-        const service = SERVICES[type];
+        const service = ResolveService(type);
 
         return service.dispatch(command, listening);
       },
       service: (type) =>
-        SERVICES[type],
+        ResolveService(type),
+      scope: () =>
+        CONTAINER.scope,
     };
 
     Object.freeze(Container);
