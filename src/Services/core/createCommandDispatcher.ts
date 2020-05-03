@@ -22,9 +22,11 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
           return DispatchResult.unhandled(type, name);
         } else {
           // #DISPATCH PROCESS: Apply COMMAND HOOK
+          /***** comment out
           if (CommandHandler.hook && CommandHandler.hook.command) {
             command = await CommandHandler.hook.command(command);
           }
+          */
 
           // #DISPATCH PROCESS: Validate Command
           const { invalidAttributes, isValid } = CommandHandler.validate(command);
@@ -34,12 +36,14 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
           }
 
           const ServiceContext = ServiceContextComposing({ isReplay: false });
-          let event = CommandHandler.transform(command, ServiceContext);
+          const event = CommandHandler.transform(command, ServiceContext);
 
           // #DISPATCH PROCESS: Apply EVENT HOOK
+          /***** comment out
           if (CommandHandler.hook && CommandHandler.hook.event) {
             event = await CommandHandler.hook.event(event);
           }
+          */
 
           // #DISPATCH PROCESS: Apply LISTENING
           if (listening) {
