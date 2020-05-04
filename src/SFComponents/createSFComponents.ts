@@ -5,9 +5,17 @@ import {
   IServiceIdentifier,
   IValidationResultType,
   EventHandler,
+  EventProcessType,
+  EventStream,
+  EventVersioning,
 } from "atomservicescore";
 
 export const createSFComponents = <Event extends IEvent = IEvent, Command extends ICommand = ICommand<Event["payloads"], Event["_createdBy"]>, ProcessResult = any>(structure: {
+  configs?: {
+    level?: EventStream.StreamLevel;
+    processType?: EventProcessType;
+    versioning?: EventVersioning;
+  };
   event: {
     name: string;
     process: EventHandler.EventProcessHandle<Event, ProcessResult>;
@@ -22,11 +30,17 @@ export const createSFComponents = <Event extends IEvent = IEvent, Command extend
     apply?: (event: Event) => Promise<void>;
   };
 }) => {
+  const configs = structure.configs || {};
   const commandStruct = structure.command || {};
   const eventStruct = structure.event;
   const stateStruct = structure.state || {};
 
   const components: ISFComponents<Event, Command> = {
+    Configs: {
+      level: configs.level,
+      processType: configs.processType,
+      versioning: configs.versioning,
+    },
     Commander: (props) => {
       const { _createdBy, _version, ...payloads } = props;
 
