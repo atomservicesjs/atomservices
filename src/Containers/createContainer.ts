@@ -2,13 +2,13 @@ import { IManagedService, IManagedServiceContainer, IServiceContainer } from "at
 import { composeNotifiers, ContainersNotifyData } from "../Notifiers";
 import { createService } from "../Services/createService";
 
-export const createContainer = (container: IServiceContainer): {
+export const createContainer = <C extends IServiceContainer>(container: C): {
   Container: IManagedServiceContainer;
-  Services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
+  Services: { [key in keyof C["Services"]]: IManagedService; };
 } =>
   ((CONTAINER): {
     Container: IManagedServiceContainer;
-    Services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
+    Services: { [key in keyof C["Services"]]: IManagedService; };
   } => {
     const ContainerNotifiers = CONTAINER.Notifiers || [];
     const NOTIFIERS = composeNotifiers(...ContainerNotifiers);
@@ -19,7 +19,7 @@ export const createContainer = (container: IServiceContainer): {
       result[type] = service;
 
       return result;
-    }, {} as { [type: string]: IManagedService; });
+    }, {} as { [key: string]: IManagedService; });
 
     const ResolveService = (type: string) => Services[type];
 
@@ -74,6 +74,6 @@ export const createContainer = (container: IServiceContainer): {
 
     return {
       Container,
-      Services,
+      Services: Services as { [key in keyof C["Services"]]: IManagedService; },
     };
   })(container);
