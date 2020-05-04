@@ -18,9 +18,13 @@ export const createSFComponents = <Event extends IEvent = IEvent, Command extend
     validate?: (command: Command) => IValidationResultType;
     transform?: (command: Command, identifier: IServiceIdentifier<Event["aggregateID"], Event["_id"]>) => Event;
   };
+  state?: {
+    apply?: (event: Event) => Promise<void>;
+  };
 }) => {
   const commandStruct = structure.command || {};
   const eventStruct = structure.event;
+  const stateStruct = structure.state || {};
 
   const components: ISFComponents<Event, Command> = {
     Commander: (props) => {
@@ -141,6 +145,14 @@ export const createSFComponents = <Event extends IEvent = IEvent, Command extend
       name: eventStruct.name,
       process: eventStruct.process,
       processEffect: eventStruct.processEffect,
+    },
+    StateHandler: {
+      name: eventStruct.name,
+      apply: async (event) => {
+        if (stateStruct.apply) {
+          await stateStruct.apply(event);
+        }
+      },
     },
   };
 
