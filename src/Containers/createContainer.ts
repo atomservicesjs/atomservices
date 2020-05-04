@@ -2,13 +2,19 @@ import { IManagedService, IManagedServiceContainer, IServiceContainer } from "at
 import { composeNotifiers, ContainersNotifyData } from "../Notifiers";
 import { createService } from "../Services/createService";
 
-export const createContainer = (container: IServiceContainer): IManagedServiceContainer =>
-  ((CONTAINER): IManagedServiceContainer => {
+export const createContainer = (container: IServiceContainer): {
+  container: IManagedServiceContainer;
+  services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
+} =>
+  ((CONTAINER): {
+    container: IManagedServiceContainer;
+    services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
+  } => {
     const ContainerNotifiers = CONTAINER.Notifiers || [];
     const NOTIFIERS = composeNotifiers(...ContainerNotifiers);
 
-    const SERVICES = CONTAINER.Services.reduce((result, SERVICE) => {
-      const service = createService(SERVICE, CONTAINER);
+    const SERVICES = Object.keys(CONTAINER.Services).reduce((result, key) => {
+      const service = createService(CONTAINER.Services[key], CONTAINER);
       const type = service.type();
       result[type] = service;
 
@@ -16,7 +22,6 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
     }, {} as { [type: string]: IManagedService; });
 
     const ResolveService = (type: string) => SERVICES[type];
-
 
     const Container: IManagedServiceContainer = {
       connect: (() => {
@@ -67,5 +72,8 @@ export const createContainer = (container: IServiceContainer): IManagedServiceCo
       },
     }));
 
-    return Container;
+    return {
+      container: Container,
+      services: SERVICES,
+    };
   })(container);

@@ -43,10 +43,19 @@ export const createService = (service: IService, container?: IServiceContainer):
   };
 
   definition = Object.keys(SFC).reduce((result, key) => {
-    const { CommandHandler, EventHandler } = SFC[key];
+    const { Configs, CommandHandler, EventHandler, StateHandler } = SFC[key];
+
+    if (definition.configs.events) {
+      definition.configs.events[EventHandler.name] = Configs;
+    } else {
+      definition.configs.events = {
+        [EventHandler.name]: Configs,
+      };
+    }
 
     definition.CommandHandlers.push(CommandHandler);
     definition.EventHandlers.push(EventHandler);
+    definition.StateHandlers.push(StateHandler);
 
     return result;
   }, definition);
