@@ -3,17 +3,17 @@ import { composeNotifiers, ContainersNotifyData } from "../Notifiers";
 import { createService } from "../Services/createService";
 
 export const createContainer = (container: IServiceContainer): {
-  container: IManagedServiceContainer;
-  services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
+  Container: IManagedServiceContainer;
+  Services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
 } =>
   ((CONTAINER): {
-    container: IManagedServiceContainer;
-    services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
+    Container: IManagedServiceContainer;
+    Services: { [type in keyof IServiceContainer["Services"]]: IManagedService; };
   } => {
     const ContainerNotifiers = CONTAINER.Notifiers || [];
     const NOTIFIERS = composeNotifiers(...ContainerNotifiers);
 
-    const SERVICES = Object.keys(CONTAINER.Services).reduce((result, key) => {
+    const Services = Object.keys(CONTAINER.Services).reduce((result, key) => {
       const service = createService(CONTAINER.Services[key], CONTAINER);
       const type = service.type();
       result[type] = service;
@@ -21,7 +21,7 @@ export const createContainer = (container: IServiceContainer): {
       return result;
     }, {} as { [type: string]: IManagedService; });
 
-    const ResolveService = (type: string) => SERVICES[type];
+    const ResolveService = (type: string) => Services[type];
 
     const Container: IManagedServiceContainer = {
       connect: (() => {
@@ -29,7 +29,7 @@ export const createContainer = (container: IServiceContainer): {
 
         return async () => {
           if (!IsConnected) {
-            await Promise.all(Object.keys(SERVICES).map((type) => SERVICES[type].connect()));
+            await Promise.all(Object.keys(Services).map((type) => Services[type].connect()));
             IsConnected = true;
 
             NOTIFIERS.emit(ContainersNotifyData.CONTAINER_CONNECTED(CONTAINER.scope));
@@ -73,7 +73,7 @@ export const createContainer = (container: IServiceContainer): {
     }));
 
     return {
-      container: Container,
-      services: SERVICES,
+      Container,
+      Services,
     };
   })(container);
