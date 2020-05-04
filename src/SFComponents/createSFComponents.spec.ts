@@ -22,7 +22,6 @@ describe("createSFComponents.ts tests", () => {
 
   describe("#Commander", () => {
     const { Commander } = createSFComponents({
-      type,
       event: {
         name: eventName,
         process: async (event: ITestedEvent, metadata, state) => {
@@ -81,7 +80,6 @@ describe("createSFComponents.ts tests", () => {
     let now: Date;
 
     const { Commander, CommandHandler } = createSFComponents({
-      type,
       event: {
         name: eventName,
         process: async (event: ITestedEvent, metadata, state) => {
@@ -182,7 +180,6 @@ describe("createSFComponents.ts tests", () => {
     let now: Date;
 
     const { Commander, CommandHandler } = createSFComponents<ITestedEvent>({
-      type,
       event: {
         name: eventName,
         process: async (event, metadata, state) => {
@@ -193,7 +190,7 @@ describe("createSFComponents.ts tests", () => {
         name: commandName,
         transform: (command, identifier) => ({
           _id: identifier.EventID(),
-          type,
+          type: identifier.type(),
           name: eventName,
           aggregateID: identifier.AggregateID(),
           payloads: command.payloads,

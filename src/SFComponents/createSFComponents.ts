@@ -8,7 +8,6 @@ import {
 import { ISFComponents } from "./ISFComponents";
 
 export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult = any>(structure: {
-  type: string;
   event: {
     name: string;
     process: EventHandler.EventProcessHandle<Event, ProcessResult>;
@@ -20,7 +19,6 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
     transform?: (command: ICommand<Event["payloads"], Event["_createdBy"]>, identifier: IServiceIdentifier<Event["aggregateID"], Event["_id"]>) => Event;
   };
 }) => {
-  const typeStruct = structure.type;
   const commandStruct = structure.command || {};
   const eventStruct = structure.event;
 
@@ -85,7 +83,7 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
             type: {
               configurable: false,
               enumerable: true,
-              value: typeStruct,
+              value: identifier.type(),
               writable: false,
             },
             name: {
