@@ -13,6 +13,7 @@ export const createService = (service: IService, container?: IServiceContainer):
   const {
     CommandHandlers = [],
     EventHandlers = [],
+    SFC = {},
     StateHandlers = [],
     Reactions = [],
     EventStores = (CONTAINER && CONTAINER.EventStores),
@@ -26,7 +27,7 @@ export const createService = (service: IService, container?: IServiceContainer):
   const ServiceNotifiers = SERVICE.Notifiers || [];
   const NOTIFIERS = composeNotifiers(...ServiceNotifiers, ...ContainerNotifiers);
 
-  const definition: IServiceDefinition = {
+  let definition: IServiceDefinition = {
     CommandHandlers,
     EventHandlers,
     EventStores,
@@ -40,6 +41,15 @@ export const createService = (service: IService, container?: IServiceContainer):
     scope,
     type,
   };
+
+  definition = Object.keys(SFC).reduce((result, key) => {
+    const { CommandHandler, EventHandler } = SFC[key];
+
+    definition.CommandHandlers.push(CommandHandler);
+    definition.EventHandlers.push(EventHandler);
+
+    return result;
+  }, definition);
 
   const CommandDispatcher = createCommandDispatcher(definition);
 

@@ -1,13 +1,13 @@
 import {
   ICommand,
   IEvent,
+  ISFComponents,
   IServiceIdentifier,
   IValidationResultType,
   EventHandler,
 } from "atomservicescore";
-import { ISFComponents } from "./ISFComponents";
 
-export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult = any>(structure: {
+export const createSFComponents = <Event extends IEvent = IEvent, Command extends ICommand = ICommand<Event["payloads"], Event["_createdBy"]>, ProcessResult = any>(structure: {
   event: {
     name: string;
     process: EventHandler.EventProcessHandle<Event, ProcessResult>;
@@ -15,17 +15,14 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
   };
   command?: {
     name?: string;
-    validate?: (command: ICommand<Event["payloads"], Event["_createdBy"]>) => IValidationResultType;
-    transform?: (command: ICommand<Event["payloads"], Event["_createdBy"]>, identifier: IServiceIdentifier<Event["aggregateID"], Event["_id"]>) => Event;
+    validate?: (command: Command) => IValidationResultType;
+    transform?: (command: Command, identifier: IServiceIdentifier<Event["aggregateID"], Event["_id"]>) => Event;
   };
 }) => {
   const commandStruct = structure.command || {};
   const eventStruct = structure.event;
 
-  const command = commandStruct.name || eventStruct.name;
-  const event = eventStruct.name;
-
-  const components: ISFComponents<Event> = {
+  const components: ISFComponents<Event, Command> = {
     Commander: (props) => {
       const { _createdBy, _version, ...payloads } = props;
 
@@ -33,7 +30,7 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
         name: {
           configurable: false,
           enumerable: true,
-          value: command,
+          value: (structure.command && structure.command.name) || structure.event.name,
           writable: false,
         },
         payloads: {
@@ -65,15 +62,15 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
       return Object.defineProperties({}, properties);
     },
     CommandHandler: {
-      name: command,
-      transform: (cmd, identifier) => {
+      name: commandStruct.name || eventStruct.name,
+      transform: (command, identifier) => {
         if (commandStruct.transform) {
-          return commandStruct.transform(cmd, identifier);
+          return commandStruct.transform(command, identifier);
         } else {
-          const { aggregateID, ...payloads } = cmd.payloads;
+          const { aggregateID, ...payloads } = command.payloads;
           const AggregateID = aggregateID || identifier.AggregateID()
 
-          const properties: any = {
+          const eventProperties: any = {
             _id: {
               configurable: false,
               enumerable: true,
@@ -89,7 +86,7 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
             name: {
               configurable: false,
               enumerable: true,
-              value: event,
+              value: eventStruct.name,
               writable: false,
             },
             aggregateID: {
@@ -113,26 +110,26 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
             _createdBy: {
               configurable: false,
               enumerable: true,
-              value: cmd._createdBy || AggregateID,
+              value: command._createdBy || AggregateID,
               writable: false,
             },
           };
 
-          if (cmd._version) {
-            properties._version = {
+          if (command._version) {
+            eventProperties._version = {
               configurable: false,
               enumerable: true,
-              value: cmd._version,
+              value: command._version,
               writable: false,
             };
           }
 
-          return Object.defineProperties({}, properties);
+          return Object.defineProperties({}, eventProperties);
         }
       },
-      validate: (cmd) => {
+      validate: (command) => {
         if (commandStruct.validate) {
-          return commandStruct.validate(cmd);
+          return commandStruct.validate(command);
         } else {
           return {
             isValid: true,
@@ -141,7 +138,7 @@ export const createSFComponents = <Event extends IEvent = IEvent, ProcessResult 
       },
     },
     EventHandler: {
-      name: event,
+      name: eventStruct.name,
       process: eventStruct.process,
       processEffect: eventStruct.processEffect,
     },

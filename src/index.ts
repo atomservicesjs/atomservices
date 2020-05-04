@@ -29,6 +29,7 @@ export {
   INotifier,
   INotifyLog,
   INotifyObject,
+  ISFComponents,
   IService,
   IServiceContainer,
   IServiceConfigs,

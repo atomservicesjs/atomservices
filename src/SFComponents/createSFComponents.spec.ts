@@ -1,13 +1,16 @@
 import { expect } from "chai";
 import * as sinon from "sinon";
-import { IEvent } from "atomservicescore";
+import { ICommand, IEvent } from "atomservicescore";
 import { createSFComponents } from "./createSFComponents";
+
+interface ITestedCommand extends ICommand<{
+  text: string;
+}> { }
 
 interface ITestedEvent extends IEvent<{
   inPayloadsText: string;
   inPayloadsNumber: number;
-}> {
-}
+}> { }
 
 const type = "InUnitTestType";
 const Identifier = {
@@ -21,57 +24,113 @@ describe("createSFComponents.ts tests", () => {
   const commandName = "TestCommand";
 
   describe("#Commander", () => {
-    const { Commander } = createSFComponents({
-      event: {
-        name: eventName,
-        process: async (event: ITestedEvent, metadata, state) => {
-          state.apply(event);
+    describe("with default command", () => {
+      const { Commander } = createSFComponents<ITestedEvent>({
+        event: {
+          name: eventName,
+          process: async (event, metadata, state) => {
+            state.apply(event);
+          },
         },
-      },
-    });
-
-    it("expect to create a commander from event", () => {
-      // arranges
-      const expected = {
-        name: eventName,
-        payloads: {
-          inPayloadsText: "text",
-          inPayloadsNumber: 0,
-        },
-      };
-
-      // acts
-      const result = Commander({
-        inPayloadsText: "text",
-        inPayloadsNumber: 0,
       });
 
-      // asserts
-      expect(result).to.deep.equal(expected);
-    });
+      it("expect to create a commander from event", () => {
+        // arranges
+        const expected = {
+          name: eventName,
+          payloads: {
+            inPayloadsText: "text",
+            inPayloadsNumber: 0,
+          },
+        };
 
-    it("expect to create a commander from event with passing properties", () => {
-      // arranges
-      const expected = {
-        name: eventName,
-        payloads: {
+        // acts
+        const result = Commander({
           inPayloadsText: "text",
           inPayloadsNumber: 0,
-        },
-        _createdBy: "creater",
-        _version: 1,
-      };
+        });
 
-      // acts
-      const result = Commander({
-        inPayloadsText: "text",
-        inPayloadsNumber: 0,
-        _createdBy: "creater",
-        _version: 1,
+        // asserts
+        expect(result).to.deep.equal(expected);
       });
 
-      // asserts
-      expect(result).to.deep.equal(expected);
+      it("expect to create a commander from event with passing properties", () => {
+        // arranges
+        const expected = {
+          name: eventName,
+          payloads: {
+            inPayloadsText: "text",
+            inPayloadsNumber: 0,
+          },
+          _createdBy: "creater",
+          _version: 1,
+        };
+
+        // acts
+        const result = Commander({
+          inPayloadsText: "text",
+          inPayloadsNumber: 0,
+          _createdBy: "creater",
+          _version: 1,
+        });
+
+        // asserts
+        expect(result).to.deep.equal(expected);
+      });
+    });
+
+    describe("with provided command", () => {
+      const { Commander } = createSFComponents<ITestedEvent, ITestedCommand>({
+        event: {
+          name: eventName,
+          process: async (event, metadata, state) => {
+            state.apply(event);
+          },
+        },
+        command: {
+          name: commandName,
+        },
+      });
+
+      it("expect to create a commander from event", () => {
+        // arranges
+        const expected = {
+          name: commandName,
+          payloads: {
+            text: "text",
+          },
+        };
+
+        // acts
+        const result = Commander({
+          text: "text",
+        });
+
+        // asserts
+        expect(result).to.deep.equal(expected);
+      });
+
+      it("expect to create a commander from event with passing properties", () => {
+        // arranges
+        const expected = {
+          name: commandName,
+          payloads: {
+            text: "text",
+          },
+          _createdBy: "creater",
+          _version: 1,
+        };
+
+        // acts
+        const result = Commander({
+          text: "text",
+          _createdBy: "creater",
+          _version: 1,
+        });
+
+        // asserts
+        expect(result).to.deep.equal(expected);
+      });
     });
   });
 
