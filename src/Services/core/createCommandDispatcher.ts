@@ -18,16 +18,9 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
         const CommandHandler = CommandHandlers.resolve(command);
 
         if (CommandHandler === undefined) {
-
+          // #UNHANDLED: Command Handler
           return DispatchResult.unhandled(type, name);
         } else {
-          // #DISPATCH PROCESS: Apply COMMAND HOOK
-          /***** comment out
-          if (CommandHandler.hook && CommandHandler.hook.command) {
-            command = await CommandHandler.hook.command(command);
-          }
-          */
-
           // #DISPATCH PROCESS: Validate Command
           const { invalidAttributes, isValid } = CommandHandler.validate(command);
 
@@ -37,13 +30,6 @@ export const createCommandDispatcher = (definition: IServiceDefinition): IComman
 
           const ServiceContext = ServiceContextComposing({ isReplay: false });
           const event = CommandHandler.transform(command, ServiceContext);
-
-          // #DISPATCH PROCESS: Apply EVENT HOOK
-          /***** comment out
-          if (CommandHandler.hook && CommandHandler.hook.event) {
-            event = await CommandHandler.hook.event(event);
-          }
-          */
 
           // #DISPATCH PROCESS: Apply LISTENING
           if (listening) {

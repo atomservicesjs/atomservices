@@ -2,14 +2,8 @@ import { IManagedService, IManagedServiceContainer, IServiceContainer } from "at
 import { composeNotifiers, ContainersNotifyData } from "../Notifiers";
 import { createService } from "../Services/createService";
 
-export const createContainer = <C extends IServiceContainer>(container: C): {
-  Container: IManagedServiceContainer;
-  Services: { [key in keyof C["Services"]]: IManagedService; };
-} =>
-  ((CONTAINER): {
-    Container: IManagedServiceContainer;
-    Services: { [key in keyof C["Services"]]: IManagedService; };
-  } => {
+export const createContainer = (container: IServiceContainer): IManagedServiceContainer =>
+  ((CONTAINER): IManagedServiceContainer => {
     const ContainerNotifiers = CONTAINER.Notifiers || [];
     const NOTIFIERS = composeNotifiers(...ContainerNotifiers);
 
@@ -72,8 +66,5 @@ export const createContainer = <C extends IServiceContainer>(container: C): {
       },
     }));
 
-    return {
-      Container,
-      Services: Services as { [key in keyof C["Services"]]: IManagedService; },
-    };
+    return Container;
   })(container);

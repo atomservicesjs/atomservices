@@ -1,6 +1,6 @@
 {
   "name": "atomservices",
-  "version": "0.8.0-alpha.22",
+  "version": "0.8.0-alpha.23",
   "description": "Providing Library Implementing Events Architecture",
   "main": "./lib/index.js",
   "typings": "./typings/index.d.ts",
